@@ -7,6 +7,11 @@ export interface Recorde {
   templateId: string;
 }
 
+export interface RecordLink {
+  fromRecordId: string;
+  toRecordId: string;
+}
+
 export type RecordNew = Omit<Recorde, "id">;
 
 export interface RecordFiltering {
@@ -40,6 +45,9 @@ export function createRandomRecord(): Recorde {
     creatorId: "user-1",
   };
 }
+
+
+
 
 export interface RecordApi {
   createRecord(recordNew: RecordNew): Promise<Recorde>;

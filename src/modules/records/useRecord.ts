@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { RecordContext, RecordStatus } from "./components/Record";
-import { Recorde } from "./record";
+import { RecordLink, Recorde } from "./record";
+import { RecordContext, RecordStatus } from "./record-context";
 
 interface UseRecord {
   status: RecordStatus;
@@ -14,5 +14,8 @@ export const useRecord = (): UseRecord => {
     throw new Error();
   }
 
-  return { record: context.record, status: context.status };
+  return {
+    record: context.record,
+    status: context.status,
+  };
 };

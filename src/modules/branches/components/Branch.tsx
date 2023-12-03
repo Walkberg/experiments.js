@@ -1,7 +1,8 @@
 import { useBranch } from "../useBranch";
-import { Record, RecordProvider } from "@/modules/records/components/Record";
+import { Record } from "@/modules/records/components/Record";
 import { BranchRecordAdd } from "./BranchRecordAdd";
 import { RecordActions } from "@/modules/records/components/RecordActions";
+import { RecordProvider } from "@/modules/records/record-context";
 
 export const Branch = () => {
   const { branch, status } = useBranch();

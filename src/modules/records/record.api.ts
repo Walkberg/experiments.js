@@ -2,6 +2,7 @@ import { delay } from "@/utils/delay";
 import {
   RecordApi,
   RecordFiltering,
+  RecordLink,
   RecordNew,
   Recorde,
   createRandomRecord,
@@ -23,6 +24,8 @@ export class RecordApiImpl implements RecordApi {
     await delay(1000);
     return createRandomRecord();
   }
+
+ 
 }
 
 
