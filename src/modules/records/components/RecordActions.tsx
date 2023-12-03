@@ -17,12 +17,15 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useBranch } from "@/modules/branches/useBranch";
 
 interface RecordActionsProps {
   recordId: string;
 }
 
 export const RecordActions = ({ recordId }: RecordActionsProps) => {
+  const { removeRecord } = useBranch();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,9 +37,9 @@ export const RecordActions = ({ recordId }: RecordActionsProps) => {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => removeRecord(recordId)}>
             <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <span>Remove record</span>
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>

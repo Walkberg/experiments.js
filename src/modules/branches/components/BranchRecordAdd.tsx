@@ -3,29 +3,22 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
 import { useBranch } from "../useBranch";
 import { RecordCreateOrSearch } from "@/modules/records/components/RecordCreateOrSearch";
-import { BranchApiImpl } from "../branch.api";
 
-const branchApi = new BranchApiImpl();
+interface BranchRecordAddProps {}
 
-interface BranchRecordAddProps {
-  branchId: string;
-}
-
-export const BranchRecordAdd = ({ branchId }: BranchRecordAddProps) => {
-  const { branch } = useBranch(branchId);
+export const BranchRecordAdd = ({}: BranchRecordAddProps) => {
+  const { branch, addRecord } = useBranch();
 
   const [open, setOpen] = useState(false);
 
   const handleAddBranchRecord = async (recordId: string) => {
-    // do server logic recordId, branchId
-
-    try {
-      await branchApi.createBranchRecord({ branchId, recordId });
-      setOpen(false);
-    } catch (e) {
-      // handle eeror
-    }
+    await addRecord(recordId);
+    setOpen(false);
   };
+
+  if (branch == null) {
+    return;
+  }
 
   const canHadMoreRecord =
     branch.config.creation.maxRecordCount > branch.recordIds.length;

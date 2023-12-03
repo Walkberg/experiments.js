@@ -18,6 +18,11 @@ export class RecordApiImpl implements RecordApi {
     await delay(1000);
     return createRandomRecords();
   }
+
+  async getRecord(recordId: string): Promise<Recorde> {
+    await delay(1000);
+    return createRandomRecord();
+  }
 }
 
 
