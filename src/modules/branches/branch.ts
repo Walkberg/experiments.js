@@ -43,7 +43,7 @@ export function createApiBranch(): ShortBranch {
   return {
     id: "test",
     name: "Vendeur",
-    recordIds: ["record-1", "record-1"],
+    recordIds: ["record-fdsfds", "record-1"],
     configId: "config-1",
   };
 }
@@ -63,7 +63,7 @@ export interface BranchApi {
   createBranchRecord: (branchRecordNew: RecordBranchNew) => Promise<void>;
 }
 
-const vendeurConfig: BranchConfig = {
+export const vendeurConfig: BranchConfig = {
   id: "branch-vendeur",
   type: "vendeur",
   acceptedTemplateIds: [],

@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { RecordDetail } from "./RecordDetail";
 import { Dialog } from "@radix-ui/react-dialog";
 import { DialogContent } from "@/components/ui/dialog";
-import { Recorde, createRandomRecord } from "../record";
+import { Recorde } from "../record";
 import { useRecord } from "../useRecord";
 import { RecordApiImpl } from "../record.api";
 
@@ -59,10 +59,13 @@ export const RecordProvider = ({ recordId, children }: BranchProviderProps) => {
   useEffect(() => {
     const fetchRecord = async () => {
       setStatus("loading");
-      const record = await recordApi.getRecord(recordId);
-      setRecord(record);
-
-      setStatus("success");
+      try {
+        const record = await recordApi.getRecord(recordId);
+        setRecord(record);
+        setStatus("success");
+      } catch (e) {
+        setStatus("error");
+      }
     };
 
     fetchRecord();
