@@ -10,7 +10,6 @@ interface RecordDetailProps {
 export const RecordDetail = ({ recordId }: RecordDetailProps) => {
   return (
     <div>
-      RecordDetail {recordId}
       <RecordForm config={personnePhysiqueConfig.form} />
       <LinkProvider recordId={recordId}>
         <RecordLink />

@@ -16,12 +16,12 @@ export class RecordApiImpl implements RecordApi {
   }
 
   async getRecords(filtering: RecordFiltering): Promise<Recorde[]> {
-    await delay(1000);
+    await delay(300);
     return createRandomRecords();
   }
 
   async getRecord(recordId: string): Promise<Recorde> {
-    await delay(1000);
+    await delay(200);
     return createRandomRecord();
   }
 

@@ -4,7 +4,7 @@ import { getRandomInt } from "@/utils/random";
 
 export class LinkApiImpl implements LinkApi {
   async getLinks(filtering: LinkFiltering): Promise<Link[]> {
-    await delay(1000);
+    await delay(200);
     return createRecordLinks();
   }
 }
