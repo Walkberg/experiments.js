@@ -1,24 +1,6 @@
 import "./App.css";
-import { Button } from "./components/ui/button";
-import {
-  Outlet,
-  Route,
-  RouterProvider,
-  createBrowserRouter,
-  createRoutesFromElements,
-} from "react-router-dom";
-import { RedactionPage } from "./modules/redaction/page/RedactionPage";
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<Test />}>
-      <Route path="dashboard" element={<Cool />} />
-      <Route path="mynotary" >
-        <Route path="redaction" element={<RedactionPage />} />
-      </Route>
-    </Route>
-  )
-);
+import { RouterProvider } from "react-router-dom";
+import { router } from "./app/router";
 
 function App() {
   return (
@@ -29,20 +11,3 @@ function App() {
 }
 
 export default App;
-
-function Test() {
-  return (
-    <>
-      <Outlet />
-    </>
-  );
-}
-
-function Cool() {
-  return (
-    <>
-      cool
-      <Button>Bonjour</Button>
-    </>
-  );
-}

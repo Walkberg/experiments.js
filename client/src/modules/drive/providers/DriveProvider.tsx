@@ -1,0 +1,107 @@
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { DriveDocument, DriveFolder, DriveFolderNew } from "../drive";
+
+interface DriveContextType {
+  id: string;
+  documents: DriveDocument[];
+  folders: DriveFolder[];
+  addFolder: (newFolder: DriveFolderNew) => void;
+}
+
+const DriveContext = createContext<DriveContextType | null>(null);
+
+interface DriveProviderProps {
+  children: ReactNode;
+}
+
+export const DriveProvider = ({ children }: DriveProviderProps) => {
+  const [folders, setFolders] = useState<DriveFolder[]>([]);
+  const [documents, setDocuments] = useState<DriveDocument[]>([]);
+
+  useEffect(() => {
+    setFolders(defaultFolders);
+  }, []);
+
+  useEffect(() => {
+    setDocuments(defaultDocuments);
+  }, []);
+
+  const addFolder = (folderNew: DriveFolderNew) => {
+    const newFolder = { ...folderNew, id: "a" };
+    setFolders((prev) => [...prev, newFolder]);
+  };
+
+  return (
+    <DriveContext.Provider value={{ id: "3", documents, folders, addFolder }}>
+      {children}
+    </DriveContext.Provider>
+  );
+};
+
+export function useFolders(): DriveFolder[] {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.folders;
+}
+
+export function useAddFolder() {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.addFolder;
+}
+
+export function useFolder(folderId: string): DriveFolder | undefined {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.folders.find((folder) => folder.id === folderId);
+}
+
+export function useDocuments(): DriveDocument[] {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.documents;
+}
+
+export function useDocument(documentId: string): DriveDocument | undefined {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.documents.find((document) => document.id === documentId);
+}
+
+const defaultFolders: DriveFolder[] = [
+  { id: "folder-1", name: "folder 1" },
+  { id: "folder-2", name: "folder 2" },
+  { id: "folder-3", name: "folder 3" },
+];
+
+const defaultDocuments: DriveDocument[] = [
+  { id: "Adezc", name: "document-1" },
+  { id: "fds", name: "document-2" },
+  { id: "dfs", name: "document-3" },
+];

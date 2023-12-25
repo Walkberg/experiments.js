@@ -118,64 +118,8 @@ export const useOthers = () => {
       if (socket.id !== data.connectionId) {
         setOthers((oldOthers) =>
           oldOthers.map((other) =>
-            other.connectionId === data.connectionId
-              ? { ...other, presence: data.presence }
-              : other
-          )
-        );
-      }
-    });
-
-    export const useOthers = () => {
-  const [others, setOthers] = useState<Other[]>([]);
-  const { socket } = useSocket();
-
-  useEffect(() => {
-    if (socket == null) {
-      return;
-    }
-
-    socket.on("user-joined", (message) => {
-      if (socket.id !== message.connectionId) {
-        setOthers((oldOther) => [
-          ...oldOther,
-          { connectionId: message.connectionId, presence: { cursor: null } },
-        ]);
-      }
-    });
-
-    return () => {
-      socket.off("user-joined");
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    if (socket == null) {
-      return;
-    }
-
-    socket.on("user-left", (data) => {
-      setOthers((others) =>
-        others.filter((other) => other.connectionId === data.connectionId)
-      );
-    });
-
-    return () => {
-      socket.off("user-left");
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    if (socket == null) {
-      return;
-    }
-
-    socket.on("presence-updated", (data: PresenceUpdated) => {
-     
-      if (socket.id !== data.connectionId) {
-        setOthers((oldOthers) =>
-          oldOthers.map((other) =>
-            other.connectionId === data.connectionId
+            other.connectionId === data.connectionId  
+            
               ? { ...other, presence: data.presence }
               : other
           )
@@ -187,18 +131,7 @@ export const useOthers = () => {
       socket.off("presence-updated");
     };
   }, [socket]);
-
   
-
-  return others;
-};
-
-    return () => {
-      socket.off("presence-updated");
-    };
-  }, [socket]);
-
-
 
   return others;
 };
