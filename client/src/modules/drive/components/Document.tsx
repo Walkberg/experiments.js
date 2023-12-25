@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { useDocument } from "../providers/DriveProvider";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { GripVertical } from "lucide-react";
 import { useHover } from "@/app/hooks/useHover";
