@@ -6,6 +6,8 @@ import {
   useState,
 } from "react";
 import { DriveDocument, DriveFolder, DriveFolderNew } from "../drive";
+import { DriveSearchProvider } from "./DriveSearchProvider";
+import { v4 as uuidv4 } from "uuid";
 
 interface DriveContextType {
   id: string;
@@ -17,10 +19,11 @@ interface DriveContextType {
 const DriveContext = createContext<DriveContextType | null>(null);
 
 interface DriveProviderProps {
+  driveId: string;
   children: ReactNode;
 }
 
-export const DriveProvider = ({ children }: DriveProviderProps) => {
+export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
   const [folders, setFolders] = useState<DriveFolder[]>([]);
   const [documents, setDocuments] = useState<DriveDocument[]>([]);
 
@@ -33,13 +36,15 @@ export const DriveProvider = ({ children }: DriveProviderProps) => {
   }, []);
 
   const addFolder = (folderNew: DriveFolderNew) => {
-    const newFolder = { ...folderNew, id: "a" };
+    const newFolder = { ...folderNew, id: uuidv4() };
     setFolders((prev) => [...prev, newFolder]);
   };
 
   return (
-    <DriveContext.Provider value={{ id: "3", documents, folders, addFolder }}>
-      {children}
+    <DriveContext.Provider
+      value={{ id: driveId, documents, folders, addFolder }}
+    >
+      <DriveSearchProvider>{children}</DriveSearchProvider>
     </DriveContext.Provider>
   );
 };

@@ -10,6 +10,7 @@ import {
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { FolderActions } from "./FolderActions";
+import { useSearch } from "../providers/DriveSearchProvider";
 
 interface FolderProps {
   folderId: string;
@@ -18,9 +19,10 @@ interface FolderProps {
 export const Folder = ({ folderId }: FolderProps) => {
   const [isOpened, setIsOpened] = useState(false);
 
+  const { search } = useSearch();
   const folder = useFolder(folderId);
 
-  if (folder == null) {
+  if (folder == null || !folder.name.includes(search)) {
     return null;
   }
 

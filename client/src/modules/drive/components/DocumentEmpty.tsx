@@ -1,3 +1,3 @@
 export const DocumentEmpty = () => {
-  return <div>empty result</div>;
+  return <div className="flex justify-center items-center">empty result</div>;
 };

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { GripVertical } from "lucide-react";
 import { useHover } from "@/app/hooks/useHover";
+import { useSearch } from "../providers/DriveSearchProvider";
 
 interface DocumentProps {
   documentId: string;
@@ -15,7 +16,13 @@ export const Document = ({ documentId }: DocumentProps) => {
 
   const document = useDocument(documentId);
 
+  const { search } = useSearch();
+
   if (document == null) {
+    return null;
+  }
+
+  if (!document.name.includes(search)) {
     return null;
   }
 
