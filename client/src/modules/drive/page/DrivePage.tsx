@@ -8,7 +8,7 @@ export const DrivePage = () => {
   return (
     <DriveProvider>
       <div className="flex flex-col gap-2 p-8">
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row gap-1 justify-between">
           <DriveSearch />
           <FolderAdd />
         </div>

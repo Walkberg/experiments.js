@@ -101,7 +101,7 @@ const defaultFolders: DriveFolder[] = [
 ];
 
 const defaultDocuments: DriveDocument[] = [
-  { id: "Adezc", name: "document-1" },
-  { id: "fds", name: "document-2" },
-  { id: "dfs", name: "document-3" },
+  { id: "Adezc", name: "document-1", size: 456653289, folderId: "folder-1" },
+  { id: "fds", name: "document-2", size: 456653289, folderId: null },
+  { id: "dfs", name: "document-3", size: 456653289, folderId: null },
 ];

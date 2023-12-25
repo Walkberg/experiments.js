@@ -14,4 +14,6 @@ export interface DriveFolderNew {
 export interface DriveDocument {
   id: string;
   name: string;
+  size: number;
+  folderId: string | null;
 }

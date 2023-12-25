@@ -45,7 +45,7 @@ export const Folder = ({ folderId }: FolderProps) => {
             <FolderActions folderId={folder.id} />
           </div>
           <CollapsibleContent className="space-y-2">
-            <Documents />
+            <Documents folderId={folder.id} />
           </CollapsibleContent>
         </div>
       </Card>

@@ -20,7 +20,7 @@ export const FolderActions = ({ folderId }: FolderActionProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>Rien</DropdownMenuLabel>
       </DropdownMenuContent>
     </DropdownMenu>
   );
