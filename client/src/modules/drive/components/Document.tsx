@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { GripVertical } from "lucide-react";
 import { useHover } from "@/app/hooks/useHover";
 import { useSearch } from "../providers/DriveSearchProvider";
+import { DocumentActions } from "./DocumentActions";
+import { DocumentSelection } from "./DocumentSelection";
 
 interface DocumentProps {
   documentId: string;
@@ -26,17 +28,23 @@ export const Document = ({ documentId }: DocumentProps) => {
     return null;
   }
 
+  const handleClickDocument = () => {};
+
   return (
-    <Card ref={ref}>
-      <div className=" flex flex-row p-4 items-center">
+    <Card onClick={handleClickDocument} className="cursor-pointer" ref={ref}>
+      <div className=" flex flex-row p-4 items-center grow">
         {isHovered && (
           <Button className="relative" variant="ghost" size="sm">
             <GripVertical className="h-4 w-4" />
           </Button>
         )}
-        <div className="flex flex-col">
-          <div>{document.name}</div>
-          <div>{convertSizeToMb(document.size)}</div>
+        <div className="flex flex-row justify-between items-center gap-4">
+          <DocumentSelection documentId={documentId} />
+          <div className="flex flex-col">
+            <div>{document.name}</div>
+            <div>{convertSizeToMb(document.size)}</div>
+          </div>
+          <DocumentActions documentId={documentId} />
         </div>
       </div>
     </Card>

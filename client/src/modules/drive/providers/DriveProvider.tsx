@@ -13,6 +13,7 @@ import {
 } from "../drive";
 import { DriveSearchProvider } from "./DriveSearchProvider";
 import { v4 as uuidv4 } from "uuid";
+import { DocumentsSelectionProvider } from "./DocumentSelectionProvider";
 
 interface DriveContextType {
   id: string;
@@ -47,7 +48,7 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
   };
 
   const updateFolder = (folderUpdate: DriveFolderUpdate) => {
-    console.log(folderUpdate)
+    console.log(folderUpdate);
     setFolders((prev) =>
       prev.map((folder) =>
         folder.id === folderUpdate.id
@@ -59,9 +60,11 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
 
   return (
     <DriveContext.Provider
-      value={{ id: driveId, documents, folders, addFolder,updateFolder }}
+      value={{ id: driveId, documents, folders, addFolder, updateFolder }}
     >
-      <DriveSearchProvider>{children}</DriveSearchProvider>
+      <DriveSearchProvider>
+        <DocumentsSelectionProvider>{children}</DocumentsSelectionProvider>
+      </DriveSearchProvider>
     </DriveContext.Provider>
   );
 };
