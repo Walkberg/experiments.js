@@ -5,7 +5,12 @@ import {
   useEffect,
   useState,
 } from "react";
-import { DriveDocument, DriveFolder, DriveFolderNew } from "../drive";
+import {
+  DriveDocument,
+  DriveFolder,
+  DriveFolderNew,
+  DriveFolderUpdate,
+} from "../drive";
 import { DriveSearchProvider } from "./DriveSearchProvider";
 import { v4 as uuidv4 } from "uuid";
 
@@ -14,6 +19,7 @@ interface DriveContextType {
   documents: DriveDocument[];
   folders: DriveFolder[];
   addFolder: (newFolder: DriveFolderNew) => void;
+  updateFolder: (folderUpdate: DriveFolderUpdate) => void;
 }
 
 const DriveContext = createContext<DriveContextType | null>(null);
@@ -40,9 +46,20 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
     setFolders((prev) => [...prev, newFolder]);
   };
 
+  const updateFolder = (folderUpdate: DriveFolderUpdate) => {
+    console.log(folderUpdate)
+    setFolders((prev) =>
+      prev.map((folder) =>
+        folder.id === folderUpdate.id
+          ? { ...folder, name: folderUpdate.name }
+          : { ...folder }
+      )
+    );
+  };
+
   return (
     <DriveContext.Provider
-      value={{ id: driveId, documents, folders, addFolder }}
+      value={{ id: driveId, documents, folders, addFolder,updateFolder }}
     >
       <DriveSearchProvider>{children}</DriveSearchProvider>
     </DriveContext.Provider>
@@ -67,6 +84,16 @@ export function useAddFolder() {
   }
 
   return context.addFolder;
+}
+
+export function useUpdateFolder() {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.updateFolder;
 }
 
 export function useFolder(folderId: string): DriveFolder | undefined {

@@ -16,7 +16,12 @@ export const Drive = ({ driveId }: DriveProps) => {
           <DriveSearch />
           <FolderAdd />
         </div>
+
         <Folders />
+        <div>
+          ---------------------------------------- separator
+          -------------------------------------------------
+        </div>
         <Documents />
       </div>
     </DriveProvider>

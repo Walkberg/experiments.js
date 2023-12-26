@@ -11,6 +11,11 @@ export interface DriveFolderNew {
   name: string;
 }
 
+export interface DriveFolderUpdate {
+  id: string;
+  name: string;
+}
+
 export interface DriveDocument {
   id: string;
   name: string;

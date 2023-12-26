@@ -11,6 +11,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { FolderActions } from "./FolderActions";
 import { useSearch } from "../providers/DriveSearchProvider";
+import { FolderName } from "./FolderRename";
 
 interface FolderProps {
   folderId: string;
@@ -42,7 +43,7 @@ export const Folder = ({ folderId }: FolderProps) => {
                   <span className="sr-only">Toggle</span>
                 </Button>
               </CollapsibleTrigger>
-              <div>{folder.name}</div>
+              <FolderName folderId={folder.id}/>
             </div>
             <FolderActions folderId={folder.id} />
           </div>

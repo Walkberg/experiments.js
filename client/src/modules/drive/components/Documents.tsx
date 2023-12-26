@@ -1,6 +1,5 @@
 import { DriveDocument } from "../drive";
 import { useDocuments } from "../providers/DriveProvider";
-import { useSearch } from "../providers/DriveSearchProvider";
 import { Document } from "./Document";
 import { DocumentEmpty } from "./DocumentEmpty";
 
