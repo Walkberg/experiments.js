@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useFolder, useUpdateFolder } from "../providers/DriveProvider";
 import { Input } from "@/components/ui/input";
-import { Pencil, X } from "lucide-react";
+import { FolderIcon, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface FolderRenameProps {
@@ -27,7 +27,8 @@ export const FolderName = ({ folderId }: FolderRenameProps) => {
   };
 
   return (
-    <div>
+    <div className="flex flex-row gap-2 items-center">
+      <FolderIcon />
       {edit ? (
         <div className="flex flex-row gap-2 items-center">
           <form

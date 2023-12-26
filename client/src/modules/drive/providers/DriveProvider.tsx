@@ -7,6 +7,7 @@ import {
 } from "react";
 import {
   DriveDocument,
+  DriveDocumentMove,
   DriveFolder,
   DriveFolderNew,
   DriveFolderUpdate,
@@ -21,6 +22,7 @@ interface DriveContextType {
   folders: DriveFolder[];
   addFolder: (newFolder: DriveFolderNew) => void;
   updateFolder: (folderUpdate: DriveFolderUpdate) => void;
+  moveDocument: (documentMove: DriveDocumentMove) => void;
 }
 
 const DriveContext = createContext<DriveContextType | null>(null);
@@ -48,7 +50,6 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
   };
 
   const updateFolder = (folderUpdate: DriveFolderUpdate) => {
-    console.log(folderUpdate);
     setFolders((prev) =>
       prev.map((folder) =>
         folder.id === folderUpdate.id
@@ -58,9 +59,26 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
     );
   };
 
+  const moveDocument = (documentMove: DriveDocumentMove) => {
+    setDocuments((prev) =>
+      prev.map((document) =>
+        document.id === documentMove.documentId
+          ? { ...document, folderId: documentMove.folderId }
+          : { ...document }
+      )
+    );
+  };
+
   return (
     <DriveContext.Provider
-      value={{ id: driveId, documents, folders, addFolder, updateFolder }}
+      value={{
+        id: driveId,
+        documents,
+        folders,
+        addFolder,
+        updateFolder,
+        moveDocument,
+      }}
     >
       <DriveSearchProvider>
         <DocumentsSelectionProvider>{children}</DocumentsSelectionProvider>
@@ -87,6 +105,16 @@ export function useAddFolder() {
   }
 
   return context.addFolder;
+}
+
+export function useMoveDocument() {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.moveDocument;
 }
 
 export function useUpdateFolder() {

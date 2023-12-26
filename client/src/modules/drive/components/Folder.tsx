@@ -7,11 +7,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { FolderActions } from "./FolderActions";
 import { useSearch } from "../providers/DriveSearchProvider";
 import { FolderName } from "./FolderRename";
+import { FolderSelection } from "./FolderSelection";
 
 interface FolderProps {
   folderId: string;
@@ -32,18 +33,19 @@ export const Folder = ({ folderId }: FolderProps) => {
       <Card className="p-2">
         <div className="flex flex-col gap-2">
           <div className="flex flex-row items-center justify-between">
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-center gap-2">
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm">
                   {isOpened ? (
                     <ChevronDown className="h-4 w-4" />
                   ) : (
-                    <ChevronUp className="h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" />
                   )}
                   <span className="sr-only">Toggle</span>
                 </Button>
               </CollapsibleTrigger>
-              <FolderName folderId={folder.id}/>
+              <FolderSelection folderId={folder.id} />
+              <FolderName folderId={folder.id} />
             </div>
             <FolderActions folderId={folder.id} />
           </div>

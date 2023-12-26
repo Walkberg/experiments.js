@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
+import { MoveDocumentFolderAction } from "./MoveDocumentFolderAction";
 
 interface DocumentActionsProps {
   documentId: string;
@@ -20,7 +20,7 @@ export const DocumentActions = ({ documentId }: DocumentActionsProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Rien</DropdownMenuLabel>
+        <MoveDocumentFolderAction documentId={documentId} />
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -22,3 +22,8 @@ export interface DriveDocument {
   size: number;
   folderId: string | null;
 }
+
+export interface DriveDocumentMove {
+  documentId: string;
+  folderId: string | null;
+}
