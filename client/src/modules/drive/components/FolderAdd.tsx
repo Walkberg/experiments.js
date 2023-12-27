@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useAddFolder } from "../providers/DriveProvider";
+import { useAddFolder, useDrive } from "../providers/DriveProvider";
 import {
   Dialog,
   DialogContent,
@@ -15,10 +15,12 @@ export const FolderAdd = ({}: FolderAddProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
 
+  const driveId = useDrive();
+
   const addFolder = useAddFolder();
 
-  const handleAddFolder = () => {
-    addFolder({ name: name });
+  const handleAddFolder = async () => {
+    await addFolder({ name: name, driveId });
     setName("");
     setOpen(false);
   };

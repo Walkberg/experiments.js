@@ -26,8 +26,8 @@ export const MoveDocumentFolderAction = ({
     (folder) => folder.id != document?.folderId
   );
 
-  const handleMoveDoc = (folderId: string | null) => {
-    moveDocument({ folderId, documentId });
+  const handleMoveDoc = async (folderId: string | null) => {
+    await moveDocument({ folderId, documentId });
   };
 
   return (

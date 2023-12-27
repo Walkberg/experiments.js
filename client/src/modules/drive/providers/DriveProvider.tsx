@@ -13,7 +13,6 @@ import {
   DriveFolderUpdate,
 } from "../drive";
 import { DriveSearchProvider } from "./DriveSearchProvider";
-import { v4 as uuidv4 } from "uuid";
 import { DocumentsSelectionProvider } from "./DocumentSelectionProvider";
 import { useDriveClient } from "./DriveClientProvider";
 
@@ -21,9 +20,9 @@ interface DriveContextType {
   id: string;
   documents: DriveDocument[];
   folders: DriveFolder[];
-  addFolder: (newFolder: DriveFolderNew) => void;
-  updateFolder: (folderUpdate: DriveFolderUpdate) => void;
-  moveDocument: (documentMove: DriveDocumentMove) => void;
+  addFolder: (newFolder: DriveFolderNew) => Promise<void>;
+  updateFolder: (folderUpdate: DriveFolderUpdate) => Promise<void>;
+  moveDocument: (documentMove: DriveDocumentMove) => Promise<void>;
 }
 
 const DriveContext = createContext<DriveContextType | null>(null);
@@ -57,29 +56,46 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
     fetchDocuments();
   }, []);
 
-  const addFolder = (folderNew: DriveFolderNew) => {
-    const newFolder = { ...folderNew, id: uuidv4() };
-    setFolders((prev) => [...prev, newFolder]);
+  const addFolder = async (folderNew: DriveFolderNew) => {
+    try {
+      const newFolder = await client.createFolder(folderNew);
+      setFolders((prev) => [...prev, { ...folderNew, id: newFolder.id }]);
+    } catch (e) {
+      //catch erro
+    }
   };
 
-  const updateFolder = (folderUpdate: DriveFolderUpdate) => {
-    setFolders((prev) =>
-      prev.map((folder) =>
-        folder.id === folderUpdate.id
-          ? { ...folder, name: folderUpdate.name }
-          : { ...folder }
-      )
-    );
+  const updateFolder = async (folderUpdate: DriveFolderUpdate) => {
+    try {
+      await client.updateFolder(folderUpdate);
+      setFolders((prev) =>
+        prev.map((folder) =>
+          folder.id === folderUpdate.id
+            ? { ...folder, name: folderUpdate.name }
+            : { ...folder }
+        )
+      );
+    } catch (e) {
+      //catch erro
+    }
   };
 
-  const moveDocument = (documentMove: DriveDocumentMove) => {
-    setDocuments((prev) =>
-      prev.map((document) =>
-        document.id === documentMove.documentId
-          ? { ...document, folderId: documentMove.folderId }
-          : { ...document }
-      )
-    );
+  const moveDocument = async (documentMove: DriveDocumentMove) => {
+    try {
+      await client.updateDocument({
+        id: documentMove.documentId,
+        folderId: documentMove.folderId,
+      });
+      setDocuments((prev) =>
+        prev.map((document) =>
+          document.id === documentMove.documentId
+            ? { ...document, folderId: documentMove.folderId }
+            : { ...document }
+        )
+      );
+    } catch (e) {
+      //catch erro
+    }
   };
 
   return (
@@ -138,6 +154,16 @@ export function useUpdateFolder() {
   }
 
   return context.updateFolder;
+}
+
+export function useDrive() {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.id;
 }
 
 export function useFolder(folderId: string): DriveFolder | undefined {

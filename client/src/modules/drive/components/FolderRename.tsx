@@ -20,8 +20,8 @@ export const FolderName = ({ folderId }: FolderRenameProps) => {
     return;
   }
 
-  const handleUpdate = () => {
-    updateFolder({ name: name, id: folderId });
+  const handleUpdate = async () => {
+    await updateFolder({ name: name, id: folderId });
     setEdit(false);
     setName("");
   };
