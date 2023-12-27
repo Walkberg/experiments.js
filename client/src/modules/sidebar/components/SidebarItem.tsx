@@ -19,13 +19,13 @@ export const SidebarItem = ({ item }: SidebarItemProps) => {
     <div>
       <TooltipProvider>
         <Tooltip>
-          <div className=" border-solid border-spacing-1 bg-green-700 rounded">
+          <div className=" border-solid border-spacing-1 bg-gradient-to-br rounded">
             <TooltipTrigger asChild>
               <div className="flex items-center ">
-                <Button className="flex items-center  gap-2" variant="ghost">
+                <Button className="flex items-center  gap-4" variant="ghost">
                   {item.icon}
                   {!collapsed && (
-                    <p className="w-20 pr-4 left-0">{item.name}</p>
+                    <p className="w-20 pr-4 text-left">{item.name}</p>
                   )}
                 </Button>
               </div>

@@ -5,9 +5,9 @@ import { Sidebar } from "../sidebar/components/Sidebar";
 export const PageTemplate = () => {
   return (
     <SidebarProvider>
-      <div className="flex flex-grow w-screen h-screen bg-green-600">
+      <div className="flex flex-grow w-screen h-screen bg-background">
         <Sidebar />
-        <div className="flex flex-grow bg-white m-1 p-2 rounded-lg">
+        <div className="flex flex-grow bg-background m-1 p-2 rounded-lg">
           <Outlet />
         </div>
       </div>
