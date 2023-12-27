@@ -3,8 +3,8 @@ import { Drive } from "../components/Drive";
 export const DrivePage = () => {
   return (
     <div>
-      <Drive driveId={"1"} />
-      <Drive driveId={"2"} />
+      <Drive driveId={"drive-1"} />
+      <Drive driveId={"drive-2"} />
     </div>
   );
 };

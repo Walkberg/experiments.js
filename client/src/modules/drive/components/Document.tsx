@@ -24,7 +24,7 @@ export const Document = ({ documentId }: DocumentProps) => {
     return null;
   }
 
-  if (!document.name.includes(search)) {
+  if (!document.filename.includes(search)) {
     return null;
   }
 
@@ -41,7 +41,7 @@ export const Document = ({ documentId }: DocumentProps) => {
         <div className="flex flex-row justify-between items-center gap-4">
           <DocumentSelection documentId={documentId} />
           <div className="flex flex-col">
-            <div>{document.name}</div>
+            <div>{document.filename}</div>
             <div>{convertSizeToMb(document.size)}</div>
           </div>
           <DocumentActions documentId={documentId} />

@@ -15,6 +15,7 @@ import {
 import { DriveSearchProvider } from "./DriveSearchProvider";
 import { v4 as uuidv4 } from "uuid";
 import { DocumentsSelectionProvider } from "./DocumentSelectionProvider";
+import { useDriveClient } from "./DriveClientProvider";
 
 interface DriveContextType {
   id: string;
@@ -36,12 +37,24 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
   const [folders, setFolders] = useState<DriveFolder[]>([]);
   const [documents, setDocuments] = useState<DriveDocument[]>([]);
 
+  const client = useDriveClient();
+
   useEffect(() => {
-    setFolders(defaultFolders);
+    const fetchFolders = async () => {
+      const folders = await client.getFolders({ driveId });
+      setFolders(folders);
+    };
+
+    fetchFolders();
   }, []);
 
   useEffect(() => {
-    setDocuments(defaultDocuments);
+    const fetchDocuments = async () => {
+      const documents = await client.getDocuments({ driveId });
+      setDocuments(documents);
+    };
+
+    fetchDocuments();
   }, []);
 
   const addFolder = (folderNew: DriveFolderNew) => {
@@ -156,15 +169,3 @@ export function useDocument(documentId: string): DriveDocument | undefined {
 
   return context.documents.find((document) => document.id === documentId);
 }
-
-const defaultFolders: DriveFolder[] = [
-  { id: "folder-1", name: "folder 1" },
-  { id: "folder-2", name: "folder 2" },
-  { id: "folder-3", name: "folder 3" },
-];
-
-const defaultDocuments: DriveDocument[] = [
-  { id: "Adezc", name: "document-1", size: 456653289, folderId: "folder-1" },
-  { id: "fds", name: "document-2", size: 456653289, folderId: null },
-  { id: "dfs", name: "document-3", size: 456653289, folderId: null },
-];
