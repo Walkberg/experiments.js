@@ -5,6 +5,7 @@ import { DriveSearch } from "./DriveSearch";
 import { FolderAdd } from "./FolderAdd";
 import { Folders } from "./Folders";
 import { Folder } from "./Folder";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface DriveProps {
   driveId: string;
@@ -18,13 +19,14 @@ export const Drive = ({ driveId }: DriveProps) => {
           <DriveSearch />
           <FolderAdd />
         </div>
-
-        <Folders FolderComponent={Folder} />
-        <div>
-          ---------------------------------------- separator
-          -------------------------------------------------
-        </div>
-        <Documents DocumentComponent={Document} />
+        <ScrollArea className="h-80  rounded-md border">
+          <Folders FolderComponent={Folder} />
+          <div>
+            ---------------------------------------- separator
+            -------------------------------------------------
+          </div>
+          <Documents DocumentComponent={Document} />
+        </ScrollArea>
       </div>
     </DriveProvider>
   );

@@ -4,6 +4,8 @@ import { DriveSearch } from "./DriveSearch";
 import { Folders } from "./Folders";
 import { BasicDocument } from "./BasicDocument";
 import { BasicFolder } from "./BasicFolder";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
 interface DriveProps {
   driveId: string;
@@ -16,8 +18,11 @@ export const StorageDrive = ({ driveId }: DriveProps) => {
         <div className="flex flex-row gap-2 justify-between">
           <DriveSearch />
         </div>
-        <Folders FolderComponent={BasicFolder} />
-        <Documents DocumentComponent={BasicDocument} />
+        <ScrollArea className="h-80  rounded-md border">
+          <Folders FolderComponent={BasicFolder} />
+          <Documents DocumentComponent={BasicDocument} />
+        </ScrollArea>
+        <Button>Accepter</Button>
       </div>
     </DriveProvider>
   );
