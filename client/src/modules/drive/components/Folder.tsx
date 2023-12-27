@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Documents } from "./Documents";
-import { useFolder } from "../providers/DriveProvider";
+import { useDocuments, useFolder } from "../providers/DriveProvider";
 import {
   Collapsible,
   CollapsibleContent,
@@ -14,6 +14,8 @@ import { useSearch } from "../providers/DriveSearchProvider";
 import { FolderName } from "./FolderRename";
 import { FolderSelection } from "./FolderSelection";
 import { Document } from "./Document";
+import { selectDocumentsByFolderId } from "../documents.selector";
+import { Badge } from "@/components/ui/badge";
 
 export interface FolderProps {
   folderId: string;
@@ -24,6 +26,8 @@ export const Folder = ({ folderId }: FolderProps) => {
 
   const { search } = useSearch();
   const folder = useFolder(folderId);
+
+  const documents = useDocuments(selectDocumentsByFolderId(folderId));
 
   if (folder == null || !folder.name.includes(search)) {
     return null;
@@ -48,7 +52,10 @@ export const Folder = ({ folderId }: FolderProps) => {
               <FolderSelection folderId={folder.id} />
               <FolderName folderId={folder.id} />
             </div>
-            <FolderActions folderId={folder.id} />
+            <div>
+              <Badge>{documents.length} items</Badge>
+              <FolderActions folderId={folder.id} />
+            </div>
           </div>
           <CollapsibleContent className="space-y-2">
             <Documents folderId={folder.id} DocumentComponent={Document} />

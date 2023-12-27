@@ -17,7 +17,7 @@ export const SidebarItem = ({ item }: SidebarItemProps) => {
 
   return (
     <div>
-      <TooltipProvider>
+      <TooltipProvider delayDuration={100}>
         <Tooltip>
           <div className=" border-solid border-spacing-1 bg-gradient-to-br rounded">
             <TooltipTrigger asChild>

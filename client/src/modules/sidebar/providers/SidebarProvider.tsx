@@ -42,7 +42,7 @@ interface DriveProviderProps {
 }
 
 export const SidebarProvider = ({ children }: DriveProviderProps) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const toogleSidebar = () => {
     setCollapsed((prev) => !prev);

@@ -176,11 +176,17 @@ export function useFolder(folderId: string): DriveFolder | undefined {
   return context.folders.find((folder) => folder.id === folderId);
 }
 
-export function useDocuments(): DriveDocument[] {
+type UseDocumentsCallBack = (doc: DriveDocument[]) => DriveDocument[];
+
+export function useDocuments(callBack?: UseDocumentsCallBack): DriveDocument[] {
   const context = useContext(DriveContext);
 
   if (context == null) {
     throw new Error();
+  }
+
+  if (callBack != null) {
+    return callBack(context.documents);
   }
 
   return context.documents;
