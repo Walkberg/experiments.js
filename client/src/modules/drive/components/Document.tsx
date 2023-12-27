@@ -8,7 +8,7 @@ import { useSearch } from "../providers/DriveSearchProvider";
 import { DocumentActions } from "./DocumentActions";
 import { DocumentSelection } from "./DocumentSelection";
 
-interface DocumentProps {
+export interface DocumentProps {
   documentId: string;
 }
 

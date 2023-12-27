@@ -1,13 +1,14 @@
 import { DriveDocument } from "../drive";
 import { useDocuments } from "../providers/DriveProvider";
-import { Document } from "./Document";
+import { DocumentProps } from "./Document";
 import { DocumentEmpty } from "./DocumentEmpty";
 
 interface DocumentsProps {
   folderId?: string;
+  DocumentComponent: React.ComponentType<DocumentProps>;
 }
 
-export const Documents = ({ folderId }: DocumentsProps) => {
+export const Documents = ({ folderId, DocumentComponent }: DocumentsProps) => {
   const documents = useDocuments();
 
   const filteredDocuments = documents.filter((document) =>
@@ -21,7 +22,7 @@ export const Documents = ({ folderId }: DocumentsProps) => {
   return (
     <div className="flex flex-col gap-1">
       {filteredDocuments.map((document) => (
-        <Document documentId={document.id} />
+        <DocumentComponent documentId={document.id} />
       ))}
     </div>
   );

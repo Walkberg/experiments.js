@@ -1,8 +1,10 @@
 import { DriveProvider } from "../providers/DriveProvider";
 import { Documents } from "./Documents";
+import { Document } from "./Document";
 import { DriveSearch } from "./DriveSearch";
 import { FolderAdd } from "./FolderAdd";
 import { Folders } from "./Folders";
+import { Folder } from "./Folder";
 
 interface DriveProps {
   driveId: string;
@@ -17,12 +19,12 @@ export const Drive = ({ driveId }: DriveProps) => {
           <FolderAdd />
         </div>
 
-        <Folders />
+        <Folders FolderComponent={Folder} />
         <div>
           ---------------------------------------- separator
           -------------------------------------------------
         </div>
-        <Documents />
+        <Documents DocumentComponent={Document} />
       </div>
     </DriveProvider>
   );

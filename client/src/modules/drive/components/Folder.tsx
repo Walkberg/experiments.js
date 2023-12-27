@@ -13,8 +13,9 @@ import { FolderActions } from "./FolderActions";
 import { useSearch } from "../providers/DriveSearchProvider";
 import { FolderName } from "./FolderRename";
 import { FolderSelection } from "./FolderSelection";
+import { Document } from "./Document";
 
-interface FolderProps {
+export interface FolderProps {
   folderId: string;
 }
 
@@ -50,7 +51,7 @@ export const Folder = ({ folderId }: FolderProps) => {
             <FolderActions folderId={folder.id} />
           </div>
           <CollapsibleContent className="space-y-2">
-            <Documents folderId={folder.id} />
+            <Documents folderId={folder.id} DocumentComponent={Document} />
           </CollapsibleContent>
         </div>
       </Card>
