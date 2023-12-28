@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
+import { FolderDeleteAction } from "./FolderDeleteAction";
 
 interface FolderActionProps {
   folderId: string;
@@ -21,6 +22,7 @@ export const FolderActions = ({ folderId }: FolderActionProps) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Rien</DropdownMenuLabel>
+        <FolderDeleteAction folderId={folderId} />
       </DropdownMenuContent>
     </DropdownMenu>
   );

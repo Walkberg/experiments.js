@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
 import { MoveDocumentFolderAction } from "./MoveDocumentFolderAction";
+import { DocumentDeleteAction } from "./DocumentDeleteAction";
 
 interface DocumentActionsProps {
   documentId: string;
@@ -21,6 +22,7 @@ export const DocumentActions = ({ documentId }: DocumentActionsProps) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <MoveDocumentFolderAction documentId={documentId} />
+        <DocumentDeleteAction documentId={documentId} />
       </DropdownMenuContent>
     </DropdownMenu>
   );

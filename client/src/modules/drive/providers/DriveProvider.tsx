@@ -23,6 +23,8 @@ interface DriveContextType {
   addFolder: (newFolder: DriveFolderNew) => Promise<void>;
   updateFolder: (folderUpdate: DriveFolderUpdate) => Promise<void>;
   moveDocument: (documentMove: DriveDocumentMove) => Promise<void>;
+  deleteFolder: (id: string) => Promise<void>;
+  deleteDocument: (id: string) => Promise<void>;
 }
 
 const DriveContext = createContext<DriveContextType | null>(null);
@@ -80,6 +82,26 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
     }
   };
 
+  const deleteFolder = async (folderId: string) => {
+    try {
+      await client.deleteFolder(folderId);
+      setFolders((prev) => prev.filter((folder) => folder.id !== folderId));
+    } catch (e) {
+      //catch erro
+    }
+  };
+
+  const deleteDocument = async (documentId: string) => {
+    try {
+      await client.deleteDocument(documentId);
+      setDocuments((prev) =>
+        prev.filter((document) => document.id !== documentId)
+      );
+    } catch (e) {
+      //catch erro
+    }
+  };
+
   const moveDocument = async (documentMove: DriveDocumentMove) => {
     try {
       await client.updateDocument({
@@ -105,6 +127,8 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
         documents,
         folders,
         addFolder,
+        deleteFolder,
+        deleteDocument,
         updateFolder,
         moveDocument,
       }}
@@ -144,6 +168,26 @@ export function useMoveDocument() {
   }
 
   return context.moveDocument;
+}
+
+export function useDeleteFolder() {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.deleteFolder;
+}
+
+export function useDeleteDocument() {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.deleteDocument;
 }
 
 export function useUpdateFolder() {
