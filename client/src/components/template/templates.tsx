@@ -1,20 +1,19 @@
+import { Header } from "@/modules/header/components/Header";
 import { ReactNode } from "react";
 import { Outlet } from "react-router";
 
 interface PageTemplateProps {
-sidebar:ReactNode;
+  sidebar: ReactNode;
 }
 
-export const PageTemplate = ({sidebar}:PageTemplateProps) => {
-
-    return (
-        <div>
-            <div>
-                {sidebar}
-            </div>
-            <div>
-                <Outlet/>
-            </div>
-        </div>
-    )
-}
+export const PageTemplate = ({ sidebar }: PageTemplateProps) => {
+  return (
+    <div>
+      <div>{sidebar}</div>
+      <div>
+       
+        <Outlet />
+      </div>
+    </div>
+  );
+};
