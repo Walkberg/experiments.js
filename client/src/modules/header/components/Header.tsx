@@ -1,8 +1,16 @@
 import { UserNotification } from "@/modules/notification/notification";
 import { UserAvatar } from "@/modules/user/components/UserAvatar";
-import { User } from "@/modules/user/user";
+import { useUser } from "@/modules/user/providers/UserProvider";
 
 export const Header = () => {
+  const { user } = useUser();
+
+  console.log(user);
+
+  if (user == null) {
+    return;
+  }
+
   return (
     <div className="flex flex-row items-center h-12 justify-between">
       <div></div>
@@ -12,12 +20,4 @@ export const Header = () => {
       </div>
     </div>
   );
-};
-
-const user: User = {
-  firstname: "test",
-  lastname: "test",
-  email: "test@test.fr",
-  id: "user-1",
-  avatarUrl: "test",
 };

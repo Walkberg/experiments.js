@@ -6,3 +6,7 @@ export interface User {
   phone?: string;
   avatarUrl: string;
 }
+
+export interface UserClient {
+  getUser: (email: string) => Promise<User>;
+}

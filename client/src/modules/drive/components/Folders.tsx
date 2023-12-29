@@ -11,7 +11,7 @@ export const Folders = ({ FolderComponent }: FoldersProps) => {
   return (
     <div className="flex flex-col gap-1">
       {folders.map((folder) => (
-        <FolderComponent folderId={folder.id} />
+        <FolderComponent key={folder.id} folderId={folder.id} />
       ))}
     </div>
   );

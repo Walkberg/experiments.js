@@ -22,7 +22,7 @@ export const Documents = ({ folderId, DocumentComponent }: DocumentsProps) => {
   return (
     <div className="flex flex-col gap-1">
       {filteredDocuments.map((document) => (
-        <DocumentComponent documentId={document.id} />
+        <DocumentComponent key={document.id} documentId={document.id} />
       ))}
     </div>
   );
