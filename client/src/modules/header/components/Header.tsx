@@ -1,11 +1,9 @@
-import { UserNotification } from "@/modules/notification/notification";
+import { UserNotification } from "@/modules/notification/components/UserNotifications";
 import { UserAvatar } from "@/modules/user/components/UserAvatar";
 import { useUser } from "@/modules/user/providers/UserProvider";
 
 export const Header = () => {
   const { user } = useUser();
-
-  console.log(user);
 
   if (user == null) {
     return;

@@ -9,7 +9,7 @@ import {
 const initialNotifications = [
   {
     id: "1",
-    creatorId: "creator-1",
+    creatorId: "user-1",
     userId: "user-1",
     name: "Notification 1",
     type: "info",
@@ -19,8 +19,8 @@ const initialNotifications = [
   },
   {
     id: "2",
-    creatorId: "creator-2",
-    userId: "user-2",
+    creatorId: "user-2",
+    userId: "user-1",
     name: "Notification 2",
     type: "alert",
     description: "Description de la notification 2",

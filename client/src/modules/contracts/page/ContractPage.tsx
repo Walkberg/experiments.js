@@ -5,11 +5,18 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { StorageDrive } from "@/modules/drive/components/StorageDrive";
 
+const initialValues = [
+  { id: "uij", operationId: "operation-1" },
+  { id: "uij", operationId: "operation-1" },
+  { id: "uij", operationId: "operation-1" },
+  { id: "uij", operationId: "operation-1" },
+];
+
 export const ContractPage = () => {
   const [contracts, setContract] = useState<Contract[]>([]);
 
   useEffect(() => {
-    setContract([{ id: "uij" }, { id: "uij" }, { id: "uij" }, { id: "uij" }]);
+    setContract(initialValues);
   }, []);
 
   return (

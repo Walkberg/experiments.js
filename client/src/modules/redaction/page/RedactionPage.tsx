@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BranchesProvider } from "@/modules/branches/branches-context";
 import { Branches } from "@/modules/branches/components/Branches";
@@ -28,7 +27,7 @@ export const RedactionPage = () => {
         <div>
           Redaction
           {/* <Button onClick={updatePresence}>Update presence</Button> */}
-          <Room/>
+          <Room />
         </div>
       </div>
     </RoomProvider>

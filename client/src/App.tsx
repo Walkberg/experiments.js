@@ -5,17 +5,26 @@ import { DriveClientProvider } from "./modules/drive/providers/DriveClientProvid
 import { ThemeProvider } from "./app/theme/ThemeProvider";
 import { UserProvider } from "./modules/user/providers/UserProvider";
 import { UserClientProvider } from "./modules/user/providers/UserClientProvider";
+import { NotificationClientProvider } from "./modules/notification/providers/NotificationClientProvider";
+import { NotificationProvider } from "./modules/notification/providers/NotificationProvider";
+import { OperationClientProvider } from "./modules/operations/providers/OperationClientProvider";
 
 function App() {
   return (
     <ThemeProvider>
-      <UserClientProvider>
-        <DriveClientProvider>
-          <UserProvider>
-            <RouterProvider router={router} />
-          </UserProvider>
-        </DriveClientProvider>
-      </UserClientProvider>
+      <OperationClientProvider>
+        <NotificationClientProvider>
+          <UserClientProvider>
+            <DriveClientProvider>
+              <NotificationProvider>
+                <UserProvider>
+                  <RouterProvider router={router} />
+                </UserProvider>
+              </NotificationProvider>
+            </DriveClientProvider>
+          </UserClientProvider>
+        </NotificationClientProvider>
+      </OperationClientProvider>
     </ThemeProvider>
   );
 }

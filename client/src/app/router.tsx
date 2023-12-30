@@ -13,7 +13,7 @@ export const router = createBrowserRouter(
       <Route path="dashboard" element={<Cool />} />
       <Route path="mynotary" element={<PageTemplate/>}>
         <Route path="redaction" element={<RedactionPage />} />
-        <Route path="operation/:id" element={<OperationPage />}>
+        <Route path="operation/:operationId" element={<OperationPage />}>
           <Route path="contracts" element={<ContractPage />} />
           <Route path="drive" element={<DrivePage />} />
         </Route>
