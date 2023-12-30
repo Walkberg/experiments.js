@@ -8,22 +8,26 @@ import { UserClientProvider } from "./modules/user/providers/UserClientProvider"
 import { NotificationClientProvider } from "./modules/notification/providers/NotificationClientProvider";
 import { NotificationProvider } from "./modules/notification/providers/NotificationProvider";
 import { OperationClientProvider } from "./modules/operations/providers/OperationClientProvider";
+import { ContractClientProvider } from "./modules/contracts/providers/ContractClientProvider";
+import { FakeContractClient } from "./modules/contracts/in-memory-contract.client";
 
 function App() {
   return (
     <ThemeProvider>
       <OperationClientProvider>
-        <NotificationClientProvider>
-          <UserClientProvider>
-            <DriveClientProvider>
-              <NotificationProvider>
-                <UserProvider>
-                  <RouterProvider router={router} />
-                </UserProvider>
-              </NotificationProvider>
-            </DriveClientProvider>
-          </UserClientProvider>
-        </NotificationClientProvider>
+        <ContractClientProvider contractClient={new FakeContractClient()}>
+          <NotificationClientProvider>
+            <UserClientProvider>
+              <DriveClientProvider>
+                <NotificationProvider>
+                  <UserProvider>
+                    <RouterProvider router={router} />
+                  </UserProvider>
+                </NotificationProvider>
+              </DriveClientProvider>
+            </UserClientProvider>
+          </NotificationClientProvider>
+        </ContractClientProvider>
       </OperationClientProvider>
     </ThemeProvider>
   );

@@ -4,24 +4,22 @@ import { Contract } from "../contract";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { StorageDrive } from "@/modules/drive/components/StorageDrive";
-
-const initialValues = [
-  { id: "uij", operationId: "operation-1" },
-  { id: "uij", operationId: "operation-1" },
-  { id: "uij", operationId: "operation-1" },
-  { id: "uij", operationId: "operation-1" },
-];
+import { ContractClientProvider } from "../providers/ContractClientProvider";
+import { ContractProvider } from "../providers/ContractProvider";
+import { useParams } from "react-router";
 
 export const ContractPage = () => {
-  const [contracts, setContract] = useState<Contract[]>([]);
 
-  useEffect(() => {
-    setContract(initialValues);
-  }, []);
+
+  const { operationId } = useParams();
+
+  if (operationId == null) {
+    throw new Error();
+  }
 
   return (
-    <div className="m-9">
-      <ContractList contracts={contracts} />
+    <ContractProvider operationId={operationId}>
+      <ContractList  />
       <Dialog>
         <DialogTrigger asChild>
           <Button>test</Button>
@@ -30,6 +28,6 @@ export const ContractPage = () => {
           <StorageDrive driveId={"drive-1"} />
         </DialogContent>
       </Dialog>
-    </div>
+    </ContractProvider>
   );
 };
