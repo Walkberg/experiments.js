@@ -41,7 +41,6 @@ export const NotificationProvider = ({
           page: { page: 1, itemByPage: 20 },
         };
         const page = await client.getNotifications(filtering);
-        console.log(page);
         setNotifications(page.items);
         setStatus("succeed");
       } catch (e) {
@@ -68,7 +67,7 @@ export const NotificationProvider = ({
       });
       setNotifications(updatedNotifications);
     } catch (e) {
-      // Gérez l'erreur de mise à jour ici si nécessaire
+     
     }
   };
 

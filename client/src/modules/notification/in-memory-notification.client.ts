@@ -35,7 +35,6 @@ export class FakeNotificationClient implements NotificationClient {
   async getNotifications(
     filtering: NotificationFiltering
   ): Promise<Page<Notification>> {
-    // Implémentation factice de filtrage pour la démonstration
     let filteredNotifications = this.notifications.filter((notification) => {
       let matchesFilter = true;
       if (filtering.userId && notification.userId !== filtering.userId) {
@@ -53,9 +52,8 @@ export class FakeNotificationClient implements NotificationClient {
       return matchesFilter;
     });
 
-    // Pagination factice pour la démonstration
     const page = filtering.page.page || 1;
-    const pageSize = 10; // Nombre d'éléments par page
+    const pageSize = 10;
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     const paginatedNotifications = filteredNotifications.slice(start, end);
