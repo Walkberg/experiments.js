@@ -6,6 +6,8 @@ import { FolderAdd } from "./FolderAdd";
 import { Folders } from "./Folders";
 import { Folder } from "./Folder";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { DocumentUploadArea } from "./DocumentUploadArea";
+import { DocumentAdd } from "./DocumentAdd";
 
 interface DriveProps {
   driveId: string;
@@ -25,7 +27,10 @@ export const Drive = ({ driveId }: DriveProps) => {
             ---------------------------------------- separator
             -------------------------------------------------
           </div>
-          <Documents DocumentComponent={Document} />
+          <DocumentUploadArea>
+            <Documents DocumentComponent={Document} />
+            <DocumentAdd />
+          </DocumentUploadArea>
         </ScrollArea>
       </div>
     </DriveProvider>

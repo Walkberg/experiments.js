@@ -1,5 +1,6 @@
 export interface Contract {
   id: string;
+  name: string;
   operationId: string;
 }
 

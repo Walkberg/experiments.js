@@ -6,5 +6,9 @@ interface ContractTileProps {
 }
 
 export const ContractTile = ({ contract }: ContractTileProps) => {
-  return <Card>Contract tiel{contract.id}</Card>;
+  return (
+    <Card className="p-4">
+      Contract tiel{contract.id} {contract.name}
+    </Card>
+  );
 };

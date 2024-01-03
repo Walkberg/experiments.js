@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import {
+  DocumentNew,
   DriveDocument,
   DriveDocumentMove,
   DriveFolder,
@@ -21,6 +22,7 @@ interface DriveContextType {
   documents: DriveDocument[];
   folders: DriveFolder[];
   addFolder: (newFolder: DriveFolderNew) => Promise<void>;
+  createDocument: (newDocument: DocumentNew) => Promise<void>;
   updateFolder: (folderUpdate: DriveFolderUpdate) => Promise<void>;
   moveDocument: (documentMove: DriveDocumentMove) => Promise<void>;
   deleteFolder: (id: string) => Promise<void>;
@@ -62,6 +64,23 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
     try {
       const newFolder = await client.createFolder(folderNew);
       setFolders((prev) => [...prev, { ...folderNew, id: newFolder.id }]);
+    } catch (e) {
+      //catch erro
+    }
+  };
+
+  const createDocument = async (documentNew: DocumentNew) => {
+    try {
+      const newDocument = await client.createDocument(documentNew);
+      setDocuments((prev) => [
+        ...prev,
+        {
+          ...documentNew,
+          id: newDocument.id,
+          filename: "vcfvx",
+          size: 1,
+        },
+      ]);
     } catch (e) {
       //catch erro
     }
@@ -131,6 +150,7 @@ export const DriveProvider = ({ children, driveId }: DriveProviderProps) => {
         deleteDocument,
         updateFolder,
         moveDocument,
+        createDocument,
       }}
     >
       <DriveSearchProvider>
@@ -158,6 +178,16 @@ export function useAddFolder() {
   }
 
   return context.addFolder;
+}
+
+export function useCreateDocument() {
+  const context = useContext(DriveContext);
+
+  if (context == null) {
+    throw new Error();
+  }
+
+  return context.createDocument;
 }
 
 export function useMoveDocument() {

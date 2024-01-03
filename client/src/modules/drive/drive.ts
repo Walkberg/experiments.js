@@ -28,7 +28,7 @@ export interface DriveDocument {
 }
 
 export interface DocumentNew {
-  name: string;
+  fileId: string;
   folderId: string | null;
   driveId: string;
 }

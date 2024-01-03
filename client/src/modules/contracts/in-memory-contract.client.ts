@@ -1,10 +1,10 @@
 import { Contract, ContractFiltering, ContractClient } from "./contract"; 
 
 const initialValues = [
-  { id: "uij", operationId: "operation-1" },
-  { id: "uij", operationId: "operation-1" },
-  { id: "uij", operationId: "operation-1" },
-  { id: "uij", operationId: "operation-1" },
+  { id: "uij", name: 'test', operationId: "operation-1" },
+  { id: "uij", name: 'test', operationId: "operation-1" },
+  { id: "uij", name: 'test', operationId: "operation-1" },
+  { id: "uij", name: 'test', operationId: "operation-1" },
 ];
 
 export class FakeContractClient implements ContractClient {

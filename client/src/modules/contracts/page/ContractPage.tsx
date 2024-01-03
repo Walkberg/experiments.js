@@ -1,16 +1,12 @@
-import { useEffect, useState } from "react";
 import { ContractList } from "../components/ContractList";
-import { Contract } from "../contract";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { StorageDrive } from "@/modules/drive/components/StorageDrive";
-import { ContractClientProvider } from "../providers/ContractClientProvider";
 import { ContractProvider } from "../providers/ContractProvider";
 import { useParams } from "react-router";
+import { ContractAdd } from "../components/ContractAdd";
 
 export const ContractPage = () => {
-
-
   const { operationId } = useParams();
 
   if (operationId == null) {
@@ -19,7 +15,10 @@ export const ContractPage = () => {
 
   return (
     <ContractProvider operationId={operationId}>
-      <ContractList  />
+      <div className="flex flex-row-reverse">
+        <ContractAdd />
+      </div>
+      <ContractList />
       <Dialog>
         <DialogTrigger asChild>
           <Button>test</Button>

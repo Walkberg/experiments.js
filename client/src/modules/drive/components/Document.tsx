@@ -6,6 +6,7 @@ import { useSearch } from "../providers/DriveSearchProvider";
 import { DocumentActions } from "./DocumentActions";
 import { DocumentSelection } from "./DocumentSelection";
 import { Handle } from "./Handle";
+import { DocumentUploadArea } from "./DocumentUploadArea";
 
 export interface DocumentProps {
   documentId: string;
