@@ -11,7 +11,7 @@ export function usePermission(type: string, subType: string) {
 
   return (
     permission.permissions.filter(
-      (perm) => !(perm.type === type && perm.subType === subType)
+      (perm) => (perm.type === type && perm.subType === subType)
     ).length !== 0
   );
 }

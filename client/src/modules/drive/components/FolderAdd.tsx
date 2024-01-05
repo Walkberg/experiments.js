@@ -19,7 +19,8 @@ export const FolderAdd = ({}: FolderAddProps) => {
 
   const addFolder = useAddFolder();
 
-  const handleAddFolder = async () => {
+  const handleAddFolder = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     await addFolder({ name: name, driveId });
     setName("");
     setOpen(false);
@@ -31,17 +32,16 @@ export const FolderAdd = ({}: FolderAddProps) => {
         <Button>Creer un dossier</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <Input
-          onChange={(e) => setName(e.target.value)}
-          id="name"
-          value={name}
-          className="col-span-3"
-        />
-        <DialogFooter>
-          <Button type="submit" onClick={handleAddFolder}>
-            Créer
-          </Button>
-        </DialogFooter>
+        <form className="flex flex-col gap-4" onSubmit={handleAddFolder}>
+          <Input
+            autoFocus
+            onChange={(e) => setName(e.target.value)}
+            id="name"
+            value={name}
+            className="col-span-3"
+          />
+          <Button type="submit">Créer</Button>
+        </form>
       </DialogContent>
     </Dialog>
   );

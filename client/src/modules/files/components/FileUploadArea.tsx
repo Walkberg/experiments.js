@@ -12,12 +12,14 @@ export const FileUploadArea = ({
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    console.log('on drag enter')
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(true);
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    console.log('on drag leave')
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false);

@@ -16,7 +16,7 @@ export const ContractPage = () => {
   return (
     <ContractProvider operationId={operationId}>
       <div className="flex flex-row-reverse">
-        <ContractAdd />
+        <ContractAdd operationId={operationId} />
       </div>
       <ContractList />
       <Dialog>

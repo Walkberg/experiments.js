@@ -1,10 +1,16 @@
-import { Contract, ContractFiltering, ContractClient } from "./contract"; 
+import {
+  Contract,
+  ContractFiltering,
+  ContractClient,
+  ContractCreated,
+  ContractNew,
+} from "./contract";
 
 const initialValues = [
-  { id: "uij", name: 'test', operationId: "operation-1" },
-  { id: "uij", name: 'test', operationId: "operation-1" },
-  { id: "uij", name: 'test', operationId: "operation-1" },
-  { id: "uij", name: 'test', operationId: "operation-1" },
+  { id: "uij", name: "test", operationId: "operation-1" },
+  { id: "uij", name: "test", operationId: "operation-1" },
+  { id: "uij", name: "test", operationId: "operation-1" },
+  { id: "uij", name: "test", operationId: "operation-1" },
 ];
 
 export class FakeContractClient implements ContractClient {
@@ -25,5 +31,17 @@ export class FakeContractClient implements ContractClient {
       (c) => c.operationId === filtering.operationId
     );
     return filteredContracts;
+  }
+
+  async createContract(contractNew: ContractNew): Promise<ContractCreated> {
+    const id = "";
+
+    this.contracts.push({
+      id: id,
+      name: contractNew.name,
+      operationId: contractNew.operationId,
+    });
+
+    return { id: id };
   }
 }

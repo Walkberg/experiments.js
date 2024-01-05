@@ -5,12 +5,13 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Contract, ContractFiltering } from "../contract"; // Importez correctement vos types
+import { Contract, ContractFiltering, ContractNew } from "../contract"; // Importez correctement vos types
 import { useContractClient } from "./ContractClientProvider"; // Importez votre hook pour accéder au client de contrats
 
 type ContractStatus = "fetching" | "init" | "succeed" | "error";
 
 interface ContractContextState {
+  createContract: (contractNew: ContractNew) => Promise<void>;
   status: ContractStatus;
   contracts: Contract[];
 }
@@ -47,8 +48,22 @@ export const ContractProvider = ({
     fetchContracts();
   }, [client, operationId]);
 
+  const createContract = async (contractNew: ContractNew) => {
+    try {
+      const contractCreated = await client.createContract(contractNew);
+
+      setContracts((prev) => [
+        ...prev,
+        { id: contractCreated.id, ...contractNew },
+      ]);
+    } catch (error) {
+      console.error("Erreur lors de la création du contrat :", error);
+      throw error;
+    }
+  };
+
   return (
-    <ContractContext.Provider value={{ contracts, status }}>
+    <ContractContext.Provider value={{ contracts, status, createContract }}>
       {children}
     </ContractContext.Provider>
   );
@@ -64,4 +79,16 @@ export function useContracts() {
   }
 
   return context;
+}
+
+export function useCreateContract() {
+  const context = useContext(ContractContext);
+
+  if (context == null) {
+    throw new Error(
+      "useContracts doit être utilisé dans un composant enfant de ContractProvider"
+    );
+  }
+
+  return context.createContract;
 }

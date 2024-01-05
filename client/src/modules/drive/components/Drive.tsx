@@ -8,6 +8,7 @@ import { Folder } from "./Folder";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DocumentUploadArea } from "./DocumentUploadArea";
 import { DocumentAdd } from "./DocumentAdd";
+import { DndContext } from "@dnd-kit/core";
 
 interface DriveProps {
   driveId: string;
@@ -16,23 +17,31 @@ interface DriveProps {
 export const Drive = ({ driveId }: DriveProps) => {
   return (
     <DriveProvider driveId={driveId}>
-      <div className="flex flex-col gap-2 p-8">
-        <div className="flex flex-row gap-2 justify-between">
-          <DriveSearch />
-          <FolderAdd />
-        </div>
-        <ScrollArea className="h-80  rounded-md border">
-          <Folders FolderComponent={Folder} />
-          <div>
-            ---------------------------------------- separator
-            -------------------------------------------------
+      <DndContext>
+        <div className="flex flex-col gap-2 p-8">
+          <div className="flex flex-row gap-2 justify-between">
+            <DriveSearch />
+            <FolderAdd />
           </div>
-          <DocumentUploadArea>
-            <Documents DocumentComponent={Document} />
-            <DocumentAdd />
-          </DocumentUploadArea>
-        </ScrollArea>
-      </div>
+          <div className="grid grid-cols-4 gap-4 r">
+            <div className="flex justify-center">nom</div>
+            <div className="flex justify-center">annexé dans</div>
+            <div className="flex justify-center">dans contrat</div>
+            <div className="flex justify-center"></div>
+          </div>
+          <ScrollArea className="h-80  rounded-md border">
+            <Folders FolderComponent={Folder} />
+            <div>
+              ---------------------------------------- separator
+              -------------------------------------------------
+            </div>
+            <DocumentUploadArea>
+              <Documents DocumentComponent={Document} />
+              <DocumentAdd />
+            </DocumentUploadArea>
+          </ScrollArea>
+        </div>
+      </DndContext>
     </DriveProvider>
   );
 };
