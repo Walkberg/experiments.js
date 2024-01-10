@@ -8,7 +8,8 @@ import { Folder } from "./Folder";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DocumentUploadArea } from "./DocumentUploadArea";
 import { DocumentAdd } from "./DocumentAdd";
-import { DndContext } from "@dnd-kit/core";
+import { DropZone } from "./DropZone";
+import { DriveDndContext, EMPTY_FOLDER_AREA } from "./DriveDndContext";
 
 interface DriveProps {
   driveId: string;
@@ -17,7 +18,7 @@ interface DriveProps {
 export const Drive = ({ driveId }: DriveProps) => {
   return (
     <DriveProvider driveId={driveId}>
-      <DndContext>
+      <DriveDndContext>
         <div className="flex flex-col gap-2 p-8">
           <div className="flex flex-row gap-2 justify-between">
             <DriveSearch />
@@ -35,13 +36,15 @@ export const Drive = ({ driveId }: DriveProps) => {
               ---------------------------------------- separator
               -------------------------------------------------
             </div>
-            <DocumentUploadArea>
-              <Documents DocumentComponent={Document} />
-              <DocumentAdd />
-            </DocumentUploadArea>
+            <DropZone id={EMPTY_FOLDER_AREA}>
+              <DocumentUploadArea>
+                <Documents DocumentComponent={Document} />
+                <DocumentAdd />
+              </DocumentUploadArea>
+            </DropZone>
           </ScrollArea>
         </div>
-      </DndContext>
+      </DriveDndContext>
     </DriveProvider>
   );
 };

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ContractPage } from "@/modules/contracts/page/ContractPage";
 import { DrivePage } from "@/modules/drive/page/DrivePage";
+import { OperationWrapper } from "@/modules/operations/components/OperationWrapper";
 import { OperationPage } from "@/modules/operations/page/OperationPage";
 import { PageTemplate } from "@/modules/page-template/PageTemplate";
 import { RedactionPage } from "@/modules/redaction/page/RedactionPage";
@@ -12,12 +13,18 @@ export const router = createBrowserRouter(
     <Route path="/" element={<Test />}>
       <Route path="dashboard" element={<Cool />} />
       <Route path="mynotary" element={<PageTemplate />}>
-        <Route path="operation/:operationId" element={<OperationPage />}>
-          <Route path="contracts" element={<ContractPage />} />
-          <Route
-            path="contracts/:contractId"
-            element={<RedactionPage />}
-          />
+        <Route element={<OperationWrapper />}>
+          <Route path="operation/:operationId">
+            <Route element={<OperationPage />}>
+              <Route path="contracts" element={<ContractPage />} />
+              <Route path="drive" element={<DrivePage />} />
+            </Route>
+            <Route path="contracts/:contractId" element={<RedactionPage />} />
+          </Route>
+        </Route>
+        <Route path="programme/:programeId" element={<OperationPage />}>
+          <Route path="ventes" element={<ContractPage />} />
+          <Route path="contracts/:contractId" element={<RedactionPage />} />
           <Route path="drive" element={<DrivePage />} />
         </Route>
       </Route>

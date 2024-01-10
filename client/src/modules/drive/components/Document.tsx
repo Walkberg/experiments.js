@@ -8,6 +8,7 @@ import { DocumentSelection } from "./DocumentSelection";
 import { Handle } from "./Handle";
 import { DocumentAnnexedIn } from "./DocumentAnnexedIn";
 import { DocumentContractIn } from "./DocumentContractIn";
+import { DraggableItem } from "./DraggableItem";
 
 export interface DocumentProps {
   documentId: string;
@@ -27,31 +28,33 @@ export const Document = ({ documentId }: DocumentProps) => {
   const handleClickDocument = () => {};
 
   return (
-    <Card
-      onClick={handleClickDocument}
-      className="cursor-pointer grid grid-cols-4"
-      ref={ref}
-    >
-      <div className="flex flex-row m-2 items-center gap-2">
-        {isHovered && <Handle />}
-        <div className="flex flex-row items-center gap-4">
-          <DocumentSelection documentId={documentId} />
-          <div className="flex flex-col items-center">
-            <div>{document.filename}</div>
-            <div>{convertSizeToMb(document.size)}</div>
+    <DraggableItem id={documentId}>
+      <Card
+        onClick={handleClickDocument}
+        className="relative cursor-pointer grid grid-cols-4  border-l-4"
+        ref={ref}
+      >
+        <div className="flex flex-row m-2 items-center gap-2 ">
+          {isHovered && <Handle />}
+          <div className="flex flex-row items-center gap-4">
+            <DocumentSelection documentId={documentId} />
+            <div className="flex flex-col items-center">
+              <div>{document.filename}</div>
+              <div>{convertSizeToMb(document.size)}</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div>
-        <DocumentAnnexedIn documentId={documentId} />
-      </div>
-      <div>
-        <DocumentContractIn documentId={documentId} />
-      </div>
-      <div>
-        <DocumentActions documentId={documentId} />
-      </div>
-    </Card>
+        <div>
+          <DocumentAnnexedIn documentId={documentId} />
+        </div>
+        <div>
+          <DocumentContractIn documentId={documentId} />
+        </div>
+        <div>
+          <DocumentActions documentId={documentId} />
+        </div>
+      </Card>
+    </DraggableItem>
   );
 };
 
