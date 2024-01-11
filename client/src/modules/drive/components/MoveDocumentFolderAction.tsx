@@ -6,10 +6,10 @@ import {
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  useMoveDocument,
-  useFolders,
   useDocument,
-} from "../providers/DriveProvider";
+  useMoveDocument,
+} from "../providers/DriveDocumentProvider";
+import { useFolders } from "../providers/DriveFolderProvider";
 
 interface MoveDocumentFolderActionProps {
   documentId: string;

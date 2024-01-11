@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useAddFolder, useDrive } from "../providers/DriveProvider";
+import { useDrive } from "../providers/DriveProvider";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useAddFolder } from "../providers/DriveFolderProvider";
 
 interface FolderAddProps {}
 

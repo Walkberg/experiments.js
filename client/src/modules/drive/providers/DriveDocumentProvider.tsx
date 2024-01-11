@@ -22,7 +22,7 @@ interface DriveDocumentProviderProps {
   children: ReactNode;
 }
 
-export const DriveProvider = ({
+export const DriveDocumentProvider = ({
   children,
   driveId,
 }: DriveDocumentProviderProps) => {

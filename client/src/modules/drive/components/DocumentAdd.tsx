@@ -1,5 +1,5 @@
 import { FileUpload } from "@/modules/files/components/FileUpload";
-import { useCreateDocument } from "../providers/DriveProvider";
+import { useCreateDocument } from "../providers/DriveDocumentProvider";
 
 interface DocumentAddProps {
   folderId?: string;

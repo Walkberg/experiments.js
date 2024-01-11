@@ -1,6 +1,6 @@
 import { FileUploadArea } from "@/modules/files/components/FileUploadArea";
 import { ReactNode } from "react";
-import { useCreateDocument } from "../providers/DriveProvider";
+import { useCreateDocument } from "../providers/DriveDocumentProvider";
 
 interface DocumentUploadAreaProps {
   children: ReactNode;
@@ -14,7 +14,7 @@ export function DocumentUploadArea({
   const createDocument = useCreateDocument();
 
   const handleFileUpload = (fileId: string) => {
-    createDocument({ fileId, folderId: folderId?? null, driveId: 'dr' });
+    createDocument({ fileId, folderId: folderId ?? null, driveId: "dr" });
   };
 
   return (

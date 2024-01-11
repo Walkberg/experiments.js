@@ -2,7 +2,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { useDeleteFolder } from "../providers/DriveProvider";
+import { useDeleteFolder } from "../providers/DriveFolderProvider";
 
 interface FolderDeleteActionProps {
   folderId: string;

@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { useDocument } from "../providers/DriveProvider";
+
 import { useRef } from "react";
 import { useHover } from "@/app/hooks/useHover";
 import { useSearch } from "../providers/DriveSearchProvider";
@@ -9,6 +9,7 @@ import { Handle } from "./Handle";
 import { DocumentAnnexedIn } from "./DocumentAnnexedIn";
 import { DocumentContractIn } from "./DocumentContractIn";
 import { DraggableItem } from "./DraggableItem";
+import { useDocument } from "../providers/DriveDocumentProvider";
 
 export interface DocumentProps {
   documentId: string;

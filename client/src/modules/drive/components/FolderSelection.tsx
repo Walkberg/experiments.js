@@ -1,6 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSelection } from "../providers/DocumentSelectionProvider";
-import { useDocuments } from "../providers/DriveProvider";
+import { useDocuments } from "../providers/DriveDocumentProvider";
 
 interface FolderSelectionProps {
   folderId: string;

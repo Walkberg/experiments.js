@@ -3,7 +3,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { useDeleteDocument } from "../providers/DriveProvider";
+import { useDeleteDocument } from "../providers/DriveDocumentProvider";
 
 interface DocumentDeleteActionProps {
   documentId: string;

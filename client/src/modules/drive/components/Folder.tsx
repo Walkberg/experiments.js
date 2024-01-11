@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Documents } from "./Documents";
-import { useDocuments, useFolder } from "../providers/DriveProvider";
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,9 +16,10 @@ import { Document } from "./Document";
 import { selectDocumentsByFolderId } from "../documents.selector";
 import { Badge } from "@/components/ui/badge";
 import { DocumentUploadArea } from "./DocumentUploadArea";
-import { FolderAdd } from "./FolderAdd";
 import { DocumentAdd } from "./DocumentAdd";
 import { DropZone } from "./DropZone";
+import { useFolder } from "../providers/DriveFolderProvider";
+import { useDocuments } from "../providers/DriveDocumentProvider";
 
 export interface FolderProps {
   folderId: string;

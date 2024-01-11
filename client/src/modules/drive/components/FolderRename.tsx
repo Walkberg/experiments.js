@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useFolder, useUpdateFolder } from "../providers/DriveProvider";
 import { Input } from "@/components/ui/input";
 import { FolderIcon, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useFolder, useUpdateFolder } from "../providers/DriveFolderProvider";
 
 interface FolderRenameProps {
   folderId: string;

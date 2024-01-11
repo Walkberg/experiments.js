@@ -1,4 +1,3 @@
-import { useMoveDocument } from "../providers/DriveProvider";
 import { Document } from "./Document";
 
 import {
@@ -8,6 +7,7 @@ import {
   rectIntersection,
 } from "@dnd-kit/core";
 import { ReactNode, useState } from "react";
+import { useMoveDocument } from "../providers/DriveDocumentProvider";
 
 export const EMPTY_FOLDER_AREA = "empty-folder-area";
 

@@ -3,9 +3,9 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { useDocument } from "../providers/DriveProvider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useDocument } from "../providers/DriveDocumentProvider";
 
 interface DocumentContractInProps {
   documentId: string;
@@ -23,7 +23,7 @@ export function DocumentContractIn({ documentId }: DocumentContractInProps) {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Button variant={'ghost'}>
+        <Button variant={"ghost"}>
           <Badge>{contracts.length} contrats</Badge>
         </Button>
       </HoverCardTrigger>

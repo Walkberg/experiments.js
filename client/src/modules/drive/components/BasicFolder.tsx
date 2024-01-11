@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Documents } from "./Documents";
-import { useFolder } from "../providers/DriveProvider";
 import {
   Collapsible,
   CollapsibleContent,
@@ -12,6 +11,7 @@ import { useState } from "react";
 import { useSearch } from "../providers/DriveSearchProvider";
 import { FolderSelection } from "./FolderSelection";
 import { BasicDocument } from "./BasicDocument";
+import { useFolder } from "../providers/DriveFolderProvider";
 
 export interface FolderProps {
   folderId: string;

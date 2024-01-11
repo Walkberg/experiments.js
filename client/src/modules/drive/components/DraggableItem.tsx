@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
-
 import { useDraggable } from "@dnd-kit/core";
-import { Handle } from "./Handle";
 
 interface DraggableItemProps {
   id: string;
@@ -15,7 +13,6 @@ export const DraggableItem = ({ id, children }: DraggableItemProps) => {
 
   return (
     <div
-  
       style={{ opacity: isDragging ? 0.5 : 1 }}
       ref={setNodeRef}
       {...attributes}

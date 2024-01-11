@@ -1,11 +1,9 @@
 import { Card } from "@/components/ui/card";
-import { useDocument } from "../providers/DriveProvider";
 import { useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { GripVertical } from "lucide-react";
 import { useHover } from "@/app/hooks/useHover";
 import { useSearch } from "../providers/DriveSearchProvider";
 import { DocumentSelection } from "./DocumentSelection";
+import { useDocument } from "../providers/DriveDocumentProvider";
 
 export interface DocumentProps {
   documentId: string;

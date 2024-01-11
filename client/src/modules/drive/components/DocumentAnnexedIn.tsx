@@ -1,11 +1,11 @@
 import { Badge } from "@/components/ui/badge";
-import { useDocument } from "../providers/DriveProvider";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
+import { useDocument } from "../providers/DriveDocumentProvider";
 
 interface DocumentAnnexedInProps {
   documentId: string;
