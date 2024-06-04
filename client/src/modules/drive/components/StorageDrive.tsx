@@ -20,7 +20,7 @@ export const StorageDrive = ({ driveId }: DriveProps) => {
         </div>
         <ScrollArea className="h-80  rounded-md border">
           <Folders FolderComponent={BasicFolder} />
-          <Documents DocumentComponent={BasicDocument} />
+          <Documents DocumentComponent={BasicDocument} filtered={false} />
         </ScrollArea>
         <Button>Accepter</Button>
       </div>

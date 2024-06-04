@@ -23,17 +23,17 @@ import { useDocuments } from "../providers/DriveDocumentProvider";
 
 export interface FolderProps {
   folderId: string;
+  filtered: boolean;
 }
 
-export const Folder = ({ folderId }: FolderProps) => {
+export const Folder = ({ folderId, filtered }: FolderProps) => {
   const [isOpened, setIsOpened] = useState(false);
 
-  const { search } = useSearch();
   const folder = useFolder(folderId);
 
   const documents = useDocuments(selectDocumentsByFolderId(folderId));
 
-  if (folder == null || !folder.name.includes(search)) {
+  if (folder == null) {
     return null;
   }
 
@@ -55,17 +55,21 @@ export const Folder = ({ folderId }: FolderProps) => {
                       <span className="sr-only">Toggle</span>
                     </Button>
                   </CollapsibleTrigger>
-                  <FolderSelection folderId={folder.id} />
-                  <FolderName folderId={folder.id} />
+                  <FolderSelection folderId={folderId} />
+                  <FolderName folderId={folderId} />
                 </div>
                 <div>
                   <Badge>{documents.length} items</Badge>
-                  <FolderActions folderId={folder.id} />
+                  <FolderActions folderId={folderId} />
                 </div>
               </div>
               <CollapsibleContent className="space-y-2">
-                <Documents folderId={folder.id} DocumentComponent={Document} />
-                <DocumentAdd folderId={folder.id} />
+                <Documents
+                  folderId={folderId}
+                  DocumentComponent={Document}
+                  filtered={filtered}
+                />
+                <DocumentAdd folderId={folderId} />
               </CollapsibleContent>
             </div>
           </Card>

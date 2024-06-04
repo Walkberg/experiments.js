@@ -15,13 +15,7 @@ export const BasicDocument = ({ documentId }: DocumentProps) => {
 
   const document = useDocument(documentId);
 
-  const { search } = useSearch();
-
   if (document == null) {
-    return null;
-  }
-
-  if (!document.filename.includes(search)) {
     return null;
   }
 

@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 
 import { useRef } from "react";
 import { useHover } from "@/app/hooks/useHover";
-import { useSearch } from "../providers/DriveSearchProvider";
 import { DocumentActions } from "./DocumentActions";
 import { DocumentSelection } from "./DocumentSelection";
 import { Handle } from "./Handle";
@@ -20,9 +19,8 @@ export const Document = ({ documentId }: DocumentProps) => {
   const isHovered = useHover(ref);
 
   const document = useDocument(documentId);
-  const { search } = useSearch();
 
-  if (document == null || !document.filename.includes(search)) {
+  if (document == null) {
     return null;
   }
 

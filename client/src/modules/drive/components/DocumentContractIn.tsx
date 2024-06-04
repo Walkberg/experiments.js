@@ -6,6 +6,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useDocument } from "../providers/DriveDocumentProvider";
+import { Link } from "react-router-dom";
 
 interface DocumentContractInProps {
   documentId: string;
@@ -14,7 +15,11 @@ interface DocumentContractInProps {
 export function DocumentContractIn({ documentId }: DocumentContractInProps) {
   const document = useDocument(documentId);
 
-  const contracts = ["test", "test", "fdjngk"];
+  const contracts = [
+    { id: "contract-1", name: "contract-1" },
+    { id: "contract-2", name: "contract-2" },
+    { id: "contract-3", name: "contract-3" },
+  ];
 
   if (contracts.length === 0) {
     return null;
@@ -29,7 +34,9 @@ export function DocumentContractIn({ documentId }: DocumentContractInProps) {
       </HoverCardTrigger>
       <HoverCardContent className="w-80">
         {contracts.map((contract) => (
-          <div>{contract}</div>
+          <Link to={""}>
+            <div className="flex">{contract.name}</div>
+          </Link>
         ))}
       </HoverCardContent>
     </HoverCard>

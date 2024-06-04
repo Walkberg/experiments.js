@@ -21,7 +21,7 @@ export const FolderActions = ({ folderId }: FolderActionProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Rien</DropdownMenuLabel>
+        <FolderDeleteAction folderId={folderId} />
         <FolderDeleteAction folderId={folderId} />
       </DropdownMenuContent>
     </DropdownMenu>

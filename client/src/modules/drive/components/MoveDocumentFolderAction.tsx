@@ -36,12 +36,22 @@ export const MoveDocumentFolderAction = ({
       <DropdownMenuPortal>
         <DropdownMenuSubContent>
           {filteredFolder.map((folder) => (
-            <DropdownMenuItem onClick={() => handleMoveDoc(folder.id)}>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation;
+                handleMoveDoc(folder.id);
+              }}
+            >
               {folder.name}
             </DropdownMenuItem>
           ))}
           {document?.folderId != null && (
-            <DropdownMenuItem onClick={() => handleMoveDoc(null)}>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation;
+                handleMoveDoc(null);
+              }}
+            >
               auncun
             </DropdownMenuItem>
           )}

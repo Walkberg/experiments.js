@@ -15,15 +15,15 @@ import { useFolder } from "../providers/DriveFolderProvider";
 
 export interface FolderProps {
   folderId: string;
+  filtered: boolean;
 }
 
-export const BasicFolder = ({ folderId }: FolderProps) => {
+export const BasicFolder = ({ folderId, filtered }: FolderProps) => {
   const [isOpened, setIsOpened] = useState(false);
 
-  const { search } = useSearch();
   const folder = useFolder(folderId);
 
-  if (folder == null || !folder.name.includes(search)) {
+  if (folder == null) {
     return null;
   }
 
@@ -48,7 +48,11 @@ export const BasicFolder = ({ folderId }: FolderProps) => {
             </div>
           </div>
           <CollapsibleContent className="space-y-2">
-            <Documents folderId={folder.id} DocumentComponent={BasicDocument} />
+            <Documents
+              folderId={folder.id}
+              DocumentComponent={BasicDocument}
+              filtered={filtered}
+            />
           </CollapsibleContent>
         </div>
       </Card>
