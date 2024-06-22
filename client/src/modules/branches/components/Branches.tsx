@@ -9,14 +9,7 @@ export const Branches = ({}: BranchesProps) => {
   const { branches, status } = useBranches("operation-1");
 
   if (status === "loading") {
-    return (
-      <div className="flex flex-col gap-4 justify-center">
-        <Skeleton className="h-12 w-[300px] bg-slate-200" />
-        <Skeleton className="h-12 w-[300px] bg-slate-200" />
-        <Skeleton className="h-12 w-[300px] bg-slate-200" />
-        <Skeleton className="h-12 w-[300px] bg-slate-200" />
-      </div>
-    );
+    return <BranchesPlaceHolder />;
   }
 
   if (status === "error") {
@@ -30,6 +23,17 @@ export const Branches = ({}: BranchesProps) => {
           <Branch />
         </BranchProvider>
       ))}
+    </div>
+  );
+};
+
+export const BranchesPlaceHolder = () => {
+  return (
+    <div className="flex flex-col gap-4 justify-center">
+      <Skeleton className="h-12 w-[300px] bg-slate-200" />
+      <Skeleton className="h-12 w-[300px] bg-slate-200" />
+      <Skeleton className="h-12 w-[300px] bg-slate-200" />
+      <Skeleton className="h-12 w-[300px] bg-slate-200" />
     </div>
   );
 };

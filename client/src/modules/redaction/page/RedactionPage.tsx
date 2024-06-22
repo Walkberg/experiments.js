@@ -8,7 +8,7 @@ export const RedactionPage = () => {
   return (
     <RoomProvider roomId={"roome-cool"}>
       <div className="flex row items-center content-center w-full h-full">
-        <div className="flex flex-col bg-slate-100 w-[700px]">
+        <div className="flex flex-col w-[700px]">
           <Tabs defaultValue="account">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="account">Questions</TabsTrigger>

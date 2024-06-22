@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { BattlegroundPage } from "@/modules/battleground/battleground-page";
+import { CommandPatternPage } from "@/modules/command-pattern/CommandPattern";
 import { ContractPage } from "@/modules/contracts/page/ContractPage";
 import { DrivePage } from "@/modules/drive/page/DrivePage";
+import { FormPage } from "@/modules/form/FormPage";
 import { OperationWrapper } from "@/modules/operations/components/OperationWrapper";
 import { OperationPage } from "@/modules/operations/page/OperationPage";
 import { PageTemplate } from "@/modules/page-template/PageTemplate";
@@ -11,6 +14,9 @@ import { createBrowserRouter } from "react-router-dom";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Test />}>
+      <Route path="command-pattern" element={<CommandPatternPage />} />
+      <Route path="battleground" element={<BattlegroundPage />} />
+      <Route path="form" element={<FormPage />} />
       <Route path="dashboard" element={<Cool />} />
       <Route path="mynotary" element={<PageTemplate />}>
         <Route element={<OperationWrapper />}>
