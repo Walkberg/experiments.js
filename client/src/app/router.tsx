@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { BalatroPage } from "@/modules/balatro/BalatroPage";
 import { BattlegroundPage } from "@/modules/battleground/battleground-page";
 import { CommandPatternPage } from "@/modules/command-pattern/CommandPattern";
 import { ContractPage } from "@/modules/contracts/page/ContractPage";
@@ -15,6 +16,7 @@ export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Test />}>
       <Route path="command-pattern" element={<CommandPatternPage />} />
+      <Route path="balatro" element={<BalatroPage />} />
       <Route path="battleground" element={<BattlegroundPage />} />
       <Route path="form" element={<FormPage />} />
       <Route path="dashboard" element={<Cool />} />
