@@ -35,10 +35,18 @@ export const UserNotification = () => {
             </form>
           </div>
           <TabsContent value={"all"}>
-            <NotificationList notifications={notifications} />
+            <NotificationList
+              notifications={notifications.filter(
+                (notification) => !notification.archived
+              )}
+            />
           </TabsContent>
           <TabsContent value={"archived"}>
-            <NotificationList notifications={notifications} />
+            <NotificationList
+              notifications={notifications.filter(
+                (notification) => notification.archived
+              )}
+            />
           </TabsContent>
         </Tabs>
       </PopoverContent>

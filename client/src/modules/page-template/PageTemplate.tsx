@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet, redirect } from "react-router";
 import { SidebarProvider } from "../sidebar/providers/SidebarProvider";
 import { Sidebar } from "../sidebar/components/Sidebar";
 import { Header } from "@/modules/header/components/Header";

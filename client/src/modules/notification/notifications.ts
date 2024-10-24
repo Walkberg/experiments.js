@@ -7,6 +7,7 @@ export interface Notification {
   description: string;
   viewed: boolean;
   creationDate: Date;
+  archived: boolean;
 }
 
 export interface NotificationFiltering {

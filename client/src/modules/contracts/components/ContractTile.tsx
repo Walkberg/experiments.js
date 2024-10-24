@@ -12,9 +12,9 @@ export const ContractTile = ({ contract }: ContractTileProps) => {
   const navigate = useNavigate();
 
   const handleClickContract = () => {
-    navigate(`${contract.id}`);
+    navigate(`./${contract.id}`);
   };
-  
+
   return (
     <Button
       onClick={handleClickContract}

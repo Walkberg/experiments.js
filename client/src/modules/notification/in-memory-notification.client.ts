@@ -16,6 +16,7 @@ const initialNotifications = [
     description: "Description de la notification 1",
     viewed: false,
     creationDate: new Date(),
+    archived: false,
   },
   {
     id: "2",
@@ -26,6 +27,18 @@ const initialNotifications = [
     description: "Description de la notification 2",
     viewed: true,
     creationDate: new Date(),
+    archived: true,
+  },
+  {
+    id: "3",
+    creatorId: "user-1",
+    userId: "user-1",
+    name: "Notification 1",
+    type: "info",
+    description: "Description de la notification 1",
+    viewed: false,
+    creationDate: new Date(),
+    archived: false,
   },
 ];
 

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { usePermission } from "@/modules/user-permissions/use-permission";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useCreateContract } from "../providers/ContractProvider";
 
 interface ContractAddProps {
@@ -26,6 +26,28 @@ export const ContractAdd = ({ operationId }: ContractAddProps) => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      let userAgent = window.navigator.userAgent.toLowerCase();
+      const isMac = false;
+
+      const isShortcutPressed = isMac
+        ? e.metaKey && e.key === "h"
+        : e.ctrlKey && e.key === "h";
+
+      if (isShortcutPressed) {
+        e.preventDefault();
+        setOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
