@@ -1,3 +1,5 @@
+import { evaluatePokerHand, getCardValue } from "./hand-evaluator";
+
 export type Chip = number;
 
 export type Multiplier = number;
@@ -70,12 +72,20 @@ export type PokerCard = {
   Enhancement &
   Seal;
 
+export type PlayerConfig = {
+  maxHandSize: number;
+  maxItemCount: number;
+  maxBuffonCount: number;
+};
+
 export interface Player {
   id: string;
   deck: Deck;
   hand: Hand;
+  buffons: BuffonsSlot;
   handScore: HandScore;
   baseScoreList: BaseScoreList;
+  config: PlayerConfig;
 }
 
 export interface Shop {
@@ -165,6 +175,20 @@ export type BaseScore = {
 
 export type BaseScoreList = Record<PlanetType, BaseScore>;
 
+export type BaseScoreListAddition = Record<PlanetType, Score>;
+
+export const addition: BaseScoreListAddition = {
+  pluto: { chip: 10, multiplier: 1 },
+  mercury: { chip: 15, multiplier: 1 },
+  uranus: { chip: 20, multiplier: 1 },
+  venus: { chip: 20, multiplier: 2 },
+  saturn: { chip: 30, multiplier: 3 },
+  jupiter: { chip: 15, multiplier: 2 },
+  earth: { chip: 25, multiplier: 2 },
+  mars: { chip: 30, multiplier: 3 },
+  neptune: { chip: 40, multiplier: 4 },
+};
+
 export const baseScoreList: BaseScoreList = {
   pluto: { chip: 5, multiplier: 1, level: 1, playedCount: 0 },
   mercury: { chip: 10, multiplier: 2, level: 1, playedCount: 0 },
@@ -183,19 +207,21 @@ export function improveBaseScoreList(
 ): BaseScoreList {
   const baseScore = baseScoreList[type];
 
+  const additionScore = addition[type];
+
   return {
     ...baseScoreList,
     [type]: {
       ...baseScore,
-      chip: baseScore.chip,
-      multiplier: baseScore.multiplier,
+      chip: baseScore.chip + additionScore.chip,
+      multiplier: baseScore.multiplier + additionScore.multiplier,
       level: baseScore.level + 1,
     },
   };
 }
 
 export function getHandBaseScore(player: Player): Score {
-  const handType = evaluateHand(player.hand);
+  const handType = evaluatePokerHand(player.hand);
   return player.baseScoreList[convertHandTypeToPlanetType(handType)];
 }
 
@@ -331,76 +357,7 @@ export function getBaseChip(card: PokerCard): number {
   return baseChipCard[card.rank];
 }
 
-export function evaluateHand(hand: Hand): PokerHandType {
-  if (isRoyalFlush(hand)) return "RoyalFlush";
-  if (isStraightFlush(hand)) return "StraightFlush";
-  if (isFourOfAKind(hand)) return "FourOfAKind";
-  if (isFullHouse(hand)) return "FullHouse";
-  if (isFlush(hand)) return "Flush";
-  if (isStraight(hand)) return "Straight";
-  if (isThreeOfAKind(hand)) return "ThreeOfAKind";
-  if (isTwoPair(hand)) return "TwoPair";
-  if (isOnePair(hand)) return "OnePair";
-  return "HighCard";
-}
-
-export function isRoyalFlush(hand: Hand): boolean {
-  return isStraightFlush(hand) && hand.some((card) => card.rank === "A");
-}
-
-export function isStraightFlush(hand: Hand): boolean {
-  return isFlush(hand) && isStraight(hand);
-}
-
-export function isFourOfAKind(hand: Hand): boolean {
-  return hasNOfAKind(hand, 4);
-}
-
-export function isFullHouse(hand: Hand): boolean {
-  return isThreeOfAKind(hand) && isOnePair(hand);
-}
-
-export function isFlush(hand: Hand): boolean {
-  if (hand.length < 5) return false;
-  const suit = hand[0].suit;
-  return hand.every((card) => card.suit === suit);
-}
-
-export function isStraight(hand: Hand): boolean {
-  const values = hand.map((card) => cardValue(card.rank)).sort((a, b) => a - b);
-  for (let i = 0; i < values.length - 1; i++) {
-    if (values[i] + 1 !== values[i + 1]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export function isThreeOfAKind(hand: Hand): boolean {
-  return hasNOfAKind(hand, 3);
-}
-
-export function isTwoPair(hand: Hand): boolean {
-  const pairs = hand.reduce((acc, card) => {
-    acc[card.rank] = (acc[card.rank] || 0) + 1;
-    return acc;
-  }, {} as Record<CardRank, number>);
-  return Object.values(pairs).filter((count) => count === 2).length === 2;
-}
-
-export function isOnePair(hand: Hand): boolean {
-  return hasNOfAKind(hand, 2);
-}
-
-export function hasNOfAKind(hand: Hand, n: number): boolean {
-  const counts = hand.reduce((acc, card) => {
-    acc[card.rank] = (acc[card.rank] || 0) + 1;
-    return acc;
-  }, {} as Record<CardRank, number>);
-  return Object.values(counts).some((count) => count === n);
-}
-
-export function cardValue(value: CardRank): Chip {
+export function getCardChips(value: CardRank): Chip {
   if (value === "A") return 14;
   if (value === "K") return 13;
   if (value === "Q") return 12;
@@ -414,8 +371,8 @@ export function getDeckSize(deck: Deck): number {
 
 export function sortBySuit(hand: Hand): Hand {
   return hand.sort((a, b) => {
-    const valueA = cardValue(a.rank);
-    const valueB = cardValue(b.rank);
+    const valueA = getCardChips(a.rank);
+    const valueB = getCardChips(b.rank);
 
     if (a.suit === b.suit) {
       return valueA > valueB ? 1 : -1;
@@ -426,8 +383,8 @@ export function sortBySuit(hand: Hand): Hand {
 
 export function sortByRank(hand: Hand): Hand {
   return hand.sort((a, b) => {
-    const valueA = cardValue(a.rank);
-    const valueB = cardValue(b.rank);
+    const valueA = getCardValue(a.rank);
+    const valueB = getCardValue(b.rank);
 
     if (valueA === valueB) {
       return a.suit > b.suit ? 1 : -1;
@@ -446,8 +403,12 @@ export function computePlayerHand(player: Player): Score {
   for (let i = 0; i < player.hand.length; i++) {
     const card = player.hand[i];
 
-    const value = cardValue(card.rank);
-    baseScore = addChipToScore(baseScore, value);
+    const chip = getCardChips(card.rank);
+    baseScore = addChipToScore(baseScore, chip);
+  }
+
+  for (let i = 0; i < player.buffons.length; i++) {
+    const buffon = player.buffons[i];
   }
 
   return baseScore;
@@ -510,6 +471,7 @@ export function multiplyMultiplierToScore(
 export const fakePlayer: Player = {
   id: "player1",
   deck: generateDeck(),
+  buffons: [],
   hand: [],
   handScore: {
     handType: "RoyalFlush",
@@ -521,4 +483,9 @@ export const fakePlayer: Player = {
     },
   },
   baseScoreList: baseScoreList,
+  config: {
+    maxBuffonCount: 6,
+    maxHandSize: 6,
+    maxItemCount: 3,
+  },
 };

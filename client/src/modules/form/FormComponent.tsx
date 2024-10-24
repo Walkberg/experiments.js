@@ -126,7 +126,7 @@ export const UserQuestionComponent = ({ type, ...rest }: UserQuestion) => {
         email: "tesst@gmail.com",
       },
     ]);
-  }, [type]);
+  }, []);
 
   return (
     <SelectQuestionComponent
@@ -256,5 +256,6 @@ export function useForm() {
   if (context == null) {
     throw new Error("useForm must be used within a FormProvider");
   }
+
   return context;
 }

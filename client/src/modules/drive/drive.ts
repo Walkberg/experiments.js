@@ -67,11 +67,18 @@ export interface FolderUpdate {
 
 export interface DriveClient {
   createFolder: (folderNew: DriveFolderNew) => Promise<FolderCreated>;
+
   getFolders: (filtering: FolderFiltering) => Promise<DriveFolder[]>;
+
   updateFolder: (folderUpdate: FolderUpdate) => Promise<void>;
+
   deleteFolder: (id: string) => Promise<void>;
+
   createDocument: (documentNew: DocumentNew) => Promise<DocumentCreated>;
+
   getDocuments: (filtering: DocumentFiltering) => Promise<DriveDocument[]>;
+
   updateDocument: (documentUpdate: DocumentUpdate) => Promise<void>;
+
   deleteDocument: (id: string) => Promise<void>;
 }

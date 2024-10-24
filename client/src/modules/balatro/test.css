@@ -1,0 +1,22 @@
+.card-edition {
+  background: url("../assets/Editions.png") no-repeat;
+  background-position: -72px 0px;
+
+  height: 90px;
+  width: 70px;
+}
+
+.card-enhancer {
+  background: url("../assets/Enhancers.png") no-repeat;
+  background-position: -72px -96px;
+
+  height: 90px;
+  width: 70px;
+}
+
+.card-rank {
+  background: url("../assets/8BitDeck.png") no-repeat;
+
+  height: 90px;
+  width: 70px;
+}

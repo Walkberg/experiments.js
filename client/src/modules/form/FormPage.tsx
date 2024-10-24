@@ -14,9 +14,8 @@ export const FormPage = () => {
 
   const [display, setDisplay] = useState<"column" | "row">("column");
 
-  const handleClick = () => {
-    setDisplay(display === "column" ? "row" : "column");
-  };
+  const handleClick = () =>
+    setDisplay((prev) => (prev === "column" ? "row" : "column"));
 
   const handleSubmit = async (answer: FormResponse) => {
     console.log(answer);
