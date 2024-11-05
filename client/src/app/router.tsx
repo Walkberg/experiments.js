@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { BalatroPage } from "@/modules/balatro/BalatroPage";
 import { BattlegroundPage } from "@/modules/battleground/battleground-page";
+import { CardGamePage } from "@/modules/card-game/CardGamePage";
 import { CommandPatternPage } from "@/modules/command-pattern/CommandPattern";
 import { ContractPage } from "@/modules/contracts/page/ContractPage";
 import { DrivePage } from "@/modules/drive/page/DrivePage";
@@ -36,6 +37,7 @@ export const router = createBrowserRouter(
           <Route path="drive" element={<DrivePage />} />
         </Route>
       </Route>
+      <Route path="mygame" element={<CardGamePage />} />
     </Route>
   )
 );
