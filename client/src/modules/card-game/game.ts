@@ -63,7 +63,6 @@ export interface Engine {
   onEvent: (eventName: string, callback: EventCallback) => void;
   getPlugin: <T extends Plugin>(name: string) => T | null;
   pool: Pool;
-  playerSide: Side;
 }
 
 export interface Plugin {
@@ -118,7 +117,6 @@ export function createEngine(): Engine {
 
   const engine: Engine = {
     pool,
-    playerSide: undefined as any,
     hasPlugin: hasPlugin,
     registerPlugin: registerPlugin,
     removePlugin: removePlugin,
@@ -126,8 +124,6 @@ export function createEngine(): Engine {
     emitEvent: emit,
     getPlugin,
   };
-
-  engine.playerSide = createSide(engine);
 
   return engine;
 }
@@ -175,30 +171,33 @@ export function createHand(game: Engine): Hand {
 
     console.log("remove card", cards);
   }
+
+  function playCard(card: Card) {
+    const cardIndex = cards.findIndex((c) => c.id === card.id);
+
+    if (cardIndex === -1) {
+      console.error("Carte introuvable dans la main !");
+      return;
+    }
+
+    const [removedCard] = cards.splice(cardIndex, 1);
+
+    removeCard(card.id);
+
+    //game.playerSide.board.addCard(removedCard);
+
+    if (card.hasBattleCry()) {
+      card.triggerBattleCry(game);
+    }
+
+    game.emitEvent("cardPlayed", card);
+  }
+
   return {
     maxHand: 0,
     getCards: () => cards,
     addCard: (card: Card) => {},
-    playCard: (card: Card) => {
-      const cardIndex = cards.findIndex((c) => c.id === card.id);
-
-      if (cardIndex === -1) {
-        console.error("Carte introuvable dans la main !");
-        return;
-      }
-
-      const [removedCard] = cards.splice(cardIndex, 1);
-
-      removeCard(card.id);
-
-      game.playerSide.board.addCard(removedCard);
-
-      if (card.hasBattleCry()) {
-        card.triggerBattleCry(game);
-      }
-
-      game.emitEvent("cardPlayed", card);
-    },
+    playCard,
   };
 }
 
@@ -324,5 +323,170 @@ export function createShopPlugin(): ShopPlugin {
     getCards,
     freeze,
     removeCard: buyCard,
+  };
+}
+
+export interface PlayerPlugin extends Plugin {
+  getPlayerStats: () => PlayerStats;
+  setPlayerStats: (stats: Partial<PlayerStats>) => void;
+  getPlayerSide: () => Side;
+}
+
+export function createPlayerPlugin(): PlayerPlugin {
+  let _engine: Engine;
+  let playerStats: PlayerStats = {
+    health: 30,
+    money: 0,
+  };
+
+  let playerSide: Side;
+
+  function init(engine: Engine): void {
+    _engine = engine;
+
+    playerSide = {
+      player: playerStats,
+      board: createBoard(engine),
+      hand: createHand(engine),
+    };
+  }
+
+  function getPlayerStats(): PlayerStats {
+    return playerStats;
+  }
+
+  function setPlayerStats(stats: Partial<PlayerStats>): void {
+    playerStats = { ...playerStats, ...stats };
+  }
+
+  function getPlayerSide(): Side {
+    return playerSide;
+  }
+
+  return {
+    name: "player",
+    init,
+    getPlayerStats,
+    setPlayerStats,
+    getPlayerSide,
+  };
+}
+
+interface Opponent {
+  id: string;
+  name: string;
+}
+
+export interface OpponentsPlugin extends Plugin {
+  getOpponents: () => Opponent[];
+}
+
+interface OpponentPluginOptions {
+  count: number;
+}
+
+export function createOpponentPlugin(
+  args?: OpponentPluginOptions
+): OpponentsPlugin {
+  let _engine: Engine;
+
+  let opponents: Opponent[];
+
+  function init(engine: Engine): void {
+    _engine = engine;
+    opponents = createOpponents(args?.count ?? 8);
+  }
+
+  function createOpponents(count: number): Opponent[] {
+    return Array.from({ length: count }, (_, i) => createOpponent(i));
+  }
+
+  function createOpponent(i: number): Opponent {
+    return {
+      id: i.toString(),
+      name: `Opponent ${i + 1}`,
+    };
+  }
+
+  function getOpponents(): Opponent[] {
+    return opponents;
+  }
+
+  return {
+    name: "opponents",
+    init,
+    getOpponents,
+  };
+}
+
+export interface EconomyPlugin extends Plugin {
+  getMoney: () => number;
+  addMoney: (amount: number) => void;
+  deductMoney: (amount: number) => boolean;
+  setMoney: (amount: number) => void;
+}
+
+export function createEconomyPlugin(initialMoney: number = 10): EconomyPlugin {
+  let _engine: Engine;
+  let money: number = initialMoney;
+
+  function init(engine: Engine): void {
+    _engine = engine;
+
+    _engine.onEvent("money-added", (payload) => {
+      console.log(`Money added: ${payload.amount}`);
+    });
+
+    _engine.onEvent("money-deducted", (payload) => {
+      console.log(`Money deducted: ${payload.amount}`);
+    });
+  }
+
+  function getMoney(): number {
+    return money;
+  }
+
+  function addMoney(amount: number): void {
+    if (amount < 0) {
+      console.warn("Cannot add a negative amount of money!");
+      return;
+    }
+    money += amount;
+
+    _engine.emitEvent("money-added", { amount, total: money });
+  }
+
+  function deductMoney(amount: number): boolean {
+    if (amount < 0) {
+      console.warn("Cannot deduct a negative amount of money!");
+      return false;
+    }
+    if (money < amount) {
+      console.warn("Not enough money to deduct!");
+      return false;
+    }
+    money -= amount;
+
+    _engine.emitEvent("money-deducted", { amount, total: money });
+
+    return true;
+  }
+
+  function setMoney(amount: number): void {
+    if (amount < 0) {
+      return;
+    }
+    money = amount;
+
+    _engine.emitEvent("money-set", { total: money });
+  }
+
+  return {
+    name: "economy",
+    init,
+    getMoney,
+    addMoney,
+    deductMoney,
+    setMoney,
   };
 }

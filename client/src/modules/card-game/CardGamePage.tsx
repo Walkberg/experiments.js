@@ -16,6 +16,11 @@ import {
   createCard,
   createShopPlugin,
   ShopPlugin,
+  createPlayerPlugin,
+  PlayerPlugin,
+  createOpponentPlugin,
+  OpponentsPlugin,
+  createEconomyPlugin,
 } from "./game";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +32,16 @@ const useGame = () => {
 
   useEffect(() => {
     const myGame = createEngine();
-    myGame.registerPlugin(createShopPlugin());
+
+    const playerPlugin = createPlayerPlugin();
+    const opponentPlugin = createOpponentPlugin({ count: 8 });
+    const shopPlugin = createShopPlugin();
+    const economyPlugin = createEconomyPlugin();
+
+    myGame.registerPlugin(playerPlugin);
+    myGame.registerPlugin(opponentPlugin);
+    myGame.registerPlugin(shopPlugin);
+    myGame.registerPlugin(economyPlugin);
 
     myGame.onEvent("test", (payload) => {
       setRefreshCounter((prev) => prev + 1);
@@ -36,7 +50,6 @@ const useGame = () => {
     myGame.pool.addCard(maSuperCard, 1);
     myGame.pool.addCard(maSuperCard2, 1);
 
-    setGame(myGame);
     myGame.onEvent("shop-rolled", (card) =>
       setRefreshCounter((prev) => prev + 1)
     );
@@ -44,6 +57,8 @@ const useGame = () => {
     myGame.onEvent("card-bought", (card) =>
       setRefreshCounter((prev) => prev + 1)
     );
+
+    setGame(myGame);
 
     return () => removeMod("mon-mod", myGame);
   }, []);
@@ -100,10 +115,11 @@ export const Shop = () => {
   }
 
   const shop = game.getPlugin<ShopPlugin>("shop");
+  const playerSide = game.getPlugin<PlayerPlugin>("player");
 
   console.log("shop", shop);
 
-  if (shop == null) {
+  if (shop == null || playerSide == null) {
     return <div>Loading...</div>;
   }
 
@@ -134,7 +150,7 @@ export const Shop = () => {
         </div>
         <div className="flex flex-col  bg-green-500">
           <div>
-            <CardList cards={game.playerSide.board.getCards()} />
+            <CardList cards={playerSide.getPlayerSide().board.getCards()} />
           </div>
         </div>
         <div>
@@ -144,8 +160,10 @@ export const Shop = () => {
           </div>
           <div>
             <CardList
-              cards={game.playerSide.hand.getCards()}
-              onClickCard={(card) => game.playerSide.hand.playCard(card)}
+              cards={playerSide.getPlayerSide().hand.getCards()}
+              onClickCard={(card) =>
+                playerSide.getPlayerSide().hand.playCard(card)
+              }
             />
           </div>
           <div>
@@ -173,15 +191,15 @@ export const GameTemplate = ({
 };
 
 export const Opponents = () => {
-  const [opponents, setOpponents] = useState<{ id: string }[]>([
-    { id: "1" },
-    { id: "2" },
-    { id: "3" },
-    { id: "4" },
-    { id: "5" },
-    { id: "6" },
-    { id: "7" },
-  ]);
+  const { game } = useCurrentGame();
+  const opponents = game
+    ?.getPlugin<OpponentsPlugin>("opponents")
+    ?.getOpponents();
+
+  if (opponents == null) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="flex flex-col">
       {opponents.map((opponent) => (
