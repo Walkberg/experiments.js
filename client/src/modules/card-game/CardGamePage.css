@@ -1,0 +1,19 @@
+.gradient {
+  background: rgb(247, 170, 188);
+  background: linear-gradient(
+    121deg,
+    rgba(247, 170, 188, 1) 0%,
+    rgba(117, 194, 255, 1) 37%,
+    rgba(178, 255, 246, 1) 100%
+  );
+}
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-10px) rotate(5deg);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}

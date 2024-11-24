@@ -1,292 +1,273 @@
+import "./CardGamePage.css";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import React, { useState, useEffect, ReactNode } from "react";
+import {
+  useState,
+  useEffect,
+  ReactNode,
+  createContext,
+  useContext,
+} from "react";
+import {
+  createEngine,
+  Engine,
+  removeMod,
+  Card as CardI,
+  createCard,
+  createShopPlugin,
+  ShopPlugin,
+} from "./game";
+import { cn } from "@/lib/utils";
 
-export const CardGamePage = () => {
-  const [game, setGame] = useState<Game | null>(null);
+const useGame = () => {
+  const [game, setGame] = useState<Engine | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
 
-  const [cards, setCards] = useState<Card[]>([
-    { id: "card-1" },
-    { id: "card-2" },
-    { id: "card-3" },
-    { id: "card-4" },
-  ]);
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   useEffect(() => {
-    const myGame = createMyGame();
+    const myGame = createEngine();
+    myGame.registerPlugin(createShopPlugin());
+
+    myGame.onEvent("test", (payload) => {
+      setRefreshCounter((prev) => prev + 1);
+    });
+
+    myGame.pool.addCard(maSuperCard, 1);
+    myGame.pool.addCard(maSuperCard2, 1);
+
     setGame(myGame);
-
-    myGame.onCardPicked((card) =>
-      setMessages((prev) => [...prev, `Card ${card.id} picked`])
+    myGame.onEvent("shop-rolled", (card) =>
+      setRefreshCounter((prev) => prev + 1)
     );
 
-    myGame.onCardDiscard((card) =>
-      setMessages((prev) => [...prev, `Card ${card.id} discarded`])
+    myGame.onEvent("card-bought", (card) =>
+      setRefreshCounter((prev) => prev + 1)
     );
-
-    myGame.onModActivated((mod) =>
-      setMessages((prev) => [...prev, `Mod ${mod.name} activated`])
-    );
-
-    myGame.onModDisabled((mod) =>
-      setMessages((prev) => [...prev, `Mod ${mod.name} disabled`])
-    );
-
-    addMod1(myGame);
 
     return () => removeMod("mon-mod", myGame);
   }, []);
 
-  const addMod1 = (game: Game) => {
-    const mod = createNewMod("mon-mod");
+  return { messages, game, refreshCounter };
+};
 
-    game.addMod(mod);
+interface GameContextType {
+  game: Engine | null;
+  refreshCounter: number;
+}
 
-    mod.onCardPicked((card) =>
-      setMessages((prev) => [
-        ...prev,
-        `Card ${card.id} picked from mod ${mod.name}`,
-      ])
+export const GameContext = createContext<GameContextType | null>(null);
+
+interface GameProviderProps {
+  children: ReactNode;
+}
+
+export const GameProvider = ({ children }: GameProviderProps) => {
+  const { game, refreshCounter } = useGame();
+
+  return (
+    <GameContext.Provider value={{ game, refreshCounter }}>
+      {children}
+    </GameContext.Provider>
+  );
+};
+
+export const useCurrentGame = () => {
+  const context = useContext(GameContext);
+
+  if (context == null) {
+    throw new Error(
+      "useBattleGround must be used within a BattleGroundProvider"
     );
-    mod.onCardDiscard((card) =>
-      setMessages((prev) => [
-        ...prev,
-        `Card ${card.id} discarded from mod ${mod.name}`,
-      ])
-    );
-  };
+  }
 
-  const addMod2 = (game: Game) => {
-    const mod = createNewMod("mon-mod-2");
+  return context;
+};
 
-    game.addMod(mod);
+export const CardGamePage = () => {
+  return (
+    <GameProvider>
+      <Shop />
+    </GameProvider>
+  );
+};
 
-    mod.onCardPicked((card) =>
-      setMessages((prev) => [
-        ...prev,
-        `Card ${card.id} picked from mod ${mod.name}`,
-      ])
-    );
-    mod.onCardDiscard((card) =>
-      setMessages((prev) => [
-        ...prev,
-        `Card ${card.id} discarded from mod ${mod.name}`,
-      ])
-    );
-  };
-
-  const handleChange = (value: boolean) => {
-    if (game == null) {
-      return;
-    }
-    if (value) {
-      addMod1(game);
-    } else {
-      game.removeMod("mon-mod");
-    }
-  };
-
-  const handleChange2 = (value: boolean) => {
-    if (game == null) {
-      return;
-    }
-    if (value) {
-      addMod2(game);
-    } else {
-      game.removeMod("mon-mod-2");
-    }
-  };
-
-  const handlePickCard = (card: Card) => {
-    if (game == null) {
-      return;
-    }
-    game.pickCard(card);
-  };
-
-  const handleDiscardCard = (card: Card) => {
-    if (game == null) {
-      return;
-    }
-    game.discardCard(card);
-  };
+export const Shop = () => {
+  const { game } = useCurrentGame();
 
   if (game == null) {
-    return <div>loading</div>;
+    return <div>Loading...</div>;
+  }
+
+  const shop = game.getPlugin<ShopPlugin>("shop");
+
+  console.log("shop", shop);
+
+  if (shop == null) {
+    return <div>Loading...</div>;
   }
 
   return (
-    <div>
-      game: {game.mods.length} activé
-      <div>
-        Activer mon mod{" "}
-        <Checkbox
-          checked={game.hasMod("mon-mod")}
-          onClick={() => handleChange(!game.hasMod("mon-mod"))}
-        />
-        Activer mon mod{" "}
-        <Checkbox
-          checked={game.hasMod("mon-mod-2")}
-          onClick={() => handleChange2(!game.hasMod("mon-mod-2"))}
-        />
+    <GameTemplate sidebar={<Opponents />}>
+      <div className=" bg-green-500 grid grid-rows-4 gap-4 h-screen">
+        <div className="flex flex-row items-center justify-center">
+          <div>
+            <Button>level up</Button>
+          </div>
+          <div>
+            <div>level indication</div>
+            <div>Bob</div>
+          </div>
+          <div>
+            <Button onClick={() => shop.roll()}>Refresh</Button>
+            <Button onClick={() => shop.freeze()}>Freeze</Button>
+          </div>
+        </div>
+        <div>
+          <CardList
+            cards={shop.getCards()}
+            onClickCard={(card) => shop.removeCard(card.id)}
+          />
+          <div className="flex justify-items-end">
+            <Button>Timer</Button>
+          </div>
+        </div>
+        <div className="flex flex-col  bg-green-500">
+          <div>
+            <CardList cards={game.playerSide.board.getCards()} />
+          </div>
+        </div>
+        <div>
+          <div className="flex flex-row items-center justify-center">
+            <div>hero</div>
+            <div>hero power</div>
+          </div>
+          <div>
+            <CardList
+              cards={game.playerSide.hand.getCards()}
+              onClickCard={(card) => game.playerSide.hand.playCard(card)}
+            />
+          </div>
+          <div>
+            <div>mana * ** ** * ** *</div>
+          </div>
+        </div>
       </div>
-      <CardList cards={game.shop} actions={<div>actions</div>} />
-      <CardList cards={game.board} actions={<div>actions</div>} />
-      <CardList cards={game.hand} actions={<div>actions</div>} />
-      <div>
-        {messages.map((message, key) => (
-          <div key={key}>{message}</div>
-        ))}
-      </div>
+    </GameTemplate>
+  );
+};
+
+export const GameTemplate = ({
+  children,
+  sidebar,
+}: {
+  children: ReactNode;
+  sidebar?: ReactNode;
+}) => {
+  return (
+    <div className="grid grid-cols-10">
+      <div className="bg-red-500 ">{sidebar}</div>
+      <div className="bg-blue-500 col-span-9">{children}</div>
+    </div>
+  );
+};
+
+export const Opponents = () => {
+  const [opponents, setOpponents] = useState<{ id: string }[]>([
+    { id: "1" },
+    { id: "2" },
+    { id: "3" },
+    { id: "4" },
+    { id: "5" },
+    { id: "6" },
+    { id: "7" },
+  ]);
+  return (
+    <div className="flex flex-col">
+      {opponents.map((opponent) => (
+        <Button key={opponent.id}>{opponent.id}</Button>
+      ))}
     </div>
   );
 };
 
 const CardList = ({
   cards,
-  actions,
+  onClickCard,
 }: {
-  cards: Card[];
-  actions: ReactNode;
+  cards: CardI[];
+  actions?: ReactNode;
+  onClickCard?: (card: CardI) => void;
 }) => {
   return (
-    <div
-      className="flex flex-row 
-    "
-    >
+    <div className="flex flex-row bg-green-600 p-8 gap-3 justify-center">
       {cards.map((card) => (
-        <Card key={card.id}>
-          {card.id} {actions}
-        </Card>
+        <AnimatedCard
+          className="p-2 "
+          key={card.id}
+          onClick={() => onClickCard?.(card)}
+        >
+          <div className="w-60 h-32 gradient " />
+          <div className="pt-4 ps-8">
+            <div className="text-xl">{card.name}</div>
+            <div className="text-base">{card.description}</div>
+          </div>
+        </AnimatedCard>
       ))}
     </div>
   );
 };
 
-interface Card {
-  id: string;
+interface AnimatedCardProps extends React.ButtonHTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+  className?: string;
+  onClick?: () => void;
 }
 
-type CardCallBack = (card: Card) => Promise<void> | void;
+const AnimatedCard = ({ children, ...rest }: AnimatedCardProps) => {
+  const [style, setStyle] = useState({});
 
-type ModCallBack = (mod: Mod) => Promise<void> | void;
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-interface Game {
-  discardCard: (card: Card) => void;
-  pickCard: (card: Card) => void;
-  hasMod: (modName: string) => boolean;
-  addMod: (mod: Mod) => void;
-  removeMod: (modName: string) => void;
-  onCardPicked: (callback: CardCallBack) => void;
-  onCardDiscard: (callback: CardCallBack) => void;
-  onModActivated: (callback: ModCallBack) => void;
-  onModDisabled: (callback: ModCallBack) => void;
-  shop: Card[];
-  board: Card[];
-  hand: Card[];
-  mods: Mod[];
-}
+    const rotateX = (y - rect.height / 2) / 3;
+    const rotateY = (x - rect.width / 2) / -3;
 
-interface Mod {
-  name: string;
-  onCardPicked: (callback: CardCallBack) => void;
-  onCardDiscard: (callback: CardCallBack) => void;
-
-  cardPickCallbacks: Array<CardCallBack>;
-  cardDiscardCallbacks: Array<CardCallBack>;
-}
-
-function createMyGame(): Game {
-  const mods: Record<string, Mod> = {};
-
-  let cardPickedCallbacks: Array<CardCallBack> = [];
-  let cardDiscardedCallbacks: Array<CardCallBack> = [];
-
-  let modActivateCallbacks: Array<ModCallBack> = [];
-  let modDisableCallbacks: Array<ModCallBack> = [];
-
-  let shop: Array<Card> = [{ id: "card-1" }, { id: "card-2" }];
-  let hand: Array<Card> = [{ id: "card-1" }, { id: "card-2" }];
-  let board: Array<Card> = [{ id: "card-1" }, { id: "card-2" }];
-
-  function hasMod(modName: string) {
-    return modName in mods;
-  }
-
-  function pickCard(card: Card) {
-    cardPickedCallbacks.forEach((callback) => callback(card));
-
-    Object.values(mods).forEach((mod) =>
-      mod.cardPickCallbacks.forEach((callback) => callback(card))
-    );
-  }
-  function discardCard(card: Card) {
-    cardDiscardedCallbacks.forEach((callback) => callback(card));
-
-    Object.values(mods).forEach((mod) =>
-      mod.cardDiscardCallbacks.forEach((callback) => callback(card))
-    );
-  }
-
-  function addMod(mod: Mod) {
-    if (!hasMod(mod.name)) {
-      mods[mod.name] = mod;
-      modActivateCallbacks.forEach((callback) => callback(mod));
-    }
-  }
-
-  function removeMod(modName: string) {
-    if (hasMod(modName)) {
-      const mod = mods[modName];
-      modDisableCallbacks.forEach((callback) => callback(mod));
-      delete mods[modName];
-    }
-  }
-
-  return {
-    board,
-    hand,
-    shop,
-    pickCard: pickCard,
-    discardCard: discardCard,
-    hasMod: hasMod,
-    addMod,
-    removeMod,
-    onCardPicked(callback: CardCallBack) {
-      cardPickedCallbacks.push(callback);
-    },
-    onCardDiscard(callback: CardCallBack) {
-      cardDiscardedCallbacks.push(callback);
-    },
-    onModActivated(callback: ModCallBack) {
-      modActivateCallbacks.push(callback);
-    },
-    onModDisabled(callback: ModCallBack) {
-      modDisableCallbacks.push(callback);
-    },
-    mods: Object.values(mods),
+    setStyle({
+      transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+      transition: "transform 0.1s ease",
+    });
   };
-}
 
-function removeMod(modName: string, game: Game): void {
-  game.removeMod(modName);
-}
-
-function createNewMod(name: string): Mod {
-  let cardPickCallbacks: Array<CardCallBack> = [];
-  let cardDiscardCallbacks: Array<CardCallBack> = [];
-
-  return {
-    name,
-    cardPickCallbacks,
-    cardDiscardCallbacks,
-    onCardPicked(callback: CardCallBack) {
-      cardPickCallbacks.push(callback);
-    },
-    onCardDiscard(callback: CardCallBack) {
-      cardDiscardCallbacks.push(callback);
-    },
+  const handleMouseLeave = () => {
+    setStyle({
+      transform: "rotateX(0) rotateY(0)",
+      transition: "transform 0.5s ease",
+    });
   };
-}
+
+  return (
+    <Card
+      className={cn("card", rest.className)}
+      style={style}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      {...rest}
+    >
+      {children}
+    </Card>
+  );
+};
+
+const maSuperCard = createCard();
+
+const maSuperCard2 = createCard();
+
+maSuperCard.addBattleCry((game) => {
+  const shop = game.getPlugin<ShopPlugin>("shop");
+  shop?.getCards().forEach((card) => {
+    shop.removeCard(card.id);
+  });
+});
