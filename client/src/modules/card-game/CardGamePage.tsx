@@ -21,6 +21,8 @@ import {
   createOpponentPlugin,
   OpponentsPlugin,
   createEconomyPlugin,
+  EconomyPlugin,
+  createPoolManagerPlugin,
 } from "./game";
 import { cn } from "@/lib/utils";
 
@@ -37,24 +39,32 @@ const useGame = () => {
     const opponentPlugin = createOpponentPlugin({ count: 8 });
     const shopPlugin = createShopPlugin();
     const economyPlugin = createEconomyPlugin();
+    const poolManagerPlugin = createPoolManagerPlugin();
+
+    poolManagerPlugin.addCard(maSuperCard);
+    poolManagerPlugin.addCard(maSuperCard2);
+
+    poolManagerPlugin.initialize();
 
     myGame.registerPlugin(playerPlugin);
     myGame.registerPlugin(opponentPlugin);
     myGame.registerPlugin(shopPlugin);
     myGame.registerPlugin(economyPlugin);
+    myGame.registerPlugin(poolManagerPlugin);
 
     myGame.onEvent("test", (payload) => {
       setRefreshCounter((prev) => prev + 1);
     });
-
-    myGame.pool.addCard(maSuperCard, 1);
-    myGame.pool.addCard(maSuperCard2, 1);
 
     myGame.onEvent("shop-rolled", (card) =>
       setRefreshCounter((prev) => prev + 1)
     );
 
     myGame.onEvent("card-bought", (card) =>
+      setRefreshCounter((prev) => prev + 1)
+    );
+
+    myGame.onEvent("cardPlayed", (card) =>
       setRefreshCounter((prev) => prev + 1)
     );
 
@@ -116,10 +126,11 @@ export const Shop = () => {
 
   const shop = game.getPlugin<ShopPlugin>("shop");
   const playerSide = game.getPlugin<PlayerPlugin>("player");
+  const economy = game.getPlugin<EconomyPlugin>("economy");
 
   console.log("shop", shop);
 
-  if (shop == null || playerSide == null) {
+  if (shop == null || playerSide == null || economy == null) {
     return <div>Loading...</div>;
   }
 
@@ -135,7 +146,12 @@ export const Shop = () => {
             <div>Bob</div>
           </div>
           <div>
-            <Button onClick={() => shop.roll()}>Refresh</Button>
+            <Button
+              disabled={economy.getCurrentMoney() <= 0}
+              onClick={() => shop.roll()}
+            >
+              Refresh
+            </Button>
             <Button onClick={() => shop.freeze()}>Freeze</Button>
           </div>
         </div>
@@ -166,12 +182,35 @@ export const Shop = () => {
               }
             />
           </div>
-          <div>
-            <div>mana * ** ** * ** *</div>
-          </div>
+          <Gold />
         </div>
       </div>
     </GameTemplate>
+  );
+};
+
+const Gold = () => {
+  const { game } = useCurrentGame();
+
+  const goldPlugin = game?.getPlugin<EconomyPlugin>("economy");
+
+  if (goldPlugin == null) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="flex flex-row gap-2">
+      <Card className="p-2 items-center">
+        {goldPlugin.getCurrentMoney()}/{goldPlugin.getMaxMoney()}
+      </Card>
+      <Card className="flex flex-row p-2 items-center ">
+        {Array.from({ length: 10 }).map((gold, index) => (
+          <div key={index}>
+            {index + 1 > goldPlugin.getCurrentMoney() ? "x" : "0"}
+          </div>
+        ))}
+      </Card>
+    </div>
   );
 };
 

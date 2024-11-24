@@ -55,7 +55,7 @@ export const Balatro = () => {
   const [sortBy, setSortBy] = useState<"rank" | "suit">("rank");
 
   useEffect(() => {
-    drawCard(18);
+    drawCard(6);
   }, []);
 
   const handleDiscard = () => {

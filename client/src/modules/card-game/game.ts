@@ -1,3 +1,5 @@
+import { v4 as uuid } from "uuid";
+
 export interface Card {
   id: string;
   name: string;
@@ -62,7 +64,6 @@ export interface Engine {
   emitEvent: (eventName: string, payload: any) => void;
   onEvent: (eventName: string, callback: EventCallback) => void;
   getPlugin: <T extends Plugin>(name: string) => T | null;
-  pool: Pool;
 }
 
 export interface Plugin {
@@ -74,8 +75,6 @@ type EventCallback = (payload: any) => void;
 
 export function createEngine(): Engine {
   const plugins: Record<string, Plugin> = {};
-
-  const pool = createPool();
 
   const eventListeners: Map<string, EventCallback[]> = new Map();
 
@@ -116,7 +115,6 @@ export function createEngine(): Engine {
   }
 
   const engine: Engine = {
-    pool,
     hasPlugin: hasPlugin,
     registerPlugin: registerPlugin,
     removePlugin: removePlugin,
@@ -133,7 +131,7 @@ export function removeMod(modName: string, game: Engine): void {
 }
 
 export function createBoard(game: Engine): Board {
-  const cards = createCards(3);
+  const cards: Card[] = [];
   return {
     getCards: () => cards,
     maxHand: 0,
@@ -150,21 +148,11 @@ export function createBoard(game: Engine): Board {
   };
 }
 
-export function createSide(game: Engine): Side {
-  return {
-    player: {
-      health: 0,
-      money: 0,
-    },
-    board: createBoard(game),
-    hand: createHand(game),
-  };
-}
-
 type ShopChangeCallback = () => void;
 
 export function createHand(game: Engine): Hand {
-  let cards = game.pool.cards;
+  const maxHandSize = 3;
+  let cards: Card[] = [];
 
   function removeCard(cardId: string) {
     cards = cards.filter((c) => c.id !== cardId);
@@ -193,10 +181,14 @@ export function createHand(game: Engine): Hand {
     game.emitEvent("cardPlayed", card);
   }
 
+  function addCard(card: Card) {
+    cards.push(card);
+  }
+
   return {
     maxHand: 0,
     getCards: () => cards,
-    addCard: (card: Card) => {},
+    addCard,
     playCard,
   };
 }
@@ -251,7 +243,7 @@ export function createCard(): Card {
   }
 
   return {
-    id: i.toString(),
+    id: uuid(),
     name: "Card " + i,
     description: "Description " + i,
     image: "https://via.placeholder.com/150",
@@ -284,16 +276,37 @@ export function createShopPlugin(): ShopPlugin {
   let cards: Card[] = [];
   let _engine: Engine;
 
+  const rollPrice = 1;
+
+  const maxCardCount = 3;
+
   function init(engine: Engine): void {
     _engine = engine;
   }
 
   function createInitialCards(): Card[] {
-    return createCards(randomNumber(1, 5));
+    const pool = _engine.getPlugin<PoolManagerPlugin>("pool");
+    if (pool == null) {
+      return [];
+    }
+    return pool.getRandomCard(maxCardCount);
   }
 
   function roll(): void {
+    const encomyPlugin = _engine.getPlugin<EconomyPlugin>("economy");
+    if (encomyPlugin == null) {
+      return;
+    }
+
+    const money = encomyPlugin?.getCurrentMoney();
+
+    if (money == null || money - rollPrice < 0) {
+      return;
+    }
+
     cards = createInitialCards();
+
+    encomyPlugin.addMoney(-rollPrice);
 
     _engine.emitEvent("shop-rolled", cards);
   }
@@ -304,12 +317,13 @@ export function createShopPlugin(): ShopPlugin {
 
   function buyCard(cardId: string): void {
     const index = cards.findIndex((c) => c.id === cardId);
+    const card = cards[index];
     if (index === -1) {
       return;
     }
     cards.splice(index, 1);
 
-    _engine.emitEvent("card-bought", {});
+    _engine.emitEvent("card-bought", card);
   }
 
   function getCards(): Card[] {
@@ -349,6 +363,14 @@ export function createPlayerPlugin(): PlayerPlugin {
       board: createBoard(engine),
       hand: createHand(engine),
     };
+
+    engine.onEvent("card-bought", (card: Card) => {
+      playerSide.hand.addCard(card);
+    });
+
+    engine.onEvent("cardPlayed", (card: Card) => {
+      playerSide.board.addCard(card);
+    });
   }
 
   function getPlayerStats(): PlayerStats {
@@ -420,15 +442,19 @@ export function createOpponentPlugin(
 }
 
 export interface EconomyPlugin extends Plugin {
-  getMoney: () => number;
+  getCurrentMoney: () => number;
+  getMaxMoney: () => number;
   addMoney: (amount: number) => void;
   deductMoney: (amount: number) => boolean;
   setMoney: (amount: number) => void;
+  resetMoney: () => void;
 }
 
-export function createEconomyPlugin(initialMoney: number = 10): EconomyPlugin {
+export function createEconomyPlugin(initialMoney: number = 8): EconomyPlugin {
   let _engine: Engine;
+
   let money: number = initialMoney;
+  let maxMoney: number = 10;
 
   function init(engine: Engine): void {
     _engine = engine;
@@ -442,15 +468,7 @@ export function createEconomyPlugin(initialMoney: number = 10): EconomyPlugin {
     });
   }
 
-  function getMoney(): number {
-    return money;
-  }
-
   function addMoney(amount: number): void {
-    if (amount < 0) {
-      console.warn("Cannot add a negative amount of money!");
-      return;
-    }
     money += amount;
 
     _engine.emitEvent("money-added", { amount, total: money });
@@ -481,12 +499,82 @@ export function createEconomyPlugin(initialMoney: number = 10): EconomyPlugin {
     _engine.emitEvent("money-set", { total: money });
   }
 
+  function resetMoney(): void {
+    money = maxMoney;
+  }
+
+  function getMaxMoney() {
+    return maxMoney;
+  }
+
+  function getCurrentMoney() {
+    return money;
+  }
+
   return {
     name: "economy",
     init,
-    getMoney,
+    getMaxMoney,
+    getCurrentMoney,
+    resetMoney,
     addMoney,
     deductMoney,
     setMoney,
+  };
+}
+
+export interface PoolManagerPlugin extends Plugin {
+  addCard: (card: Card) => void;
+  initialize: () => void;
+  getRandomCard: (count: number) => Card[];
+}
+
+export function createPoolManagerPlugin(): PoolManagerPlugin {
+  let _engine: Engine;
+
+  let cards: Card[] = [];
+
+  let pool: Card[] = [];
+
+  function init(engine: Engine): void {
+    _engine = engine;
+    console.log("Pool Plugin initialized.");
+  }
+
+  function addCard(card: Card): void {
+    cards.push(card);
+  }
+
+  function initialize(): void {
+    cards.forEach((card) => {
+      for (let i = 0; i < 5; i++) {
+        pool.push({ ...card, id: uuid() });
+      }
+    });
+  }
+
+  function getRandomCard(count: number): Card[] {
+    const randomCards: Card[] = [];
+
+    const availableCards = pool.length;
+
+    for (let i = 0; i < Math.min(count, availableCards); i++) {
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      const card = pool[randomIndex];
+
+      randomCards.push(card);
+
+      pool.splice(randomIndex, 1);
+    }
+
+    return randomCards;
+  }
+
+  return {
+    name: "pool",
+    init,
+    addCard,
+    initialize,
+    getRandomCard,
   };
 }
