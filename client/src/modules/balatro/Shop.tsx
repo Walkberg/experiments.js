@@ -9,13 +9,15 @@ import {
 } from "./balatro";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { CardContainer } from "./BalatroPage";
+import { CardContainer, useGameManager } from "./BalatroPage";
 import { PlayCard } from "./Card";
 
 interface ShopProps {}
 
 export const Shop = ({}: ShopProps) => {
   const [shop, setShop] = useState<IShop>(generateShop());
+
+  const gameManager = useGameManager();
 
   const handleBuyCard = (buyableItem: BuyableItem<ICard>) => {
     setShop((prev) => ({
@@ -29,11 +31,15 @@ export const Shop = ({}: ShopProps) => {
     setShop((prev) => ({ ...prev, cards }));
   };
 
+  if (!gameManager) return null;
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-4">
         <div className="flex flex-col gap-2">
-          <Button>Next Round</Button>
+          <Button onClick={() => gameManager.startNextPhase()}>
+            Next Round
+          </Button>
           <Button onClick={handleReroll}>Reroll 5$</Button>
         </div>
         <div>

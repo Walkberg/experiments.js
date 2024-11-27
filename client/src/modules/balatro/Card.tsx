@@ -15,24 +15,29 @@ import {
 } from "@/components/ui/hover-card";
 import { ReactNode } from "react";
 import { animated, useSpring } from "@react-spring/web";
+import { cn } from "@/lib/utils";
 
 interface PlayCardProps {
   card: ICard;
-  onSelectCard: () => void;
+  onSelectCard?: () => void;
+  selected?: boolean;
 }
 
-export const PlayCard = ({ card, onSelectCard }: PlayCardProps) => {
+export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
   return (
     <HoverCard>
       <HoverCardTrigger>
         <AnimatedCard card={card}>
           <Card
             onClick={onSelectCard}
-            className="flex flex-col cursor-pointer hover:shadow-indigo-500/60"
+            className={cn(
+              "flex flex-col cursor-pointer hover:shadow-indigo-500/60",
+              selected ? "translate-y-2" : ""
+            )}
           >
             <CardEdition card={card}>
               <CardEnhancer card={card}>
-                <CardView card={card}>sd</CardView>
+                <CardView card={card} />
               </CardEnhancer>
             </CardEdition>
           </Card>
@@ -50,7 +55,7 @@ export const PlayCard = ({ card, onSelectCard }: PlayCardProps) => {
 
 interface CardBackgroundProps {
   card: ICard;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export const CardBackground = ({ children }: CardBackgroundProps) => {
@@ -115,6 +120,5 @@ function getCardSuitPosition(cardSuit: CardSuit): number {
 }
 
 function getCardRankPosition(cardRank: CardRank): number {
-  console.log(getCardChips(cardRank));
   return (getCardChips(cardRank) - 2) * -CARD_X_SIZE;
 }
