@@ -1,4 +1,11 @@
+import { PokerCard } from "./balatro";
+import {
+  BalatroEngine,
+  getPlayerPluginManagerPlugin,
+  ScoreManagerPlugin,
+} from "./balatro-engine";
 import { createCallbackManager, getCallbackManager, Mod } from "./mod";
+import { Buffon } from "./plugins/buffons-manager-plugin";
 
 export type BuffonId = string;
 
@@ -99,3 +106,102 @@ export const Balatro: IBalatro = {
     getCallbackManager().onGameEnd.notify();
   },
 };
+
+export function createBuffon1(): Buffon {
+  const buffon = createBaseBuffon({
+    name: "buffon_1",
+    description: "add 10 multiplier when 10 is played",
+  });
+
+  buffon.onCardComputeScore = (context: BalatroEngine, card: PokerCard) => {
+    const scoreManager = context.getPlugin<ScoreManagerPlugin>("score");
+
+    if (scoreManager == null) {
+      return;
+    }
+
+    if (card.rank === "10") {
+      scoreManager.addMultiplier(20);
+    }
+  };
+
+  return buffon;
+}
+
+export function createBuffon2(): Buffon {
+  const buffon = createBaseBuffon({
+    name: "buffon_2",
+    description: "add 100 chips when a heart is played",
+  });
+
+  buffon.onCardComputeScore = (context: BalatroEngine, card: PokerCard) => {
+    const scoreManager = context.getPlugin<ScoreManagerPlugin>("score");
+
+    if (scoreManager == null) {
+      return;
+    }
+
+    if (card.suit === "hearts") {
+      scoreManager.addChip(100);
+    }
+  };
+
+  return buffon;
+}
+
+function getScoreManagerPlugin(context: BalatroEngine) {
+  return context.getPlugin<ScoreManagerPlugin>("score");
+}
+
+function getPlayerManagerPlugin(context: BalatroEngine) {
+  const manager = context.getPlugin<ScoreManagerPlugin>("player");
+
+  if (manager == null) {
+    throw new Error("Player manager not found");
+  }
+
+  return manager;
+}
+
+export function createBuffon3(): Buffon {
+  const buffon = createBaseBuffon({
+    name: "buffon_3",
+    description: "ajoute une main",
+  });
+
+  buffon.onBuffonEnabled = (context: BalatroEngine) => {
+    console.log("buffon_3 enabled");
+    const playerManagerPlugin = getPlayerPluginManagerPlugin(context);
+    playerManagerPlugin.addMaxHandCount(1);
+  };
+
+  buffon.onBuffonDisabled = (context: BalatroEngine) => {
+    const playerManagerPlugin = getPlayerPluginManagerPlugin(context);
+    playerManagerPlugin.removeMaxHandCount(1);
+  };
+
+  return buffon;
+}
+
+export function createBaseBuffon({
+  name,
+  description,
+}: {
+  name: string;
+  description: string;
+}): Buffon {
+  return {
+    id: name,
+    name: name,
+    description,
+    onCardComputeScore(context: BalatroEngine, card: PokerCard) {},
+    onBuffonEnabled(context: BalatroEngine) {},
+    onBuffonDisabled(context: BalatroEngine) {},
+  };
+}
+
+export const buffonsPlayer = [
+  createBuffon1(),
+  createBuffon2(),
+  createBuffon3(),
+];

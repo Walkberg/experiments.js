@@ -21,12 +21,14 @@ import { evaluatePokerHand } from "./hand-evaluator";
 import {
   BlindManagerPlugin,
   DeckManagerPlugin,
+  EconomyManagerPlugin,
   GameManagerPlugin,
   HandManagerPlugin,
   Phase,
   PlayedCardManagerPlugin,
   ScoreManagerPlugin,
 } from "./balatro-engine";
+import { Buffon, BuffonsManagerPlugin } from "./plugins/buffons-manager-plugin";
 import { cn } from "@/lib/utils";
 
 export const BalatroPage = () => {
@@ -52,7 +54,9 @@ export const Balatro = () => {
     });
   }, [balatro]);
 
-  const [buffons, setBuffons] = useState<IBuffon[]>([]);
+  if (phase === "GameOver") {
+    return <div> Game Over</div>;
+  }
 
   return (
     <div className="grid grid-cols-5 bg-green-800 background-tv">
@@ -62,7 +66,7 @@ export const Balatro = () => {
       <div className="grid grid-rows-3  grid-cols-5 col-span-4 m-2 w-full gap-3">
         <div className="col-span-3">
           <CardContainer>
-            <Buffons buffons={buffons} />
+            <Buffons />
           </CardContainer>
         </div>
         <div className="col-span-2">
@@ -143,11 +147,25 @@ export const Sidebar = () => {
 };
 
 export const PlayerInfo = () => {
+  const { balatro } = useCurrentGame();
   const handmanager = useHandManager();
+  const economyManager = useEconomyManager();
 
-  if (handmanager == null) {
+  const [refresh, setRefresh] = useState(false);
+
+  useEffect(() => {
+    if (balatro == null) return;
+    balatro.onEvent("economy-updated", () => {
+      console.log("economy updated aaaa");
+      setRefresh((prev) => !prev);
+    });
+  }, [balatro]);
+
+  if (handmanager == null || economyManager == null) {
     return null;
   }
+
+  console.log("economyManager", economyManager.getMoney());
 
   return (
     <div className="grid flex-row gap-4">
@@ -161,7 +179,7 @@ export const PlayerInfo = () => {
       </ItemContainer>
       <ItemCard className="col-span-2 col-start-2 row-start-2">
         <ItemTest>
-          <Button>$32</Button>
+          <Button>${economyManager.getMoney()}</Button>
         </ItemTest>
       </ItemCard>
       <ItemContainer className="row-start-3" name="antes">
@@ -251,6 +269,13 @@ export const Score = ({}: ScoreProps) => {
         setRoundScore(plugin.getRoundScore());
       }
     });
+
+    balatro?.onEvent("score-reset", (score) => {
+      const plugin = balatro.getPlugin<ScoreManagerPlugin>("score");
+      if (plugin != null) {
+        setRoundScore(plugin.getRoundScore());
+      }
+    });
   }, [balatro]);
 
   return (
@@ -332,6 +357,18 @@ export function useHandManager() {
   }
 
   return handManager;
+}
+
+export function useEconomyManager() {
+  const { balatro } = useCurrentGame();
+
+  const economyManager = balatro?.getPlugin<EconomyManagerPlugin>("economy");
+
+  if (economyManager == null) {
+    return null;
+  }
+
+  return economyManager;
 }
 
 export function useGameManager() {
@@ -453,19 +490,57 @@ export const Deck = ({}: DeckProps) => {
   return <div>{deck?.getDeckSize()}</div>;
 };
 
-interface BuffonsProps {
-  buffons: IBuffon[];
+export function useBuffonManager() {
+  const { balatro } = useCurrentGame();
+
+  const [refresh, setRefresh] = useState(false);
+
+  const buffonManager =
+    balatro?.getPlugin<BuffonsManagerPlugin>("buffon-manager");
+
+  useEffect(() => {
+    balatro?.onEvent("buffon-added", () => {
+      setRefresh((prev) => !prev);
+    });
+  }, [buffonManager]);
+
+  if (buffonManager == null) {
+    return null;
+  }
+
+  return buffonManager;
 }
 
-export const Buffons = ({ buffons }: BuffonsProps) => {
+interface BuffonsProps {}
+
+export const Buffons = ({}: BuffonsProps) => {
+  const buffonManager = useBuffonManager();
+
+  if (buffonManager == null) {
+    return null;
+  }
+
   return (
     <div className="flex flex-row gap-2">
-      {BuffonPool()
-        .getBuffon()
-        .map((buffon) => (
-          <Card>buffon</Card>
-        ))}
+      {buffonManager.getBuffons().map((buffon) => (
+        <BuffonCard key={buffon.id} buffon={buffon} />
+      ))}
     </div>
+  );
+};
+
+export const BuffonCard = ({
+  buffon,
+  onClick,
+}: {
+  buffon: Buffon;
+  onClick?: () => void;
+}) => {
+  return (
+    <Card onClick={onClick}>
+      <div>{buffon.name}</div>
+      <div>{buffon.description}</div>
+    </Card>
   );
 };
 

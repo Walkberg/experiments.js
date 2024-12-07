@@ -199,7 +199,7 @@ export function isStraight(hand: Hand): boolean {
       return false;
     }
   }
-  return true;
+  return values.length > 4;
 }
 
 export function isThreeOfAKind(hand: Hand): boolean {

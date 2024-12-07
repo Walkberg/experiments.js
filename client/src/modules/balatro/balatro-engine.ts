@@ -3,9 +3,12 @@ import {
   CardSuit,
   Deck,
   getBaseChip,
+  getHandBaseScore,
   Hand,
   PokerCard,
 } from "./balatro";
+import { BuffonsManagerPlugin } from "./plugins/buffons-manager-plugin";
+import { evaluatePokerHand } from "./hand-evaluator";
 
 export type EventName =
   | "change-phase"
@@ -19,9 +22,17 @@ export type EventName =
   | "card-discard"
   | "card-discarded"
   | "score-calculated"
+  | "score-reset"
   | "phase-changed"
   | "played-card-reset"
-  | "card-selected";
+  | "shop-rerolled"
+  | "shop-item-bought"
+  | "economy-updated"
+  | "card-selected"
+  | "buffon-added"
+  | "buffon-removed"
+  | "item-added"
+  | "item-removed";
 
 export interface BalatroEngine {
   removePlugin: (modName: string) => void;
@@ -208,21 +219,33 @@ export interface HandManagerPlugin extends Plugin {
   reset: () => void;
 }
 
+export function getPlayerPluginManagerPlugin(
+  engine: BalatroEngine
+): PlayerManagerPlugin {
+  const test = engine.getPlugin<PlayerManagerPlugin>("player-manager");
+
+  if (test == null) {
+    throw new Error("Player manager plugin not found");
+  }
+
+  return test;
+}
+
 export function createHandPlugin(): HandManagerPlugin {
   let _engine: BalatroEngine;
+  let _playerManagerPlugin: PlayerManagerPlugin;
   let _hand: Hand = [];
 
-  // TODO: Move to Player config
-  const _maxHandSize = 7;
-  const _maxHand = 2;
-  const _maxDiscard = 2;
-
-  let _remainingHandSize = _maxHandSize;
-  let _remainingHand = _maxHand;
-  let _remainingDiscard = _maxDiscard;
+  let _remainingHandSize = 0;
+  let _remainingHand = 0;
+  let _remainingDiscard = 0;
 
   function init(engine: BalatroEngine) {
     _engine = engine;
+    _playerManagerPlugin = getPlayerPluginManagerPlugin(engine);
+
+    reset();
+
     console.log("Hand plugin initialized");
   }
 
@@ -275,9 +298,9 @@ export function createHandPlugin(): HandManagerPlugin {
 
   function reset() {
     _hand = [];
-    _remainingHandSize = _maxHandSize;
-    _remainingHand = _maxHand;
-    _remainingDiscard = _maxDiscard;
+    _remainingHandSize = _playerManagerPlugin.getMaxHandSize();
+    _remainingHand = _playerManagerPlugin.getMaxHandCount();
+    _remainingDiscard = _playerManagerPlugin.getMaxDiscard();
   }
 
   return {
@@ -343,14 +366,18 @@ export interface ScoreManagerPlugin extends Plugin {
   getRoundScore: () => number;
   calculateScore: () => void;
   resetScore: () => void;
+  addChip: (chip: number) => void;
+  addMultiplier: (multiplier: number) => void;
+  multiplyMultiplier: (count: number) => void;
 }
 
 export function createScorePlugin(): ScoreManagerPlugin {
   let _engine: BalatroEngine;
   let _playedCard: PlayedCardManagerPlugin;
+  let _buffonsManager: BuffonsManagerPlugin;
 
-  const baseChip = 10;
-  const baseMultiplier = 10;
+  const baseChip = 0;
+  const baseMultiplier = 0;
 
   let roundScore = 0;
 
@@ -360,18 +387,32 @@ export function createScorePlugin(): ScoreManagerPlugin {
   function init(engine: BalatroEngine) {
     _engine = engine;
     const playedCard = engine.getPlugin<PlayedCardManagerPlugin>("played-card");
+    const buffonsManager =
+      engine.getPlugin<BuffonsManagerPlugin>("buffon-manager");
 
-    if (playedCard) {
-      _playedCard = playedCard;
+    if (playedCard && buffonsManager) {
+      {
+        _playedCard = playedCard;
+        _buffonsManager = buffonsManager;
+      }
     }
   }
 
   function calculateScore() {
-    currentChip = baseChip;
-    currentMultiplier = baseMultiplier;
+    const handScore = getHandBaseScore(_playedCard.getHand());
+
+    currentChip = handScore.chip;
+    currentMultiplier = handScore.multiplier;
 
     for (const card of _playedCard.getHand()) {
+      if (!isCardScore(card)) {
+        continue;
+      }
       currentChip += getBaseChip(card);
+
+      for (const buffon of _buffonsManager.getBuffons()) {
+        _buffonsManager.applyBuffonEffectCardPlay(buffon, card);
+      }
     }
 
     roundScore += currentChip * currentMultiplier;
@@ -382,9 +423,28 @@ export function createScorePlugin(): ScoreManagerPlugin {
     });
   }
 
+  function isCardScore(card: PokerCard) {
+    return true;
+  }
+
+  function addChip(chip: number) {
+    currentChip += chip;
+  }
+
+  function addMultiplier(multiplier: number) {
+    currentMultiplier += multiplier;
+  }
+
+  function multiplyMultiplier(count: number) {
+    currentMultiplier *= count;
+  }
+
   function resetScore() {
     currentChip = baseChip;
     currentMultiplier = baseMultiplier;
+    roundScore = 0;
+
+    _engine.emitEvent("score-reset", {});
   }
 
   return {
@@ -394,10 +454,13 @@ export function createScorePlugin(): ScoreManagerPlugin {
     getScore: () => ({ chip: currentChip, multiplier: currentMultiplier }),
     calculateScore,
     resetScore,
+    addChip,
+    addMultiplier,
+    multiplyMultiplier,
   };
 }
 
-export type Phase = "Pause" | "Play" | "Score" | "Shop";
+export type Phase = "Pause" | "Play" | "Score" | "Shop" | "GameOver";
 
 export interface GameManagerPlugin extends Plugin {
   getPhase: () => Phase;
@@ -413,6 +476,7 @@ export function createGamePlugin(): GameManagerPlugin {
   let _playedCard: PlayedCardManagerPlugin;
   let _score: ScoreManagerPlugin;
   let _blind: BlindManagerPlugin;
+  let _economyManager: EconomyManagerPlugin;
 
   let _phase: Phase = "Pause";
 
@@ -423,24 +487,32 @@ export function createGamePlugin(): GameManagerPlugin {
     const playedCard = engine.getPlugin<PlayedCardManagerPlugin>("played-card");
     const score = engine.getPlugin<ScoreManagerPlugin>("score");
     const blind = engine.getPlugin<BlindManagerPlugin>("blind-manager");
+    const economyManager = engine.getPlugin<EconomyManagerPlugin>("economy");
 
-    if (deck && hand && playedCard && score && blind) {
+    if (deck && hand && playedCard && score && blind && economyManager) {
       _deck = deck;
       _hand = hand;
       _playedCard = playedCard;
       _score = score;
       _blind = blind;
+      _economyManager = economyManager;
     }
+
+    _economyManager.addMoney(38);
 
     engine.onEvent("hand-played", playHand);
 
     engine.onEvent("hand-discarded", () => drawCards(5));
 
     engine.onEvent("score-calculated", (event) => {
-      if (blind == null || score == null) return;
+      if (blind == null || score == null || hand == null) return;
 
       if (score.getRoundScore() < blind.getCurrentBlind().amount) {
-        endTurn();
+        if (hand.getRemainingHands() === 0) {
+          changePhase("GameOver");
+        } else {
+          endTurn();
+        }
       } else {
         goToShop();
       }
@@ -491,6 +563,9 @@ export function createGamePlugin(): GameManagerPlugin {
     changePhase("Play");
 
     _deck.generateDeck();
+    _hand.reset();
+    _score.resetScore();
+    _playedCard.reset();
 
     drawCards(8);
   }
@@ -529,7 +604,7 @@ export function createBlindManagerPlugin(): BlindManagerPlugin {
   function init(engine: BalatroEngine) {
     currentBlind = {
       id: "1",
-      amount: 400,
+      amount: 100,
       description: "Blind",
     };
     console.log("BlindManagerPlugin initialized");
@@ -542,26 +617,111 @@ export function createBlindManagerPlugin(): BlindManagerPlugin {
   };
 }
 
-interface ShopPlugin extends Plugin {}
-
-function createShopPlugin(): ShopPlugin {
-  return { name: "shop", init: (engine) => {} };
+export interface PlayerConfig {
+  maxHandSize: number;
+  maxHandCount: number;
+  maxDiscard: number;
 }
 
-interface BuffonPlugin extends Plugin {}
-
-function createBuffonPlugin(): BuffonPlugin {
-  return { name: "buffon", init: (engine) => {} };
+export interface PlayerManagerPlugin extends Plugin {
+  addMaxHandCount: (size: number) => void;
+  removeMaxHandCount: (size: number) => void;
+  getMaxHandSize: () => number;
+  getMaxHandCount: () => number;
+  getMaxDiscard: () => number;
 }
 
-interface PlayerPlugin extends Plugin {}
+export function createPlayerManagerPlugin(): PlayerManagerPlugin {
+  let _engine: BalatroEngine;
 
-function createPlayerPlugin(): PlayerPlugin {
-  return { name: "player", init: (engine) => {} };
+  let _maxHandSize: number = 8;
+  let _maxHandCount: number = 4;
+  let _maxDiscard: number = 4;
+
+  function init(engine: BalatroEngine) {
+    _engine = engine;
+  }
+
+  function addMaxHandCount(size: number) {
+    _maxHandCount += size;
+  }
+
+  function removeMaxHandCount(size: number) {
+    _maxHandCount -= size;
+  }
+
+  function getMaxHandSize() {
+    return _maxHandSize;
+  }
+
+  function getMaxHandCount() {
+    return _maxHandCount;
+  }
+
+  function getMaxDiscard() {
+    return _maxDiscard;
+  }
+
+  return {
+    name: "player-manager",
+    init,
+    addMaxHandCount,
+    removeMaxHandCount,
+    getMaxHandSize,
+    getMaxHandCount,
+    getMaxDiscard,
+  };
 }
 
-interface ItemPlugin extends Plugin {}
+export interface EconomyManagerPlugin extends Plugin {
+  getMoney: () => number;
+  addMoney: (amount: number) => void;
+  removeMoney: (amount: number) => void;
+}
 
-function createItemPlugin(): ItemPlugin {
-  return { name: "item", init: (engine) => {} };
+export function createEconomyManagerPlugin(): EconomyManagerPlugin {
+  let _engine: BalatroEngine;
+  let _money: number = 0;
+
+  function init(engine: BalatroEngine) {
+    _engine = engine;
+    console.log("Economy plugin initialized with money:", _money);
+  }
+
+  function getMoney() {
+    return _money;
+  }
+
+  function addMoney(amount: number) {
+    if (amount < 0) {
+      console.warn("Cannot add a negative amount of money.");
+      return;
+    }
+
+    updateAmount(amount);
+  }
+
+  function removeMoney(amount: number) {
+    if (amount < 0) {
+      console.warn("Cannot remove a negative amount of money.");
+    }
+    if (_money < amount) {
+      console.warn("Insufficient funds: Cannot remove money.");
+    }
+
+    updateAmount(-amount);
+  }
+
+  function updateAmount(amount: number) {
+    _money += amount;
+    _engine.emitEvent("economy-updated", {});
+  }
+
+  return {
+    name: "economy",
+    init,
+    getMoney,
+    addMoney,
+    removeMoney,
+  };
 }

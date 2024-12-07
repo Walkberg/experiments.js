@@ -220,9 +220,9 @@ export function improveBaseScoreList(
   };
 }
 
-export function getHandBaseScore(player: Player): Score {
-  const handType = evaluatePokerHand(player.hand);
-  return player.baseScoreList[convertHandTypeToPlanetType(handType)];
+export function getHandBaseScore(hand: Hand): Score {
+  const handType = evaluatePokerHand(hand);
+  return baseScoreList[convertHandTypeToPlanetType(handType)];
 }
 
 export function getBuyPrice<T>(item: BuyableItem<T>): Price {
@@ -398,7 +398,7 @@ export function getCardLabel(card: PokerCard): string {
 }
 
 export function computePlayerHand(player: Player): Score {
-  let baseScore = getHandBaseScore(player);
+  let baseScore = getHandBaseScore(player.hand);
 
   for (let i = 0; i < player.hand.length; i++) {
     const card = player.hand[i];
@@ -417,28 +417,19 @@ export function computePlayerHand(player: Player): Score {
 export function convertHandTypeToPlanetType(
   handType: PokerHandType
 ): PlanetType {
-  switch (handType) {
-    case "HighCard":
-      return "mercury";
-    case "OnePair":
-      return "venus";
-    case "TwoPair":
-      return "earth";
-    case "ThreeOfAKind":
-      return "mars";
-    case "Straight":
-      return "jupiter";
-    case "Flush":
-      return "saturn";
-    case "FullHouse":
-      return "uranus";
-    case "FourOfAKind":
-      return "neptune";
-    case "StraightFlush":
-      return "pluto";
-    case "RoyalFlush":
-      return "pluto";
-  }
+  const record: Record<PokerHandType, PlanetType> = {
+    HighCard: "pluto",
+    OnePair: "mercury",
+    TwoPair: "uranus",
+    ThreeOfAKind: "venus",
+    Straight: "saturn",
+    Flush: "jupiter",
+    FullHouse: "earth",
+    FourOfAKind: "mars",
+    StraightFlush: "neptune",
+    RoyalFlush: "neptune",
+  };
+  return record[handType];
 }
 
 export function addChipToScore(score: Score, chip: Chip): Score {

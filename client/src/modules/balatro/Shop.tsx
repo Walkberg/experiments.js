@@ -1,37 +1,45 @@
-import { Card } from "@/components/ui/card";
-import {
-  PokerCard as ICard,
-  Shop as IShop,
-  generateShop,
-  generateCards,
-  generateBuyableItems,
-  BuyableItem,
-} from "./balatro";
+import { Shop as IShop, generateShop } from "./balatro";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { CardContainer, useGameManager } from "./BalatroPage";
-import { PlayCard } from "./Card";
+import { useEffect, useState } from "react";
+import { BuffonCard, CardContainer, useGameManager } from "./BalatroPage";
+import { ShopPlugin } from "./plugins/shop-plugin";
+import { useCurrentGame } from "./BalatroProvider";
+import { Card } from "@/components/ui/card";
+import { Item } from "./plugins/items-manager-plugin";
+
+function useShopManager() {
+  const [shop, setShop] = useState<IShop>(generateShop());
+  const { balatro } = useCurrentGame();
+
+  const shopPlugin = balatro?.getPlugin<ShopPlugin>("shop");
+
+  if (shopPlugin == null) {
+    return null;
+  }
+
+  useEffect(() => {
+    balatro?.onEvent("shop-rerolled", (shop) => setShop(shop));
+    balatro?.onEvent("shop-item-bought", (shop) => setShop(shop));
+  }, [shopPlugin]);
+
+  return shopPlugin;
+}
 
 interface ShopProps {}
 
 export const Shop = ({}: ShopProps) => {
-  const [shop, setShop] = useState<IShop>(generateShop());
-
   const gameManager = useGameManager();
-
-  const handleBuyCard = (buyableItem: BuyableItem<ICard>) => {
-    setShop((prev) => ({
-      ...prev,
-      cards: prev.cards.filter((card) => card.id !== buyableItem.id),
-    }));
-  };
-
-  const handleReroll = () => {
-    const cards = generateBuyableItems(generateCards(2));
-    setShop((prev) => ({ ...prev, cards }));
-  };
+  const shopManager = useShopManager();
 
   if (!gameManager) return null;
+
+  if (!shopManager) return null;
+
+  const handleBuyItem = (itemId: string) => {
+    if (shopManager.canBuyItem(itemId)) {
+      shopManager.buyItem(itemId);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -40,17 +48,35 @@ export const Shop = ({}: ShopProps) => {
           <Button onClick={() => gameManager.startNextPhase()}>
             Next Round
           </Button>
-          <Button onClick={handleReroll}>Reroll 5$</Button>
+          <Button
+            disabled={!shopManager.canReroll()}
+            onClick={() => shopManager.rerollShop()}
+          >
+            Reroll {shopManager.getRerollPrice()}$
+          </Button>
         </div>
         <div>
           <CardContainer>
             <div className="flex flex-row gap-2">
-              {shop.cards.map((card) => (
-                <PlayCard
-                  onSelectCard={() => handleBuyCard(card)}
-                  key={card.id}
-                  card={card}
-                />
+              {shopManager.getItems().map((item) => (
+                <div className="flex flex-col gap-2">
+                  {item.type === "buffon" && (
+                    <BuffonCard
+                      key={item.buffon.id}
+                      buffon={item.buffon}
+                      onClick={() => handleBuyItem(item.buffon.id)}
+                    />
+                  )}
+                  {item.type === "item" && (
+                    <ItemCard
+                      key={item.item.id}
+                      item={item.item}
+                      onClick={() => handleBuyItem(item.item.id)}
+                    />
+                  )}
+
+                  <div>{item.price}</div>
+                </div>
               ))}
             </div>
           </CardContainer>
@@ -59,13 +85,29 @@ export const Shop = ({}: ShopProps) => {
       <div className="flex flex-row gap-2">
         <CardContainer>voucher</CardContainer>
         <CardContainer>
-          <div className="flex flex-row gap-2">
+          aa
+          {/* <div className="flex flex-row gap-2">
             {shop.packs.map((pack, index) => (
               <Card key={index}>{"pack"}</Card>
             ))}
-          </div>
+          </div> */}
         </CardContainer>
       </div>
     </div>
+  );
+};
+
+export const ItemCard = ({
+  item,
+  onClick,
+}: {
+  item: Item;
+  onClick?: () => void;
+}) => {
+  return (
+    <Card onClick={onClick}>
+      <div>{item.name}</div>
+      <div>{item.description}</div>
+    </Card>
   );
 };
