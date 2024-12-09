@@ -1,6 +1,6 @@
 import { Buffon } from "./buffons-manager-plugin";
 import { BalatroEngine, Plugin } from "../balatro-engine";
-import { Consumable } from "./consumables-manager-plugin";
+import { Consumable, ConsumableType } from "./consumables-manager-plugin";
 
 export interface PoolManagerPlugin extends Plugin {
   registerBuffon: (buffon: Buffon) => void;
@@ -10,7 +10,7 @@ export interface PoolManagerPlugin extends Plugin {
   removeFromPool: (cardId: string) => void;
   getPool: () => Buffon[];
   getConsumablePool: () => Consumable[];
-  getRandomConsumables: (count: number) => Consumable[];
+  getRandomConsumables: (count: number, type?: ConsumableType) => Consumable[];
   setupPool: (cards: Buffon[]) => void;
 }
 
@@ -54,15 +54,20 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     pool = [...cards];
   }
 
-  function getRandomConsumables(count: number) {
-    const consumables = [...items];
+  function getRandomConsumables(count: number, type?: ConsumableType) {
+    const filteredConsumables = type
+      ? items.filter((item) => item.type === type)
+      : items;
+
     const randomConsumables = [];
 
     for (let i = 0; i < count; i++) {
-      const randomIndex = Math.floor(Math.random() * consumables.length);
-      const randomConsumable = consumables[randomIndex];
+      const randomIndex = Math.floor(
+        Math.random() * filteredConsumables.length
+      );
+      const randomConsumable = filteredConsumables[randomIndex];
       randomConsumables.push(randomConsumable);
-      consumables.splice(randomIndex, 1);
+      filteredConsumables.splice(randomIndex, 1);
     }
     return randomConsumables;
   }
@@ -80,4 +85,13 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     getRandomConsumables,
     setupPool,
   };
+}
+
+export function getPoolManagerPlugin(engine: BalatroEngine): PoolManagerPlugin {
+  const plugin = engine.getPlugin<PoolManagerPlugin>("pool-manager");
+
+  if (plugin == null) {
+    throw new Error("PoolManagerPlugin not found");
+  }
+  return plugin;
 }

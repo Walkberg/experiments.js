@@ -97,8 +97,11 @@ export function createHandPlugin(): HandManagerPlugin {
   function selectCard(cardId: string) {
     const card = _hand.find((c) => c.id === cardId);
 
+    console.log("selectCard", card);
+
     if (card) {
       _selectedCards.push(card);
+      _engine.emitEvent("card-selected", { cardId });
     }
   }
 
@@ -107,6 +110,7 @@ export function createHandPlugin(): HandManagerPlugin {
 
     if (card) {
       _selectedCards = _selectedCards.filter((c) => c.id !== cardId);
+      _engine.emitEvent("card-unselected", { cardId });
     }
   }
 
@@ -125,4 +129,13 @@ export function createHandPlugin(): HandManagerPlugin {
     selectCard,
     unSelectCard,
   };
+}
+
+export function getHandManagerPlugin(engine: BalatroEngine): HandManagerPlugin {
+  const plugin = engine.getPlugin<HandManagerPlugin>("hand");
+
+  if (plugin == null) {
+    throw new Error("Hand plugin not found");
+  }
+  return plugin;
 }

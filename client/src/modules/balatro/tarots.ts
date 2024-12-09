@@ -1,4 +1,8 @@
-import { Consumable, getConsumablesPlugin } from "./plugins";
+import {
+  Consumable,
+  getConsumablesPlugin,
+  getPoolManagerPlugin,
+} from "./plugins";
 import { createBaseConsumable } from "./consumables";
 import { TarorType } from "./balatro";
 import { BalatroEngine } from "./balatro-engine";
@@ -23,7 +27,7 @@ const createTheFool = (): Consumable => {
     description: "Le Mat",
   });
 
-  theFool.onConsumableUse = (ctx: BalatroEngine) => {
+  theFool.onConsumableUsed = (ctx: BalatroEngine) => {
     const consumableManager = getConsumablesPlugin(ctx);
 
     const lastConsumable = consumableManager.getLastConsumableUsed();
@@ -46,16 +50,31 @@ const createTheMagician = (): Consumable => {
 };
 
 const createTheHighPriestess = (): Consumable => {
-  return createTarotConsumable({
+  const theHighPriestess = createTarotConsumable({
     name: "theHighPriestess",
     description: "La Papesse",
   });
+
+  theHighPriestess.onConsumableUsed = (ctx: BalatroEngine) => {
+    const poolManager = getPoolManagerPlugin(ctx);
+    const consumableManager = getConsumablesPlugin(ctx);
+
+    const consumables = poolManager.getRandomConsumables(2, "planet");
+
+    for (const consumable of consumables) {
+      consumableManager.addConsumable(consumable);
+    }
+  };
+
+  return theHighPriestess;
 };
 const createTheEmpress = (): Consumable => {
-  return createTarotConsumable({
+  const theEmpress = createTarotConsumable({
     name: "theEmpress",
     description: "L'Impératrice",
   });
+
+  return theEmpress;
 };
 
 const createTheEmperor = (): Consumable => {

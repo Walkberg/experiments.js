@@ -25,7 +25,7 @@ export function createPlanetConsumable({
     type: "planet",
   });
 
-  planet.onConsumableUse = (ctx: BalatroEngine) => {
+  planet.onConsumableUsed = (ctx: BalatroEngine) => {
     const handScoreManager = getHandScorePlugin(ctx);
 
     handScoreManager.improveHandScore(convertPlanetTypeToHandType(planeteType));
@@ -143,7 +143,7 @@ export function createLeMat(): Consumable {
       "Crée la carte de Tarot ou de Planète utilisée en dernier durant cette partie, en excluant Le mat.",
   });
 
-  tarotCard.onConsumableUse = (ctx) => {
+  tarotCard.onConsumableUsed = (ctx) => {
     const manager = ctx.getPlugin<ConsumablesManagerPlugin>(
       "consumables-manager"
     );

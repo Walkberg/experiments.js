@@ -20,7 +20,7 @@ export interface Consumable {
   name: string;
   type: ConsumableType;
   description: string;
-  onConsumableUse?: (ctx: BalatroEngine) => void;
+  onConsumableUsed?: (ctx: BalatroEngine) => void;
 }
 
 export function createConsumableManagerPlugin(): ConsumablesManagerPlugin {
@@ -83,8 +83,8 @@ export function createConsumableManagerPlugin(): ConsumablesManagerPlugin {
 
     _engine.emitEvent("consumable-used", { item: consumable });
 
-    if (consumable.onConsumableUse != null) {
-      consumable.onConsumableUse(_engine);
+    if (consumable.onConsumableUsed != null) {
+      consumable.onConsumableUsed(_engine);
     }
 
     _lastConsumableUsed = consumable;

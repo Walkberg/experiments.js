@@ -136,6 +136,7 @@ export type TarorType =
   | "theSun"
   | "judgment"
   | "theWorld";
+
 export type PlanetType =
   | "mercury"
   | "venus"

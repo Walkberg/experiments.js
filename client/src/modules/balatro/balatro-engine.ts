@@ -1,5 +1,6 @@
 import { CardRank, CardSuit, Deck, Hand, PokerCard } from "./balatro";
 import { evaluatePokerHand } from "./hand-evaluator";
+import { v4 as uuid } from "uuid";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
 import { ScoreManagerPlugin } from "./plugins";
 
@@ -22,12 +23,14 @@ export type EventName =
   | "shop-item-bought"
   | "economy-updated"
   | "card-selected"
+  | "card-unselected"
   | "buffon-added"
   | "buffon-removed"
   | "consumable-added"
   | "consumable-removed"
   | "consumable-used"
-  | "hand-score-improved";
+  | "hand-score-improved"
+  | "achievement-unlocked";
 
 export interface BalatroEngine {
   removePlugin: (modName: string) => void;
@@ -148,7 +151,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
         deck.push({
           suit,
           rank,
-          id: `${suit}-${rank}`,
+          id: uuid(),
           enhancement: "none",
           edition: "base",
           seal: "none",

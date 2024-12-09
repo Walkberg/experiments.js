@@ -1,4 +1,4 @@
-import { getHandBaseScore, getBaseChip, PokerCard } from "../balatro";
+import { getBaseChip, PokerCard } from "../balatro";
 import {
   BalatroEngine,
   PlayedCardManagerPlugin,
@@ -9,7 +9,7 @@ import {
   BuffonsManagerPlugin,
   getHandScorePlugin,
   HandScoreManagerPlugin,
-} from "../plugins";
+} from ".";
 
 interface Score {
   chip: number;
