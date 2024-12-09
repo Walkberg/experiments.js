@@ -136,35 +136,6 @@ export function createPluto(): Consumable {
     planeteType: "pluto",
   });
 }
-export function createLeMat(): Consumable {
-  const tarotCard = createTarotConsumable({
-    name: "tarot_1",
-    description:
-      "Crée la carte de Tarot ou de Planète utilisée en dernier durant cette partie, en excluant Le mat.",
-  });
-
-  tarotCard.onConsumableUsed = (ctx) => {
-    const manager = ctx.getPlugin<ConsumablesManagerPlugin>(
-      "consumables-manager"
-    );
-
-    if (manager == null) {
-      throw new Error("consumables-manager plugin not found");
-    }
-
-    const lastConsumable = manager?.getLastConsumableUsed();
-
-    console.log("last consumable", lastConsumable);
-
-    if (lastConsumable == null) {
-      return;
-    }
-
-    manager.addConsumable(lastConsumable);
-  };
-
-  return tarotCard;
-}
 
 export const planetCards: Consumable[] = [
   createMercury(),
