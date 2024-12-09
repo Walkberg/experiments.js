@@ -3,33 +3,33 @@ import { Card } from "@/components/ui/card";
 import {
   Hand as IHand,
   PokerCard as ICard,
-  Buffon as IBuffon,
   Score as IScore,
   sortByRank,
   sortBySuit,
-  BaseScoreList,
-  BaseScore,
-  PlanetType,
 } from "./balatro";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Shop } from "./Shop";
 import { PlayCard } from "./Card";
 import { BalatroProvider, useCurrentGame } from "./BalatroProvider";
-import { BuffonPool as BuffonPool } from "./buffons";
 import { evaluatePokerHand } from "./hand-evaluator";
 import {
   BlindManagerPlugin,
   DeckManagerPlugin,
   EconomyManagerPlugin,
   GameManagerPlugin,
-  HandManagerPlugin,
   Phase,
   PlayedCardManagerPlugin,
-  ScoreManagerPlugin,
 } from "./balatro-engine";
+import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
+import { ScoreManagerPlugin } from "./plugins";
 import { Buffon, BuffonsManagerPlugin } from "./plugins/buffons-manager-plugin";
 import { cn } from "@/lib/utils";
+import {
+  Consumable,
+  ConsumablesManagerPlugin,
+} from "./plugins/consumables-manager-plugin";
+import { HandScoreDetail } from "./modules/hand-score/HandScoreDetail";
 
 export const BalatroPage = () => {
   return (
@@ -71,7 +71,7 @@ export const Balatro = () => {
         </div>
         <div className="col-span-2">
           <CardContainer>
-            <ItemList />
+            <ConsumableList />
           </CardContainer>
         </div>
         <div className="col-span-4 row-span-2 col-start-1 row-start-2">
@@ -188,6 +188,7 @@ export const PlayerInfo = () => {
       <ItemContainer className="row-start-3" name="rounds">
         <Button>1</Button>
       </ItemContainer>
+      <HandScoreDetail />
     </div>
   );
 };
@@ -337,12 +338,77 @@ export const CardContainer = ({ children }: CardContainerProps) => {
   );
 };
 
-interface ItemListProps {}
+export function useConsumableManager() {
+  const { balatro } = useCurrentGame();
 
-export const ItemList = ({}: ItemListProps) => {
+  const [refresh, setRefresh] = useState(false);
+
+  const consumableManager = balatro?.getPlugin<ConsumablesManagerPlugin>(
+    "consumables-manager"
+  );
+
+  useEffect(() => {
+    if (balatro == null) {
+      return;
+    }
+    balatro.onEvent("consumable-added", () => setRefresh((prev) => !prev));
+    balatro.onEvent("consumable-removed", () => setRefresh((prev) => !prev));
+  }, [balatro]);
+
+  if (consumableManager == null) {
+    return null;
+  }
+
+  return consumableManager;
+}
+
+interface ConsumableListProps {}
+
+export const ConsumableList = ({}: ConsumableListProps) => {
+  const consumableManager = useConsumableManager();
+
+  if (consumableManager == null) {
+    return null;
+  }
+
+  const handleUseConsumable = (consumableId: string) => {
+    consumableManager.useConsumable(consumableId);
+  };
+
   return (
-    <div className="flex flex-row items-center gap-2">
-      <div>0 / 0 </div>
+    <div className="flex flex-row gap-2">
+      {consumableManager.getConsumables().map((consumable) => (
+        <ConsumableCard
+          key={consumable.id}
+          consumable={consumable}
+          onUse={handleUseConsumable}
+        />
+      ))}
+    </div>
+  );
+};
+
+export const ConsumableCard = ({
+  className,
+  consumable,
+  onUse,
+}: {
+  className?: string;
+  consumable: Consumable;
+  onUse: (consumableId: string) => void;
+}) => {
+  return (
+    <div>
+      <Card
+        className={cn(
+          className,
+          "flex flex-col items-center p-2",
+          consumable.id
+        )}
+      >
+        {consumable.name}
+      </Card>
+      <Button onClick={() => onUse(consumable.id)}>Use</Button>
     </div>
   );
 };
@@ -570,38 +636,6 @@ export const PlayHand = () => {
         <PlayCard key={handCard.id} card={handCard} />
       ))}
     </div>
-  );
-};
-
-interface BaseScoreDetailProps {
-  baseScoreList: BaseScoreList;
-}
-
-export const BaseScoreDetail = ({ baseScoreList }: BaseScoreDetailProps) => {
-  return (
-    <div className="flex flex-col gap-2 p-2">
-      {Object.entries(baseScoreList).map(([planeteType, baseScore]) => (
-        <BaseScoreRow
-          key={planeteType}
-          baseScore={{ ...baseScore, type: planeteType as PlanetType }}
-        />
-      ))}
-    </div>
-  );
-};
-
-interface BaseScoreRowProps {
-  baseScore: BaseScore & { type: PlanetType };
-}
-
-export const BaseScoreRow = ({ baseScore }: BaseScoreRowProps) => {
-  return (
-    <Card className="flex flex-row items-center justify-between p-2">
-      <div>lvl {baseScore.level}</div>
-      <div>{baseScore.type}</div>
-      <ScoreDetail score={baseScore} />
-      <div># {baseScore.playedCount}</div>
-    </Card>
   );
 };
 

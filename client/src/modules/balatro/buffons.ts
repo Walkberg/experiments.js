@@ -1,9 +1,6 @@
 import { PokerCard } from "./balatro";
-import {
-  BalatroEngine,
-  getPlayerPluginManagerPlugin,
-  ScoreManagerPlugin,
-} from "./balatro-engine";
+import { BalatroEngine, getPlayerManagerPlugin } from "./balatro-engine";
+import { ScoreManagerPlugin } from "./plugins";
 import { createCallbackManager, getCallbackManager, Mod } from "./mod";
 import { Buffon } from "./plugins/buffons-manager-plugin";
 
@@ -171,12 +168,12 @@ export function createBuffon3(): Buffon {
 
   buffon.onBuffonEnabled = (context: BalatroEngine) => {
     console.log("buffon_3 enabled");
-    const playerManagerPlugin = getPlayerPluginManagerPlugin(context);
+    const playerManagerPlugin = getPlayerManagerPlugin(context);
     playerManagerPlugin.addMaxHandCount(1);
   };
 
   buffon.onBuffonDisabled = (context: BalatroEngine) => {
-    const playerManagerPlugin = getPlayerPluginManagerPlugin(context);
+    const playerManagerPlugin = getPlayerManagerPlugin(context);
     playerManagerPlugin.removeMaxHandCount(1);
   };
 

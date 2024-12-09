@@ -5,7 +5,7 @@ import { BuffonCard, CardContainer, useGameManager } from "./BalatroPage";
 import { ShopPlugin } from "./plugins/shop-plugin";
 import { useCurrentGame } from "./BalatroProvider";
 import { Card } from "@/components/ui/card";
-import { Item } from "./plugins/items-manager-plugin";
+import { Consumable } from "./plugins/consumables-manager-plugin";
 
 function useShopManager() {
   const [shop, setShop] = useState<IShop>(generateShop());
@@ -58,24 +58,23 @@ export const Shop = ({}: ShopProps) => {
         <div>
           <CardContainer>
             <div className="flex flex-row gap-2">
-              {shopManager.getItems().map((item) => (
+              {shopManager.getItems().map((shopItem) => (
                 <div className="flex flex-col gap-2">
-                  {item.type === "buffon" && (
+                  <Card className="flex justify-center">{shopItem.price}</Card>
+                  {shopItem.type === "buffon" && (
                     <BuffonCard
-                      key={item.buffon.id}
-                      buffon={item.buffon}
-                      onClick={() => handleBuyItem(item.buffon.id)}
+                      key={shopItem.buffon.id}
+                      buffon={shopItem.buffon}
+                      onClick={() => handleBuyItem(shopItem.buffon.id)}
                     />
                   )}
-                  {item.type === "item" && (
+                  {shopItem.type === "consumable" && (
                     <ItemCard
-                      key={item.item.id}
-                      item={item.item}
-                      onClick={() => handleBuyItem(item.item.id)}
+                      key={shopItem.item.id}
+                      item={shopItem.item}
+                      onClick={() => handleBuyItem(shopItem.item.id)}
                     />
                   )}
-
-                  <div>{item.price}</div>
                 </div>
               ))}
             </div>
@@ -101,7 +100,7 @@ export const ItemCard = ({
   item,
   onClick,
 }: {
-  item: Item;
+  item: Consumable;
   onClick?: () => void;
 }) => {
   return (

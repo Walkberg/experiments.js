@@ -6,19 +6,18 @@ import {
   createDeckPlugin,
   createEconomyManagerPlugin,
   createGamePlugin,
-  createHandPlugin,
   createPlayedCardPlugin,
   createPlayerManagerPlugin,
-  createScorePlugin,
 } from "./balatro-engine";
+import { createHandPlugin } from "./plugins/hand-manager-plugin";
+import { createScorePlugin } from "./plugins";
 import { createPoolManagerPlugin } from "./plugins/pool-manager-plugin";
 import { createBuffonManagerPlugin } from "./plugins/buffons-manager-plugin";
 import { createShopPlugin } from "./plugins/shop-plugin";
 import { buffonsPlayer } from "./buffons";
-import {
-  createItemsManagerPlugin,
-  itemsPlayer,
-} from "./plugins/items-manager-plugin";
+import { createConsumableManagerPlugin } from "./plugins/consumables-manager-plugin";
+import { createHandScoreManagerPlugin } from "./plugins/hand-score-manager-plugin";
+import { itemsPlayer } from "./consumables";
 
 export const useBalatroGame = () => {
   const [balatro, setBalatro] = useState<BalatroEngine | null>(null);
@@ -33,19 +32,21 @@ export const useBalatroGame = () => {
     const economyManagerPlugin = createEconomyManagerPlugin();
     const bliandManagerPlugin = createBlindManagerPlugin();
     const buffonManagerPlugin = createBuffonManagerPlugin();
-    const itemsManagerPlugin = createItemsManagerPlugin();
+    const itemsManagerPlugin = createConsumableManagerPlugin();
     const playerManagerPlugin = createPlayerManagerPlugin();
     const playedCardPlugin = createPlayedCardPlugin();
     const poolManagerPlugin = createPoolManagerPlugin();
     const shopPlugin = createShopPlugin();
     const gamePlugin = createGamePlugin();
     const scorePlugin = createScorePlugin();
+    const handScoreManager = createHandScoreManagerPlugin();
 
     poolManagerPlugin.registerBuffons(buffonsPlayer);
     poolManagerPlugin.registerItems(itemsPlayer);
 
     balatro.registerPlugin(playerManagerPlugin);
     balatro.registerPlugin(economyManagerPlugin);
+    balatro.registerPlugin(handScoreManager);
     balatro.registerPlugin(deckPlugin);
     balatro.registerPlugin(handPlugin);
     balatro.registerPlugin(playedCardPlugin);

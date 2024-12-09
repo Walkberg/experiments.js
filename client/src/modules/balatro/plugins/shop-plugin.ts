@@ -5,7 +5,10 @@ import {
   DeckManagerPlugin,
 } from "../balatro-engine";
 import { Buffon, BuffonsManagerPlugin } from "./buffons-manager-plugin";
-import { Item, ItemsManagerPlugin } from "./items-manager-plugin";
+import {
+  Consumable,
+  ConsumablesManagerPlugin,
+} from "./consumables-manager-plugin";
 import { PoolManagerPlugin } from "./pool-manager-plugin";
 
 export interface ShopPlugin extends Plugin {
@@ -18,16 +21,16 @@ export interface ShopPlugin extends Plugin {
   canBuyItem: (itemId: string) => boolean;
 }
 
-export type Buyable = BuyableBuffon | BuyableItem;
+export type Buyable = BuyableBuffon | BuyableConsumable;
 
 type BuyableBuffon = {
   type: "buffon";
   buffon: Buffon;
 } & Price;
 
-type BuyableItem = {
-  type: "item";
-  item: Item;
+type BuyableConsumable = {
+  type: "consumable";
+  item: Consumable;
 } & Price;
 
 interface Price {
@@ -43,7 +46,7 @@ export function createShopPlugin(): ShopPlugin {
   let _deckManager: DeckManagerPlugin;
   let _poolManager: PoolManagerPlugin;
   let _buffonsManager: BuffonsManagerPlugin;
-  let _itemsManager: ItemsManagerPlugin;
+  let _consumablesManager: ConsumablesManagerPlugin;
 
   let _items: Buyable[] = [];
   let rerollPrice = REROLL_START_PRICE;
@@ -56,7 +59,9 @@ export function createShopPlugin(): ShopPlugin {
     const poolManager = engine.getPlugin<PoolManagerPlugin>("pool-manager");
     const buffonManager =
       engine.getPlugin<BuffonsManagerPlugin>("buffon-manager");
-    const itemsManager = engine.getPlugin<ItemsManagerPlugin>("items-manager");
+    const itemsManager = engine.getPlugin<ConsumablesManagerPlugin>(
+      "consumables-manager"
+    );
 
     if (
       !economy ||
@@ -72,14 +77,15 @@ export function createShopPlugin(): ShopPlugin {
     _deckManager = deckManager;
     _poolManager = poolManager;
     _buffonsManager = buffonManager;
-    _itemsManager = itemsManager;
+    _consumablesManager = itemsManager;
 
     resetShop();
   }
 
   function resetShop() {
     const buffons = _poolManager.getPool();
-    const items = _poolManager.getItemsPool();
+
+    const consumables = _poolManager.getRandomConsumables(2);
 
     const price = BUFFON_PRICE;
 
@@ -89,13 +95,15 @@ export function createShopPlugin(): ShopPlugin {
       price,
     }));
 
-    const buyableItems: BuyableItem[] = items.map((item) => ({
-      type: "item",
-      item,
-      price,
-    }));
+    const buyableConsumable: BuyableConsumable[] = consumables.map(
+      (consumable) => ({
+        type: "consumable",
+        item: consumable,
+        price,
+      })
+    );
 
-    _items = [...buyableBuffons, ...buyableItems];
+    _items = [...buyableBuffons, ...buyableConsumable];
   }
 
   function canReroll() {
@@ -131,6 +139,20 @@ export function createShopPlugin(): ShopPlugin {
   function canBuyItem(itemId: string) {
     const item = getItem(itemId);
 
+    if (!item) {
+      return false;
+    }
+
+    if (item.type === "consumable") {
+      if (!_consumablesManager.canAddConsumable()) {
+        return false;
+      }
+    } else {
+      if (!_buffonsManager.canAddBuffon()) {
+        return false;
+      }
+    }
+
     return item ? _economy.getMoney() >= item.price : false;
   }
 
@@ -148,9 +170,9 @@ export function createShopPlugin(): ShopPlugin {
     _economy.removeMoney(item.price);
 
     if (item.type === "buffon") {
-      _buffonsManager.addBuffons([item.buffon]);
+      _buffonsManager.addBuffon(item.buffon);
     } else {
-      _itemsManager.addItems([item.item]);
+      _consumablesManager.addConsumable(item.item);
     }
 
     _items = _items.filter((i) => getBuyableId(i) !== itemId);

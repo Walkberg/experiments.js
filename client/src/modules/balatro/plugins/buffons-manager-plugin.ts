@@ -12,9 +12,10 @@ export interface Buffon {
 }
 
 export interface BuffonsManagerPlugin extends Plugin {
-  addBuffons: (buffons: Buffon[]) => boolean;
-  addBuffon: (buffon: Buffon) => boolean;
+  addBuffons: (buffons: Buffon[]) => void;
+  addBuffon: (buffon: Buffon) => void;
   removeBuffon: (id: string) => void;
+  canAddBuffon: () => boolean;
   getBuffons: () => Buffon[];
   setMaxCount: (maxCount: number) => void;
   getMaxCount: () => number;
@@ -32,27 +33,28 @@ export function createBuffonManagerPlugin(): BuffonsManagerPlugin {
 
   function addBuffons(buffons: Buffon[]) {
     if (buffons.length >= maxCount) {
+      return;
       console.warn("Cannot add Buffons: Max count reached");
-      return false;
     }
     for (const buffon of buffons) {
       addBuffon(buffon);
     }
-    return true;
+  }
+
+  function canAddBuffon() {
+    return buffons.length < maxCount;
   }
 
   function addBuffon(buffon: Buffon) {
-    if (buffons.length >= maxCount) {
+    if (!canAddBuffon()) {
       console.warn("Cannot add Buffon: Max count reached");
-      return false;
+      return;
     }
     buffons.push(buffon);
 
     buffon.onBuffonEnabled(_engine);
 
     _engine.emitEvent("buffon-added", { buffon });
-
-    return true;
   }
 
   function removeBuffon(id: string) {
@@ -85,6 +87,7 @@ export function createBuffonManagerPlugin(): BuffonsManagerPlugin {
 
   return {
     name: "buffon-manager",
+    canAddBuffon,
     init,
     addBuffons,
     addBuffon,

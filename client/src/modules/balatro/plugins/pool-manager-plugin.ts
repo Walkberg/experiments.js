@@ -1,21 +1,22 @@
 import { Buffon } from "./buffons-manager-plugin";
 import { BalatroEngine, Plugin } from "../balatro-engine";
-import { Item } from "./items-manager-plugin";
+import { Consumable } from "./consumables-manager-plugin";
 
 export interface PoolManagerPlugin extends Plugin {
   registerBuffon: (buffon: Buffon) => void;
   registerBuffons: (buffons: Buffon[]) => void;
-  registerItem: (item: Item) => void;
-  registerItems: (items: Item[]) => void;
+  registerItem: (item: Consumable) => void;
+  registerItems: (items: Consumable[]) => void;
   removeFromPool: (cardId: string) => void;
   getPool: () => Buffon[];
-  getItemsPool: () => Item[];
+  getConsumablePool: () => Consumable[];
+  getRandomConsumables: (count: number) => Consumable[];
   setupPool: (cards: Buffon[]) => void;
 }
 
 export function createPoolManagerPlugin(): PoolManagerPlugin {
   let pool: Buffon[] = [];
-  let items: Item[] = [];
+  let items: Consumable[] = [];
 
   function init(engine: BalatroEngine) {
     console.log("PoolManagerPlugin initialized");
@@ -31,11 +32,11 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     }
   }
 
-  function registerItem(item: Item) {
+  function registerItem(item: Consumable) {
     items.push(item);
   }
 
-  function registerItems(items: Item[]) {
+  function registerItems(items: Consumable[]) {
     for (const item of items) {
       registerItem(item);
     }
@@ -53,6 +54,19 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     pool = [...cards];
   }
 
+  function getRandomConsumables(count: number) {
+    const consumables = [...items];
+    const randomConsumables = [];
+
+    for (let i = 0; i < count; i++) {
+      const randomIndex = Math.floor(Math.random() * consumables.length);
+      const randomConsumable = consumables[randomIndex];
+      randomConsumables.push(randomConsumable);
+      consumables.splice(randomIndex, 1);
+    }
+    return randomConsumables;
+  }
+
   return {
     name: "pool-manager",
     init,
@@ -62,7 +76,8 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     registerItems,
     removeFromPool,
     getPool,
-    getItemsPool: () => items,
+    getConsumablePool: () => items,
+    getRandomConsumables,
     setupPool,
   };
 }

@@ -125,15 +125,17 @@ export type TarorType =
   | "justice"
   | "theHermit"
   | "wheelOfFortune"
-  | "justice"
+  | "strength"
   | "theHangedMan"
   | "death"
   | "temperance"
   | "theDevil"
   | "theTower"
   | "theStar"
-  | "theMoon";
-
+  | "theMoon"
+  | "theSun"
+  | "judgment"
+  | "theWorld";
 export type PlanetType =
   | "mercury"
   | "venus"
