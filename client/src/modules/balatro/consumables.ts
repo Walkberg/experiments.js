@@ -31,6 +31,10 @@ export function createPlanetConsumable({
     handScoreManager.improveHandScore(convertPlanetTypeToHandType(planeteType));
   };
 
+  planet.checkCanUse = (ctx: BalatroEngine) => {
+    return true;
+  };
+
   return planet;
 }
 

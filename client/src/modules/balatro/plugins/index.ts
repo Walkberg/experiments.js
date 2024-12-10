@@ -6,3 +6,4 @@ export * from "./pool-manager-plugin";
 export * from "./card-lifecycle-plugin";
 export * from "./hand-manager-plugin";
 export * from "./score-manager-plugin";
+export * from "./deck-manager-plugin";

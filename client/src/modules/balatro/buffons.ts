@@ -1,5 +1,6 @@
 import { PokerCard } from "./balatro";
-import { BalatroEngine, getPlayerManagerPlugin } from "./balatro-engine";
+import { BalatroEngine } from "./balatro-engine";
+import { getPlayerManagerPlugin } from "./plugins/deck-manager-plugin";
 import { ScoreManagerPlugin } from "./plugins";
 import { createCallbackManager, getCallbackManager, Mod } from "./mod";
 import { Buffon } from "./plugins/buffons-manager-plugin";

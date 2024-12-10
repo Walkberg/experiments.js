@@ -15,12 +15,12 @@ import { BalatroProvider, useCurrentGame } from "./BalatroProvider";
 import { evaluatePokerHand } from "./hand-evaluator";
 import {
   BlindManagerPlugin,
-  DeckManagerPlugin,
   EconomyManagerPlugin,
   GameManagerPlugin,
   Phase,
   PlayedCardManagerPlugin,
 } from "./balatro-engine";
+import { DeckManagerPlugin } from "./plugins/deck-manager-plugin";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
 import { ScoreManagerPlugin } from "./plugins";
 import { Buffon, BuffonsManagerPlugin } from "./plugins/buffons-manager-plugin";
@@ -409,7 +409,9 @@ export const ConsumableCard = ({
       >
         {consumable.name}
       </Card>
-      <Button onClick={() => onUse(consumable.id)}>Use</Button>
+      <Button disabled={false} onClick={() => onUse(consumable.id)}>
+        Use
+      </Button>
     </div>
   );
 };

@@ -1,9 +1,6 @@
 import { Plugin } from "../balatro-engine";
-import {
-  BalatroEngine,
-  EconomyManagerPlugin,
-  DeckManagerPlugin,
-} from "../balatro-engine";
+import { BalatroEngine, EconomyManagerPlugin } from "../balatro-engine";
+import { DeckManagerPlugin } from "./deck-manager-plugin";
 import { Buffon, BuffonsManagerPlugin } from "./buffons-manager-plugin";
 import {
   Consumable,

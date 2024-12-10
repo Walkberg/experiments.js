@@ -33,6 +33,7 @@ export const Hand = ({}: HandProps) => {
     balatro.onEvent("card-unselected", (data: { cardId: string }) =>
       setSelectedCard((prev) => prev.filter((id) => id !== data.cardId))
     );
+    balatro.onEvent("card-upgraded", (data) => setRerender((prev) => !prev));
   }, [balatro]);
 
   if (handPlugin == null) {

@@ -20,6 +20,7 @@ export interface Consumable {
   name: string;
   type: ConsumableType;
   description: string;
+  checkCanUse?: (ctx: BalatroEngine) => boolean;
   onConsumableUsed?: (ctx: BalatroEngine) => void;
 }
 

@@ -1,10 +1,11 @@
 import {
   Consumable,
   getConsumablesPlugin,
+  getHandManagerPlugin,
   getPoolManagerPlugin,
 } from "./plugins";
 import { createBaseConsumable } from "./consumables";
-import { TarorType } from "./balatro";
+import { CardSuit, TarorType } from "./balatro";
 import { BalatroEngine } from "./balatro-engine";
 
 export function createTarotConsumable({
@@ -43,10 +44,27 @@ const createTheFool = (): Consumable => {
 };
 
 const createTheMagician = (): Consumable => {
-  return createTarotConsumable({
+  const theMagician = createTarotConsumable({
     name: "theMagician",
     description: "Le Magicien",
   });
+
+  theMagician.onConsumableUsed = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    // improve cards
+  };
+
+  theMagician.checkCanUse = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    return (
+      handManager.getSelectedCards().length < 2 &&
+      handManager.getSelectedCards().length > 0
+    );
+  };
+
+  return theMagician;
 };
 
 const createTheHighPriestess = (): Consumable => {
@@ -169,23 +187,26 @@ const createTheTower = (): Consumable => {
 };
 
 const createTheStar = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateSuitTarotCard({
     name: "theStar",
     description: "L'Étoile",
+    cardSuit: "diamonds",
   });
 };
 
 const createTheMoon = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateSuitTarotCard({
     name: "theMoon",
     description: "La Lune",
+    cardSuit: "clubs",
   });
 };
 
 const createTheSun = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateSuitTarotCard({
     name: "theSun",
     description: "Le Soleil",
+    cardSuit: "hearts",
   });
 };
 
@@ -197,11 +218,46 @@ const createJudgment = (): Consumable => {
 };
 
 const createTheWorld = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateSuitTarotCard({
     name: "theWorld",
     description: "Le Monde",
+    cardSuit: "spades",
   });
 };
+
+function createUpdateSuitTarotCard({
+  name,
+  description,
+  cardSuit,
+}: {
+  name: TarorType;
+  description: string;
+  cardSuit: CardSuit;
+}): Consumable {
+  const tarot = createTarotConsumable({
+    name: name,
+    description: description,
+  });
+
+  tarot.onConsumableUsed = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    handManager.getSelectedCards().forEach((card) => {
+      handManager.updateCardSuit(card.id, cardSuit);
+    });
+  };
+
+  tarot.checkCanUse = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    return (
+      handManager.getSelectedCards().length > 0 &&
+      handManager.getSelectedCards().length < 3
+    );
+  };
+
+  return tarot;
+}
 
 export const tarotCards = [
   createTheFool(),

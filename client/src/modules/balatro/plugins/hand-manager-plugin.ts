@@ -1,10 +1,6 @@
-import { PokerCard, Hand } from "../balatro";
-import {
-  BalatroEngine,
-  PlayerManagerPlugin,
-  getPlayerManagerPlugin,
-  Plugin,
-} from "../balatro-engine";
+import { PokerCard, Hand, CardSuit, CardRank } from "../balatro";
+import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
+import { getPlayerManagerPlugin } from "./deck-manager-plugin";
 
 export interface HandManagerPlugin extends Plugin {
   addToHand: (card: PokerCard) => void;
@@ -17,6 +13,8 @@ export interface HandManagerPlugin extends Plugin {
   selectCard: (cardId: string) => void;
   unSelectCard: (cardId: string) => void;
   getSelectedCards: () => PokerCard[];
+  upgradeCardValue: (cardId: string, cardRank: CardRank) => void;
+  updateCardSuit: (cardId: string, cardSuit: CardSuit) => void;
   reset: () => void;
 }
 
@@ -114,6 +112,30 @@ export function createHandPlugin(): HandManagerPlugin {
     }
   }
 
+  function upgradeCardValue(cardId: string, cardRank: CardRank) {
+    const card = _selectedCards.find((c) => c.id === cardId);
+
+    if (card == null) {
+      return;
+    }
+
+    card.rank = cardRank;
+
+    _engine.emitEvent("card-upgraded", card);
+  }
+
+  function updateCardSuit(cardId: string, cardSuit: CardSuit) {
+    const card = _selectedCards.find((c) => c.id === cardId);
+
+    if (card == null) {
+      return;
+    }
+
+    card.suit = cardSuit;
+
+    _engine.emitEvent("card-upgraded", card);
+  }
+
   return {
     name: "hand",
     init,
@@ -128,6 +150,8 @@ export function createHandPlugin(): HandManagerPlugin {
     getSelectedCards: () => _selectedCards,
     selectCard,
     unSelectCard,
+    upgradeCardValue,
+    updateCardSuit,
   };
 }
 

@@ -3,12 +3,12 @@ import {
   BalatroEngine,
   createBalatroEngine,
   createBlindManagerPlugin,
-  createDeckPlugin,
   createEconomyManagerPlugin,
   createGamePlugin,
   createPlayedCardPlugin,
   createPlayerManagerPlugin,
 } from "./balatro-engine";
+import { createDeckPlugin } from "./plugins/deck-manager-plugin";
 import { createHandPlugin } from "./plugins/hand-manager-plugin";
 import { createScorePlugin } from "./plugins";
 import { createPoolManagerPlugin } from "./plugins/pool-manager-plugin";
