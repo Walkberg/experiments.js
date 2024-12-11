@@ -1,9 +1,7 @@
-import { PokerCard } from "./balatro";
-import { BalatroEngine } from "./balatro-engine";
-import { getPlayerManagerPlugin } from "./plugins/deck-manager-plugin";
-import { ScoreManagerPlugin } from "./plugins";
-import { createCallbackManager, getCallbackManager, Mod } from "./mod";
-import { Buffon } from "./plugins/buffons-manager-plugin";
+import { PokerCard } from "../balatro";
+import { BalatroEngine, PlayerManagerPlugin } from "../balatro-engine";
+import { ScoreManagerPlugin } from "../plugins";
+import { Buffon } from "../plugins/buffons-manager-plugin";
 
 export type BuffonId = string;
 
@@ -30,80 +28,12 @@ const buffon_2: BuffonConfig = {
   cost: 5,
 };
 
-interface BuffonPool {
-  getBuffon(): BuffonConfig[];
-
-  addBuffon(...buffonsToAdd: BuffonConfig[]): void;
-
-  removeBuffon(buffonToRemove: BuffonConfig): void;
-}
-
-export function createBuffonPool(): BuffonPool {
-  const buffons: { [key: string]: BuffonConfig } = {};
-
-  function addBuffon(...buffonsToAdd: BuffonConfig[]) {
-    buffonsToAdd.forEach((buffon) => {
-      buffons[buffon.id] = buffon;
-    });
-  }
-
-  function getBuffon() {
-    return Object.values(buffons);
-  }
-
-  function removeBuffon() {
-    return Object.values(buffons);
-  }
-
-  return {
-    addBuffon,
-    getBuffon,
-    removeBuffon,
-  };
-}
-
-BuffonPool().addBuffon(buffon_1, buffon_2);
-
-export function BuffonPool() {
-  let pool;
-
-  if (pool == null) {
-    pool = createBuffonPool();
-  }
-
-  return pool;
-}
-
 interface BuffonEntity {
   id: BuffonId;
   name: string;
   rarety: Rarety;
   cost: number;
 }
-
-export interface IBalatro {
-  GetBuffonIdByName(name: string): BuffonEntity;
-
-  pickBuffon(): void;
-}
-
-export const Balatro: IBalatro = {
-  GetBuffonIdByName: (name: string) => {
-    const buffon = BuffonPool()
-      .getBuffon()
-      .find((buffon) => buffon.name === name);
-
-    if (buffon == null) {
-      throw new Error(`Buffon ${name} not found`);
-    }
-    return buffon;
-  },
-
-  pickBuffon: () => {
-    console.log("pickBuffon");
-    getCallbackManager().onGameEnd.notify();
-  },
-};
 
 export function createBuffon1(): Buffon {
   const buffon = createBaseBuffon({
@@ -147,12 +77,8 @@ export function createBuffon2(): Buffon {
   return buffon;
 }
 
-function getScoreManagerPlugin(context: BalatroEngine) {
-  return context.getPlugin<ScoreManagerPlugin>("score");
-}
-
 function getPlayerManagerPlugin(context: BalatroEngine) {
-  const manager = context.getPlugin<ScoreManagerPlugin>("player");
+  const manager = context.getPlugin<PlayerManagerPlugin>("player");
 
   if (manager == null) {
     throw new Error("Player manager not found");
@@ -168,7 +94,6 @@ export function createBuffon3(): Buffon {
   });
 
   buffon.onBuffonEnabled = (context: BalatroEngine) => {
-    console.log("buffon_3 enabled");
     const playerManagerPlugin = getPlayerManagerPlugin(context);
     playerManagerPlugin.addMaxHandCount(1);
   };
@@ -188,13 +113,26 @@ export function createBaseBuffon({
   name: string;
   description: string;
 }): Buffon {
+  const _price = 5;
+
+  function getBuyPrice() {
+    return _price;
+  }
+
+  function getSellPrice() {
+    return Math.floor(_price / 2);
+  }
+
   return {
     id: name,
     name: name,
     description,
+    rarity: "common",
     onCardComputeScore(context: BalatroEngine, card: PokerCard) {},
     onBuffonEnabled(context: BalatroEngine) {},
     onBuffonDisabled(context: BalatroEngine) {},
+    getBuyPrice,
+    getSellPrice,
   };
 }
 

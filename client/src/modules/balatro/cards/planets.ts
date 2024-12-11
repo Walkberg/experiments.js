@@ -1,13 +1,11 @@
-import { v4 as uuid } from "uuid";
-import { BalatroEngine } from "./balatro-engine";
+import { BalatroEngine } from "../balatro-engine";
 import {
-  Consumable,
-  ConsumablesManagerPlugin,
-  ConsumableType,
-  convertPlanetTypeToHandType,
-  getHandScorePlugin,
   PlanetType,
-} from "./plugins";
+  Consumable,
+  getHandScorePlugin,
+  convertPlanetTypeToHandType,
+} from "../plugins";
+import { createBaseConsumable } from "./consumables";
 import { tarotCards } from "./tarots";
 
 export function createPlanetConsumable({
@@ -35,38 +33,15 @@ export function createPlanetConsumable({
     return true;
   };
 
-  return planet;
-}
-
-export function createTarotConsumable({
-  name,
-  description,
-}: {
-  name: string;
-  description: string;
-}): Consumable {
-  return createBaseConsumable({
-    name,
-    description,
-    type: "tarot",
-  });
-}
-
-export function createBaseConsumable({
-  name,
-  description,
-  type,
-}: {
-  name: string;
-  description: string;
-  type: ConsumableType;
-}): Consumable {
-  return {
-    id: uuid(),
-    name: name,
-    type: type,
-    description,
+  planet.getBuyPrice = () => {
+    return 3;
   };
+
+  planet.getSellPrice = () => {
+    return Math.floor(planet.getBuyPrice() / 2);
+  };
+
+  return planet;
 }
 
 export function createMercury(): Consumable {

@@ -1,5 +1,6 @@
 import { Plugin } from "../balatro-engine";
 import { BalatroEngine } from "../balatro-engine";
+import { Buyable } from "./buffons-manager-plugin";
 
 export interface ConsumablesManagerPlugin extends Plugin {
   addConsumables: (items: Consumable[]) => void;
@@ -15,14 +16,14 @@ export interface ConsumablesManagerPlugin extends Plugin {
 
 export type ConsumableType = "planet" | "tarot" | "pack" | "spectral";
 
-export interface Consumable {
+export type Consumable = {
   id: string;
   name: string;
   type: ConsumableType;
   description: string;
   checkCanUse?: (ctx: BalatroEngine) => boolean;
   onConsumableUsed?: (ctx: BalatroEngine) => void;
-}
+} & Buyable;
 
 export function createConsumableManagerPlugin(): ConsumablesManagerPlugin {
   const MAX_COUNT_START = 2;

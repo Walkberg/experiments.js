@@ -3,10 +3,10 @@ import {
   getConsumablesPlugin,
   getHandManagerPlugin,
   getPoolManagerPlugin,
-} from "./plugins";
+} from "../plugins";
 import { createBaseConsumable } from "./consumables";
-import { CardSuit, TarorType } from "./balatro";
-import { BalatroEngine } from "./balatro-engine";
+import { CardSuit, TarorType } from "../balatro";
+import { BalatroEngine } from "../balatro-engine";
 
 export function createTarotConsumable({
   name,
@@ -15,11 +15,21 @@ export function createTarotConsumable({
   name: TarorType;
   description: string;
 }): Consumable {
-  return createBaseConsumable({
+  const tarot = createBaseConsumable({
     name,
     description,
     type: "tarot",
   });
+
+  tarot.getBuyPrice = () => {
+    return 3;
+  };
+
+  tarot.getSellPrice = () => {
+    return Math.floor(tarot.getBuyPrice() / 2);
+  };
+
+  return tarot;
 }
 
 const createTheFool = (): Consumable => {

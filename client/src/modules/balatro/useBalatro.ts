@@ -14,10 +14,10 @@ import { createScorePlugin } from "./plugins";
 import { createPoolManagerPlugin } from "./plugins/pool-manager-plugin";
 import { createBuffonManagerPlugin } from "./plugins/buffons-manager-plugin";
 import { createShopPlugin } from "./plugins/shop-plugin";
-import { buffonsPlayer } from "./buffons";
+import { buffonsPlayer } from "./cards/buffons";
 import { createConsumableManagerPlugin } from "./plugins/consumables-manager-plugin";
 import { createHandScoreManagerPlugin } from "./plugins/hand-score-manager-plugin";
-import { itemsPlayer } from "./consumables";
+import { itemsPlayer } from "./cards/planets";
 
 export const useBalatroGame = () => {
   const [balatro, setBalatro] = useState<BalatroEngine | null>(null);

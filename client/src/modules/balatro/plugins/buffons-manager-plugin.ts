@@ -2,14 +2,24 @@ import { Plugin } from "../balatro-engine";
 import { PokerCard } from "../balatro";
 import { BalatroEngine } from "../balatro-engine";
 
-export interface Buffon {
-  id: string;
+export type BuffonId = string;
+
+export type BuffonRarity = "common" | "uncommon" | "rare" | "legendary";
+
+export interface Buyable {
+  getBuyPrice: () => number;
+  getSellPrice: () => number;
+}
+
+export type Buffon = {
+  id: BuffonId;
   name: string;
   description: string;
+  rarity: BuffonRarity;
   onCardComputeScore: (ctx: BalatroEngine, card: PokerCard) => void;
   onBuffonEnabled: (ctx: BalatroEngine) => void;
   onBuffonDisabled: (ctx: BalatroEngine) => void;
-}
+} & Buyable;
 
 export interface BuffonsManagerPlugin extends Plugin {
   addBuffons: (buffons: Buffon[]) => void;

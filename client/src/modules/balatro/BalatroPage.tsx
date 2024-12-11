@@ -30,7 +30,7 @@ import {
   ConsumablesManagerPlugin,
 } from "./plugins/consumables-manager-plugin";
 import { HandScoreDetail } from "./modules/hand-score/HandScoreDetail";
-import { Hand } from "./modules/hand/hand";
+import { Hand } from "./modules/hand/Hand";
 
 export const BalatroPage = () => {
   return (
