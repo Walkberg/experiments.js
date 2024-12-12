@@ -54,9 +54,9 @@ export function createDeckPlugin(): DeckManagerPlugin {
           suit,
           rank,
           id: uuid(),
-          enhancement: "glass",
+          enhancement: "none",
           edition: "base",
-          seal: "gold",
+          seal: "none",
         });
       });
     });

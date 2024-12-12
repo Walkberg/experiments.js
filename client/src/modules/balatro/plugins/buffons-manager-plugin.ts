@@ -108,3 +108,14 @@ export function createBuffonManagerPlugin(): BuffonsManagerPlugin {
     applyBuffonEffectCardPlay,
   };
 }
+
+export function getBuffonManagerPlugin(
+  balatro: BalatroEngine
+): BuffonsManagerPlugin {
+  const plugin = balatro.getPlugin<BuffonsManagerPlugin>("buffon-manager")!;
+
+  if (plugin == null) {
+    throw new Error("BuffonManagerPlugin not found");
+  }
+  return plugin;
+}

@@ -1,13 +1,14 @@
 import {
   Consumable,
+  getBuffonManagerPlugin,
   getConsumablesPlugin,
   getHandManagerPlugin,
   getPoolManagerPlugin,
 } from "../plugins";
 import { createBaseConsumable } from "./consumables";
-import { TarorType } from "../balatro";
-import { CardSuit } from "./poker-cards";
-import { BalatroEngine } from "../balatro-engine";
+import { getNextCardRank, TarorType } from "../balatro";
+import { CardSuit, EnhancementType } from "./poker-cards";
+import { BalatroEngine, getEconomyManagerPlugin } from "../balatro-engine";
 
 export function createTarotConsumable({
   name,
@@ -55,27 +56,12 @@ const createTheFool = (): Consumable => {
 };
 
 const createTheMagician = (): Consumable => {
-  const theMagician = createTarotConsumable({
+  return createUpdateEnhancementTarotCard({
     name: "theMagician",
     description: "Le Magicien",
+    enhancement: "lucky",
+    maxCardCount: 2,
   });
-
-  theMagician.onConsumableUsed = (ctx: BalatroEngine) => {
-    const handManager = getHandManagerPlugin(ctx);
-
-    // improve cards
-  };
-
-  theMagician.checkCanUse = (ctx: BalatroEngine) => {
-    const handManager = getHandManagerPlugin(ctx);
-
-    return (
-      handManager.getSelectedCards().length < 2 &&
-      handManager.getSelectedCards().length > 0
-    );
-  };
-
-  return theMagician;
 };
 
 const createTheHighPriestess = (): Consumable => {
@@ -98,12 +84,12 @@ const createTheHighPriestess = (): Consumable => {
   return theHighPriestess;
 };
 const createTheEmpress = (): Consumable => {
-  const theEmpress = createTarotConsumable({
+  return createUpdateEnhancementTarotCard({
     name: "theEmpress",
     description: "L'Impératrice",
+    enhancement: "mult",
+    maxCardCount: 2,
   });
-
-  return theEmpress;
 };
 
 const createTheEmperor = (): Consumable => {
@@ -114,38 +100,59 @@ const createTheEmperor = (): Consumable => {
 };
 
 const createTheHierophant = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateEnhancementTarotCard({
     name: "theHierophant",
     description: "Le Pape",
+    enhancement: "bonus",
+    maxCardCount: 2,
   });
 };
 
 const createTheLovers = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateEnhancementTarotCard({
     name: "theLovers",
     description: "Les Amoureux",
+    enhancement: "wildcard",
+    maxCardCount: 1,
   });
 };
 
 const createTheChariot = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateEnhancementTarotCard({
     name: "theChariot",
     description: "Le Chariot",
+    enhancement: "steel",
+    maxCardCount: 1,
   });
 };
 
 const createJustice = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateEnhancementTarotCard({
     name: "justice",
     description: "La Justice",
+    enhancement: "glass",
+    maxCardCount: 1,
   });
 };
 
 const createTheHermit = (): Consumable => {
-  return createTarotConsumable({
+  const tarot = createTarotConsumable({
     name: "theHermit",
     description: "L'Hermite",
   });
+
+  tarot.onConsumableUsed = (ctx: BalatroEngine) => {
+    const economyManager = getEconomyManagerPlugin(ctx);
+
+    let money = economyManager.getMoney();
+
+    if (money > 20) {
+      money = 20;
+    }
+    economyManager.addMoney(money);
+  };
+
+  return tarot;
 };
 
 const createTheWheelOfFortune = (): Consumable => {
@@ -156,44 +163,115 @@ const createTheWheelOfFortune = (): Consumable => {
 };
 
 const createStrength = (): Consumable => {
-  return createTarotConsumable({
+  const tarot = createTarotConsumable({
     name: "strength",
     description: "La Force",
   });
+
+  tarot.onConsumableUsed = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    handManager.getSelectedCards().forEach((card) => {
+      const cardRank = getNextCardRank(card.rank);
+      handManager.upgradeCardValue(card.id, cardRank);
+    });
+  };
+
+  return tarot;
 };
 
 const createTheHangedMan = (): Consumable => {
-  return createTarotConsumable({
+  const tarot = createTarotConsumable({
     name: "theHangedMan",
     description: "Le Pendu",
   });
+
+  tarot.onConsumableUsed = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    handManager.getSelectedCards().forEach((card) => {
+      handManager.destroy(card.id);
+    });
+  };
+
+  tarot.checkCanUse = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    return (
+      handManager.getSelectedCards().length > 0 &&
+      handManager.getSelectedCards().length < 2
+    );
+  };
+
+  return tarot;
 };
 
 const createDeath = (): Consumable => {
-  return createTarotConsumable({
+  const tarot = createTarotConsumable({
     name: "death",
     description: "La Mort",
   });
+
+  tarot.onConsumableUsed = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    const firstCard = handManager.getSelectedCards()[0];
+
+    const secondCard = handManager.getSelectedCards()[0];
+
+    //@ todo copy firstCrad into second
+
+    handManager.upgradeCardValue(secondCard.id, firstCard.rank);
+    handManager.updateCardEnhancement(secondCard.id, firstCard.enhancement);
+    handManager.updateCardSuit(secondCard.id, firstCard.suit);
+  };
+
+  tarot.checkCanUse = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    return handManager.getSelectedCards().length === 2;
+  };
+
+  return tarot;
 };
 
 const createTemperance = (): Consumable => {
-  return createTarotConsumable({
+  const tarot = createTarotConsumable({
     name: "temperance",
     description: "Tempérance",
   });
+
+  tarot.onConsumableUsed = (ctx: BalatroEngine) => {
+    const buffonManager = getBuffonManagerPlugin(ctx);
+    const economyManager = getEconomyManagerPlugin(ctx);
+
+    let price = 0;
+
+    buffonManager.getBuffons().forEach((buffon) => {
+      price += buffon.getSellPrice();
+    });
+
+    economyManager.addMoney(price < 50 ? price : 50);
+  };
+
+  return tarot;
 };
 
 const createTheDevil = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateEnhancementTarotCard({
     name: "theDevil",
     description: "Le Diable",
+    enhancement: "gold",
+    maxCardCount: 1,
   });
 };
 
 const createTheTower = (): Consumable => {
-  return createTarotConsumable({
+  return createUpdateEnhancementTarotCard({
     name: "theTower",
     description: "La Maison Dieu",
+    enhancement: "stone",
+    maxCardCount: 1,
   });
 };
 
@@ -222,10 +300,30 @@ const createTheSun = (): Consumable => {
 };
 
 const createJudgment = (): Consumable => {
-  return createTarotConsumable({
+  const tarot = createTarotConsumable({
     name: "judgment",
     description: "Le Jugement",
   });
+
+  tarot.onConsumableUsed = (ctx: BalatroEngine) => {
+    const poolManager = getPoolManagerPlugin(ctx);
+    const buffonManagerPlugin = getBuffonManagerPlugin(ctx);
+
+    const buffon = poolManager.getRandomBuffons(1)[0];
+
+    buffonManagerPlugin.addBuffon(buffon);
+  };
+
+  tarot.checkCanUse = (ctx: BalatroEngine) => {
+    const buffonManagerPlugin = getBuffonManagerPlugin(ctx);
+
+    return (
+      buffonManagerPlugin.getBuffons().length + 1 <=
+      buffonManagerPlugin.getMaxCount()
+    );
+  };
+
+  return tarot;
 };
 
 const createTheWorld = (): Consumable => {
@@ -264,6 +362,42 @@ function createUpdateSuitTarotCard({
     return (
       handManager.getSelectedCards().length > 0 &&
       handManager.getSelectedCards().length < 3
+    );
+  };
+
+  return tarot;
+}
+
+function createUpdateEnhancementTarotCard({
+  name,
+  description,
+  enhancement,
+  maxCardCount,
+}: {
+  name: TarorType;
+  description: string;
+  enhancement: EnhancementType;
+  maxCardCount: number;
+}): Consumable {
+  const tarot = createTarotConsumable({
+    name: name,
+    description: description,
+  });
+
+  tarot.onConsumableUsed = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    handManager.getSelectedCards().forEach((card) => {
+      handManager.updateCardEnhancement(card.id, enhancement);
+    });
+  };
+
+  tarot.checkCanUse = (ctx: BalatroEngine) => {
+    const handManager = getHandManagerPlugin(ctx);
+
+    return (
+      handManager.getSelectedCards().length > 0 &&
+      handManager.getSelectedCards().length < maxCardCount
     );
   };
 

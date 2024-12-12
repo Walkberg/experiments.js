@@ -1,5 +1,10 @@
 import { Hand } from "../balatro";
-import { PokerCard, CardSuit, CardRank } from "../cards/poker-cards";
+import {
+  PokerCard,
+  CardSuit,
+  CardRank,
+  EnhancementType,
+} from "../cards/poker-cards";
 import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
 import { getPlayerManagerPlugin } from "./deck-manager-plugin";
 
@@ -16,6 +21,11 @@ export interface HandManagerPlugin extends Plugin {
   getSelectedCards: () => PokerCard[];
   upgradeCardValue: (cardId: string, cardRank: CardRank) => void;
   updateCardSuit: (cardId: string, cardSuit: CardSuit) => void;
+  updateCardEnhancement: (
+    cardId: string,
+    enhancementType: EnhancementType
+  ) => void;
+  destroy: (cardId: string) => void;
   reset: () => void;
 }
 
@@ -137,6 +147,30 @@ export function createHandPlugin(): HandManagerPlugin {
     _engine.emitEvent("card-upgraded", card);
   }
 
+  function updateCardEnhancement(
+    cardId: string,
+    enhancementType: EnhancementType
+  ) {
+    const card = _selectedCards.find((c) => c.id === cardId);
+
+    if (card == null) {
+      return;
+    }
+
+    card.enhancement = enhancementType;
+
+    _engine.emitEvent("card-upgraded", card);
+  }
+
+  function destroy(cardId: string) {
+    const card = _hand.find((c) => c.id === cardId);
+    if (card == null) {
+      return;
+    }
+    _hand = _hand.filter((c) => c.id !== cardId);
+    //_engine.emitEvent("card-destroyed", { cardId });
+  }
+
   return {
     name: "hand",
     init,
@@ -153,6 +187,8 @@ export function createHandPlugin(): HandManagerPlugin {
     unSelectCard,
     upgradeCardValue,
     updateCardSuit,
+    updateCardEnhancement,
+    destroy,
   };
 }
 

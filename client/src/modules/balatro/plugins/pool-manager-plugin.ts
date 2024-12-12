@@ -11,6 +11,7 @@ export interface PoolManagerPlugin extends Plugin {
   getPool: () => Buffon[];
   getConsumablePool: () => Consumable[];
   getRandomConsumables: (count: number, type?: ConsumableType) => Consumable[];
+  getRandomBuffons: (count: number) => Buffon[];
   setupPool: (cards: Buffon[]) => void;
 }
 
@@ -72,6 +73,17 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     return randomConsumables;
   }
 
+  function getRandomBuffons(count: number) {
+    const randomBuffons = [];
+    for (let i = 0; i < count; i++) {
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      const randomBuffon = pool[randomIndex];
+      randomBuffons.push(randomBuffon);
+      pool.splice(randomIndex, 1);
+    }
+    return randomBuffons;
+  }
+
   return {
     name: "pool-manager",
     init,
@@ -84,6 +96,7 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     getConsumablePool: () => items,
     getRandomConsumables,
     setupPool,
+    getRandomBuffons,
   };
 }
 

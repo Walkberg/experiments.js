@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import {
   BalatroEngine,
   createBalatroEngine,
-  createBlindManagerPlugin,
   createEconomyManagerPlugin,
   createGamePlugin,
   createPlayedCardPlugin,
   createPlayerManagerPlugin,
 } from "./balatro-engine";
+import { createAnteManagerPlugin } from "./plugins/blind-manager-plugin";
 import { createDeckPlugin } from "./plugins/deck-manager-plugin";
 import { createHandPlugin } from "./plugins/hand-manager-plugin";
 import { createScorePlugin } from "./plugins";
@@ -21,7 +21,7 @@ import { itemsPlayer } from "./cards/planets";
 import { createEnhancementPlugin } from "./plugins/enhancement-plugin";
 import { createSealPlugin } from "./plugins/seal-plugin";
 import { createEditionPlugin } from "./plugins/edition-plugin";
-import { createGoldEnhancement } from "./cards/enhancements";
+import { enhancements } from "./cards/enhancements";
 import { creatGoldSeal } from "./cards/seal";
 import { createBaseEdition } from "./cards/editions";
 
@@ -36,7 +36,7 @@ export const useBalatroGame = () => {
     const deckPlugin = createDeckPlugin();
     const handPlugin = createHandPlugin();
     const economyManagerPlugin = createEconomyManagerPlugin();
-    const bliandManagerPlugin = createBlindManagerPlugin();
+    const bliandManagerPlugin = createAnteManagerPlugin();
     const buffonManagerPlugin = createBuffonManagerPlugin();
     const itemsManagerPlugin = createConsumableManagerPlugin();
     const playerManagerPlugin = createPlayerManagerPlugin();
@@ -53,7 +53,7 @@ export const useBalatroGame = () => {
     poolManagerPlugin.registerBuffons(buffonsPlayer);
     poolManagerPlugin.registerItems(itemsPlayer);
 
-    enhancementManager.registerEnhancement(createGoldEnhancement());
+    enhancementManager.registerEnhancements(enhancements);
     sealManager.registerSeal(creatGoldSeal());
     editionManager.registerEdition(createBaseEdition());
 

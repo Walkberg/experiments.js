@@ -318,6 +318,32 @@ export function getCardChips(value: CardRank): Chip {
   return parseInt(value, 10);
 }
 
+export function getNextCardRank(value: CardRank): CardRank {
+  const ranks: CardRank[] = [
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "J",
+    "Q",
+    "K",
+    "A",
+  ];
+  const currentIndex = ranks.indexOf(value);
+
+  if (currentIndex === -1) {
+    throw new Error(`Invalid CardRank: ${value}`);
+  }
+
+  const nextIndex = (currentIndex + 1) % ranks.length;
+  return ranks[nextIndex];
+}
+
 export function getDeckSize(deck: Deck): number {
   return deck.length;
 }

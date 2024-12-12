@@ -3,6 +3,7 @@ import { EnhancementHandler, EnhancementManager } from "../cards/poker-cards";
 
 interface EnhancementPlugin extends Plugin {
   registerEnhancement: (handler: EnhancementHandler) => void;
+  registerEnhancements: (handler: EnhancementHandler[]) => void;
 }
 
 export function createEnhancementPlugin(): EnhancementPlugin {
@@ -18,9 +19,16 @@ export function createEnhancementPlugin(): EnhancementPlugin {
     enhancementHandler.registerHandler(handler);
   }
 
+  function registerEnhancements(handlers: EnhancementHandler[]) {
+    handlers.forEach((handler) => {
+      registerEnhancement(handler);
+    });
+  }
+
   return {
     name: "enhancement-plugin",
     init,
     registerEnhancement,
+    registerEnhancements,
   };
 }

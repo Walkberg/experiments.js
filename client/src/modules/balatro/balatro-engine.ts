@@ -3,6 +3,7 @@ import { PokerCard } from "./cards/poker-cards";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
 import { ScoreManagerPlugin } from "./plugins";
 import { DeckManagerPlugin } from "./plugins/deck-manager-plugin";
+import { BlindManagerPlugin } from "./plugins/blind-manager-plugin";
 
 export type EventName =
   | "change-phase"
@@ -142,7 +143,7 @@ export function createPlayedCardPlugin(): PlayedCardManagerPlugin {
   };
 }
 
-export type Phase = "Pause" | "Play" | "Score" | "Shop" | "GameOver";
+export type Phase = "Pause" | "Play" | "Score" | "Shop" | "Blind" | "GameOver";
 
 export interface GameManagerPlugin extends Plugin {
   getPhase: () => Phase;
@@ -189,7 +190,11 @@ export function createGamePlugin(): GameManagerPlugin {
     engine.onEvent("score-calculated", (event) => {
       if (blind == null || score == null || hand == null) return;
 
-      if (score.getRoundScore() < blind.getCurrentBlind().amount) {
+      const currentBlind = blind.getCurrentBlind();
+
+      if (currentBlind == null) return;
+
+      if (score.getRoundScore() < currentBlind.score) {
         if (hand.getRemainingHands() === 0) {
           changePhase("GameOver");
         } else {
@@ -240,14 +245,29 @@ export function createGamePlugin(): GameManagerPlugin {
   }
 
   function startNextPhase() {
-    changePhase("Play");
+    if (_phase === "Shop") {
+      changePhase("Blind");
+    } else if (_phase === "Blind") {
+      _blind.selectNextBlind();
+      changePhase("Play");
 
-    _deck.generateDeck();
-    _hand.reset();
-    _score.resetScore();
-    _playedCard.reset();
+      _deck.generateDeck();
+      _hand.reset();
+      _score.resetScore();
+      _playedCard.reset();
 
-    drawCards(8);
+      drawCards(8);
+    } else {
+      changePhase("Play");
+
+      _deck.generateDeck();
+
+      _hand.reset();
+      _score.resetScore();
+      _playedCard.reset();
+
+      drawCards(8);
+    }
   }
 
   function drawCards(count: number) {
@@ -265,35 +285,6 @@ export function createGamePlugin(): GameManagerPlugin {
     endTurn: () => console.log("Turn ended"),
     getPhase: () => _phase,
     startNextPhase,
-  };
-}
-
-export interface Blind {
-  id: string;
-  amount: number;
-  description?: string;
-}
-
-export interface BlindManagerPlugin extends Plugin {
-  getCurrentBlind: () => Blind;
-}
-
-export function createBlindManagerPlugin(): BlindManagerPlugin {
-  let currentBlind: Blind;
-
-  function init(engine: BalatroEngine) {
-    currentBlind = {
-      id: "1",
-      amount: 100,
-      description: "Blind",
-    };
-    console.log("BlindManagerPlugin initialized");
-  }
-
-  return {
-    name: "blind-manager",
-    init,
-    getCurrentBlind: () => currentBlind,
   };
 }
 
@@ -404,4 +395,16 @@ export function createEconomyManagerPlugin(): EconomyManagerPlugin {
     addMoney,
     removeMoney,
   };
+}
+
+export function getEconomyManagerPlugin(
+  balatro: BalatroEngine
+): EconomyManagerPlugin {
+  const manager = balatro.getPlugin<EconomyManagerPlugin>("economy");
+
+  if (!manager) {
+    throw new Error("Economy manager plugin not found");
+  }
+
+  return manager;
 }

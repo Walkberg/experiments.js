@@ -14,12 +14,12 @@ import { PlayCard } from "./Card";
 import { BalatroProvider, useCurrentGame } from "./BalatroProvider";
 import { evaluatePokerHand } from "./hand-evaluator";
 import {
-  BlindManagerPlugin,
   EconomyManagerPlugin,
   GameManagerPlugin,
   Phase,
   PlayedCardManagerPlugin,
 } from "./balatro-engine";
+import { BlindManagerPlugin } from "./plugins/blind-manager-plugin";
 import { DeckManagerPlugin } from "./plugins/deck-manager-plugin";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
 import { ScoreManagerPlugin } from "./plugins";
@@ -31,6 +31,7 @@ import {
 } from "./plugins/consumables-manager-plugin";
 import { HandScoreDetail } from "./modules/hand-score/HandScoreDetail";
 import { Hand } from "./modules/hand/Hand";
+import { Ante } from "./modules/ante/Ante";
 
 export const BalatroPage = () => {
   return (
@@ -76,7 +77,13 @@ export const Balatro = () => {
           </CardContainer>
         </div>
         <div className="col-span-4 row-span-2 col-start-1 row-start-2">
-          {phase === "Shop" ? <Shop /> : <Board />}
+          {phase === "Blind" ? (
+            <Ante />
+          ) : phase === "Shop" ? (
+            <Shop />
+          ) : (
+            <Board />
+          )}
         </div>
         <div className="col-start-5 row-start-3">
           <CardContainer>
@@ -299,7 +306,9 @@ export const Blind = ({}: BlindProps) => {
 
   const plugin = balatro?.getPlugin<BlindManagerPlugin>("blind-manager");
 
-  if (plugin == null) {
+  const currentBlind = plugin?.getCurrentBlind();
+
+  if (plugin == null || currentBlind == null) {
     throw new Error("balatro is not defined");
   }
 
@@ -312,7 +321,7 @@ export const Blind = ({}: BlindProps) => {
           <div>Score at least</div>
           <div className="flex flex-row">
             <div>seal Icon</div>
-            <div>{plugin.getCurrentBlind().amount}</div>
+            <div>{currentBlind.score}</div>
           </div>
           <div className="flex flex-row">
             <div>Reward</div>
