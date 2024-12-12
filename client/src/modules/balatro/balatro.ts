@@ -1,25 +1,9 @@
 import { evaluatePokerHand, getCardValue } from "./hand-evaluator";
+import { PokerCard, Edition, CardSuit, CardRank } from "./cards/poker-cards";
 
 export type Chip = number;
 
 export type Multiplier = number;
-
-export type CardSuit = "hearts" | "diamonds" | "clubs" | "spades";
-
-export type CardRank =
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9"
-  | "10"
-  | "J"
-  | "Q"
-  | "K"
-  | "A";
 
 export type PokerHandType =
   | "HighCard"
@@ -33,26 +17,6 @@ export type PokerHandType =
   | "StraightFlush"
   | "RoyalFlush";
 
-export type EnhancementType =
-  | "none"
-  | "bonus"
-  | "mult"
-  | "wildcard"
-  | "glass"
-  | "steel"
-  | "stone"
-  | "gold"
-  | "lucky";
-
-export type EditionType =
-  | "base"
-  | "foil"
-  | "holographic"
-  | "polychrome"
-  | "negative";
-
-export type SealType = "none" | "gold" | "red" | "blue" | "purple";
-
 export type Score = { chip: Chip; multiplier: Multiplier };
 
 export type Rarety = "common" | "uncommon" | "rare" | "legendary";
@@ -63,14 +27,6 @@ export type HandScore = {
   multiplier: Multiplier;
   score: Score;
 };
-
-export type PokerCard = {
-  id: string;
-  suit: CardSuit;
-  rank: CardRank;
-} & Edition &
-  Enhancement &
-  Seal;
 
 export type PlayerConfig = {
   maxHandSize: number;
@@ -92,12 +48,6 @@ export interface Shop {
   cards: BuyableItem<PokerCard>[];
   packs: BuyableItem<CardPack>[];
 }
-
-export type Edition = { edition: EditionType };
-
-export type Enhancement = { enhancement: EnhancementType };
-
-export type Seal = { seal: SealType };
 
 export type Pack<T> = T[];
 

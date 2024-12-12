@@ -5,7 +5,8 @@ import {
   getPoolManagerPlugin,
 } from "../plugins";
 import { createBaseConsumable } from "./consumables";
-import { CardSuit, TarorType } from "../balatro";
+import { TarorType } from "../balatro";
+import { CardSuit } from "./poker-cards";
 import { BalatroEngine } from "../balatro-engine";
 
 export function createTarotConsumable({

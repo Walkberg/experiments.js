@@ -18,6 +18,12 @@ import { buffonsPlayer } from "./cards/buffons";
 import { createConsumableManagerPlugin } from "./plugins/consumables-manager-plugin";
 import { createHandScoreManagerPlugin } from "./plugins/hand-score-manager-plugin";
 import { itemsPlayer } from "./cards/planets";
+import { createEnhancementPlugin } from "./plugins/enhancement-plugin";
+import { createSealPlugin } from "./plugins/seal-plugin";
+import { createEditionPlugin } from "./plugins/edition-plugin";
+import { createGoldEnhancement } from "./cards/enhancements";
+import { creatGoldSeal } from "./cards/seal";
+import { createBaseEdition } from "./cards/editions";
 
 export const useBalatroGame = () => {
   const [balatro, setBalatro] = useState<BalatroEngine | null>(null);
@@ -40,9 +46,16 @@ export const useBalatroGame = () => {
     const gamePlugin = createGamePlugin();
     const scorePlugin = createScorePlugin();
     const handScoreManager = createHandScoreManagerPlugin();
+    const enhancementManager = createEnhancementPlugin();
+    const sealManager = createSealPlugin();
+    const editionManager = createEditionPlugin();
 
     poolManagerPlugin.registerBuffons(buffonsPlayer);
     poolManagerPlugin.registerItems(itemsPlayer);
+
+    enhancementManager.registerEnhancement(createGoldEnhancement());
+    sealManager.registerSeal(creatGoldSeal());
+    editionManager.registerEdition(createBaseEdition());
 
     balatro.registerPlugin(playerManagerPlugin);
     balatro.registerPlugin(economyManagerPlugin);
@@ -56,6 +69,7 @@ export const useBalatroGame = () => {
     balatro.registerPlugin(bliandManagerPlugin);
     balatro.registerPlugin(poolManagerPlugin);
     balatro.registerPlugin(shopPlugin);
+    balatro.registerPlugin(enhancementManager);
     balatro.registerPlugin(gamePlugin);
 
     gamePlugin.startGame();

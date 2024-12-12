@@ -1,4 +1,5 @@
-import { getBaseChip, PokerCard } from "../balatro";
+import { getBaseChip } from "../balatro";
+import { PokerCard } from "../cards/poker-cards";
 import {
   BalatroEngine,
   PlayedCardManagerPlugin,
@@ -72,6 +73,8 @@ export function createScorePlugin(): ScoreManagerPlugin {
       for (const buffon of _buffonsManager.getBuffons()) {
         _buffonsManager.applyBuffonEffectCardPlay(buffon, card);
       }
+
+      _engine.emitEvent("score-card-calculated", card);
     }
 
     roundScore += currentChip * currentMultiplier;
@@ -117,4 +120,16 @@ export function createScorePlugin(): ScoreManagerPlugin {
     addMultiplier,
     multiplyMultiplier,
   };
+}
+
+export function getScoreManagerPlugin(
+  engine: BalatroEngine
+): ScoreManagerPlugin {
+  const plugin = engine.getPlugin<ScoreManagerPlugin>("score");
+
+  if (!plugin) {
+    throw new Error("Score plugin not found");
+  }
+
+  return plugin;
 }

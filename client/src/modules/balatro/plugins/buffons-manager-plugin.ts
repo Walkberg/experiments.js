@@ -1,5 +1,5 @@
 import { Plugin } from "../balatro-engine";
-import { PokerCard } from "../balatro";
+import { PokerCard } from "../cards/poker-cards";
 import { BalatroEngine } from "../balatro-engine";
 
 export type BuffonId = string;

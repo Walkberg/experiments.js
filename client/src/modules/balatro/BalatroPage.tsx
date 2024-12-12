@@ -2,11 +2,11 @@ import "./balatro.css";
 import { Card } from "@/components/ui/card";
 import {
   Hand as IHand,
-  PokerCard as ICard,
   Score as IScore,
   sortByRank,
   sortBySuit,
 } from "./balatro";
+import { PokerCard as ICard } from "./cards/poker-cards";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Shop } from "./Shop";

@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
-import { PokerCard, Deck, CardSuit, CardRank } from "../balatro";
+import { Deck } from "../balatro";
+import { PokerCard, CardSuit, CardRank } from "../cards/poker-cards";
 import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
 
 export function getPlayerManagerPlugin(
@@ -53,9 +54,9 @@ export function createDeckPlugin(): DeckManagerPlugin {
           suit,
           rank,
           id: uuid(),
-          enhancement: "none",
+          enhancement: "glass",
           edition: "base",
-          seal: "none",
+          seal: "gold",
         });
       });
     });

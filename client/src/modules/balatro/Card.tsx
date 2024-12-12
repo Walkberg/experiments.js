@@ -1,13 +1,14 @@
 import "./test.css";
 import { Card } from "@/components/ui/card";
+import { getCardLabel, getBaseChip, getCardChips } from "./balatro";
 import {
   PokerCard as ICard,
   CardSuit,
-  getCardLabel,
-  getBaseChip,
-  getCardChips,
   CardRank,
-} from "./balatro";
+  EditionType,
+  EnhancementType,
+  SealType,
+} from "./cards/poker-cards";
 import {
   HoverCard,
   HoverCardContent,
@@ -37,7 +38,9 @@ export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
           >
             <CardEdition card={card}>
               <CardEnhancer card={card}>
-                <CardView card={card} />
+                <CardView card={card}>
+                  <CardSeal card={card} />
+                </CardView>
               </CardEnhancer>
             </CardEdition>
           </Card>
@@ -58,19 +61,53 @@ interface CardBackgroundProps {
   children?: ReactNode;
 }
 
-export const CardBackground = ({ children }: CardBackgroundProps) => {
+export const CardBackground = ({ card, children }: CardBackgroundProps) => {
   return <div className="test-card">{children}</div>;
 };
 
-export const CardEdition = ({ children }: CardBackgroundProps) => {
-  return <div className="card-edition">{children}</div>;
+export const CardEdition = ({ card, ...props }: CardBackgroundProps) => {
+  const position = getCardEditionPosition(card.edition);
+  return (
+    <div
+      style={{
+        backgroundPositionX: position.x,
+        backgroundPositionY: position.y,
+      }}
+      className={cn("card-edition", { negative: card.edition === "negative" })}
+      {...props}
+    />
+  );
 };
 
-export const CardEnhancer = ({ children }: CardBackgroundProps) => {
-  return <div className="card-enhancer">{children}</div>;
+export const CardEnhancer = ({ card, ...props }: CardBackgroundProps) => {
+  const position = getCardEnhancementPosition(card.enhancement);
+  return (
+    <div
+      style={{
+        backgroundPositionX: position.x,
+        backgroundPositionY: position.y,
+      }}
+      className="card-enhancer"
+      {...props}
+    />
+  );
 };
 
-export const CardView = ({ children, card }: CardBackgroundProps) => {
+export const CardSeal = ({ card, ...props }: CardBackgroundProps) => {
+  const position = getCardSealPosition(card.seal);
+  return (
+    <div
+      style={{
+        backgroundPositionX: position.x,
+        backgroundPositionY: position.y,
+      }}
+      className="card-enhancer"
+      {...props}
+    />
+  );
+};
+
+export const CardView = ({ card, ...props }: CardBackgroundProps) => {
   return (
     <div
       style={{
@@ -78,9 +115,8 @@ export const CardView = ({ children, card }: CardBackgroundProps) => {
         backgroundPositionY: getCardSuitPosition(card.suit),
       }}
       className="card-rank"
-    >
-      {children}
-    </div>
+      {...props}
+    />
   );
 };
 
@@ -121,4 +157,49 @@ function getCardSuitPosition(cardSuit: CardSuit): number {
 
 function getCardRankPosition(cardRank: CardRank): number {
   return (getCardChips(cardRank) - 2) * -CARD_X_SIZE;
+}
+
+const editionPosition = {
+  base: { x: 0 * -CARD_X_SIZE, y: 0 * -CARD_Y_SIZE },
+  foil: { x: -CARD_X_SIZE, y: 0 * -CARD_Y_SIZE },
+  holographic: { x: -CARD_X_SIZE * 2, y: 0 * -CARD_Y_SIZE },
+  polychrome: { x: -CARD_X_SIZE * 3, y: 0 * -CARD_Y_SIZE },
+  negative: { x: 0 * -CARD_X_SIZE, y: 0 * -CARD_Y_SIZE },
+};
+
+function getCardEditionPosition(type: EditionType): Position {
+  return editionPosition[type];
+}
+
+const enhancementPosition = {
+  none: { x: 0, y: 1 * CARD_Y_SIZE },
+  bonus: { x: -CARD_X_SIZE, y: 1 * -CARD_Y_SIZE },
+  mult: { x: -CARD_X_SIZE * 2, y: 1 * -CARD_Y_SIZE },
+  wildcard: { x: -CARD_X_SIZE * 3, y: 1 * -CARD_Y_SIZE },
+  glass: { x: -CARD_X_SIZE * 5, y: 1 * -CARD_Y_SIZE },
+  steel: { x: -CARD_X_SIZE * 6, y: 1 * -CARD_Y_SIZE },
+  stone: { x: -CARD_X_SIZE * 5, y: 0 * -CARD_Y_SIZE },
+  gold: { x: -CARD_X_SIZE * 6, y: 0 * -CARD_Y_SIZE },
+  lucky: { x: -CARD_X_SIZE * 4, y: 2 * -CARD_Y_SIZE },
+};
+
+function getCardEnhancementPosition(type: EnhancementType): Position {
+  return enhancementPosition[type];
+}
+
+const sealPosition = {
+  none: { x: -1 * -CARD_X_SIZE, y: -1 * -CARD_X_SIZE },
+  gold: { x: 2 * -CARD_X_SIZE, y: 0 * -CARD_X_SIZE },
+  red: { x: -CARD_X_SIZE * 5, y: 4 * -CARD_X_SIZE },
+  blue: { x: -CARD_X_SIZE * 6, y: 4 * -CARD_X_SIZE },
+  purple: { x: -CARD_X_SIZE * 4, y: 4 * -CARD_X_SIZE },
+};
+
+function getCardSealPosition(type: SealType): Position {
+  return sealPosition[type];
+}
+
+interface Position {
+  x: number;
+  y: number;
 }

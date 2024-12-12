@@ -1,4 +1,5 @@
-import { Hand, PokerCard } from "./balatro";
+import { Hand } from "./balatro";
+import { PokerCard } from "./cards/poker-cards";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
 import { ScoreManagerPlugin } from "./plugins";
 import { DeckManagerPlugin } from "./plugins/deck-manager-plugin";
@@ -30,7 +31,8 @@ export type EventName =
   | "consumable-removed"
   | "consumable-used"
   | "hand-score-improved"
-  | "achievement-unlocked";
+  | "achievement-unlocked"
+  | "score-card-calculated";
 
 export interface BalatroEngine {
   removePlugin: (modName: string) => void;

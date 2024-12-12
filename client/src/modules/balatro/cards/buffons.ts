@@ -1,4 +1,4 @@
-import { PokerCard } from "../balatro";
+import { PokerCard } from "./poker-cards";
 import { BalatroEngine, PlayerManagerPlugin } from "../balatro-engine";
 import { ScoreManagerPlugin } from "../plugins";
 import { Buffon } from "../plugins/buffons-manager-plugin";

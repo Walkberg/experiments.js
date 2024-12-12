@@ -1,4 +1,5 @@
-import { PokerCard, Hand, CardSuit, CardRank } from "../balatro";
+import { Hand } from "../balatro";
+import { PokerCard, CardSuit, CardRank } from "../cards/poker-cards";
 import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
 import { getPlayerManagerPlugin } from "./deck-manager-plugin";
 

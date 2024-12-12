@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { CardContainer } from "../../BalatroPage";
 import { PlayCard } from "../../Card";
 import { useEffect, useState } from "react";
-import { sortByRank, sortBySuit, PokerCard as ICard } from "../../balatro";
+import { sortByRank, sortBySuit } from "../../balatro";
+import { PokerCard as ICard } from "../../cards/poker-cards";
 import { useCurrentGame } from "../../BalatroProvider";
 import { HandManagerPlugin } from "../../plugins";
 

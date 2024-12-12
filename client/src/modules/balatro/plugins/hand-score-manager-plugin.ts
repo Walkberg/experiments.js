@@ -1,4 +1,5 @@
-import { Hand, PokerCard } from "../balatro";
+import { Hand } from "../balatro";
+import { PokerCard } from "../cards/poker-cards";
 import { Plugin } from "../balatro-engine";
 import { BalatroEngine } from "../balatro-engine";
 import { evaluatePokerHand } from "../hand-evaluator";
@@ -97,75 +98,77 @@ export const addition: BaseScoreListAddition = {
   RoyalFlush: { chip: 50, multiplier: 5 },
 };
 
+const BASE_SCORE: Record<PokerHandType, BaseScore> = {
+  HighCard: {
+    type: "HighCard",
+    chip: 5,
+    multiplier: 1,
+    level: 1,
+    playedCount: 0,
+  },
+  OnePair: {
+    type: "OnePair",
+    chip: 10,
+    multiplier: 2,
+    level: 1,
+    playedCount: 0,
+  },
+  TwoPair: {
+    type: "TwoPair",
+    chip: 20,
+    multiplier: 2,
+    level: 1,
+    playedCount: 0,
+  },
+  ThreeOfAKind: {
+    type: "ThreeOfAKind",
+    chip: 30,
+    multiplier: 3,
+    level: 1,
+    playedCount: 0,
+  },
+  Straight: {
+    type: "Straight",
+    chip: 30,
+    multiplier: 4,
+    level: 1,
+    playedCount: 0,
+  },
+  Flush: { type: "Flush", chip: 35, multiplier: 4, level: 1, playedCount: 0 },
+  FullHouse: {
+    type: "FullHouse",
+    chip: 40,
+    multiplier: 4,
+    level: 1,
+    playedCount: 0,
+  },
+  FourOfAKind: {
+    type: "FourOfAKind",
+    chip: 60,
+    multiplier: 7,
+    level: 1,
+    playedCount: 0,
+  },
+  StraightFlush: {
+    type: "StraightFlush",
+    chip: 100,
+    multiplier: 8,
+    level: 1,
+    playedCount: 0,
+  },
+  RoyalFlush: {
+    type: "RoyalFlush",
+    chip: 120,
+    multiplier: 9,
+    level: 1,
+    playedCount: 0,
+  },
+};
+
 export function createHandScoreManagerPlugin(): HandScoreManagerPlugin {
   let _engine: BalatroEngine;
 
-  let baseScoreList: Record<PokerHandType, BaseScore> = {
-    HighCard: {
-      type: "HighCard",
-      chip: 5,
-      multiplier: 1,
-      level: 1,
-      playedCount: 0,
-    },
-    OnePair: {
-      type: "OnePair",
-      chip: 10,
-      multiplier: 2,
-      level: 1,
-      playedCount: 0,
-    },
-    TwoPair: {
-      type: "TwoPair",
-      chip: 20,
-      multiplier: 2,
-      level: 1,
-      playedCount: 0,
-    },
-    ThreeOfAKind: {
-      type: "ThreeOfAKind",
-      chip: 30,
-      multiplier: 3,
-      level: 1,
-      playedCount: 0,
-    },
-    Straight: {
-      type: "Straight",
-      chip: 30,
-      multiplier: 4,
-      level: 1,
-      playedCount: 0,
-    },
-    Flush: { type: "Flush", chip: 35, multiplier: 4, level: 1, playedCount: 0 },
-    FullHouse: {
-      type: "FullHouse",
-      chip: 40,
-      multiplier: 4,
-      level: 1,
-      playedCount: 0,
-    },
-    FourOfAKind: {
-      type: "FourOfAKind",
-      chip: 60,
-      multiplier: 7,
-      level: 1,
-      playedCount: 0,
-    },
-    StraightFlush: {
-      type: "StraightFlush",
-      chip: 100,
-      multiplier: 8,
-      level: 1,
-      playedCount: 0,
-    },
-    RoyalFlush: {
-      type: "RoyalFlush",
-      chip: 120,
-      multiplier: 9,
-      level: 1,
-      playedCount: 0,
-    },
-  };
+  let baseScoreList: Record<PokerHandType, BaseScore> = BASE_SCORE;
 
   function init(engine: BalatroEngine) {
     _engine = engine;

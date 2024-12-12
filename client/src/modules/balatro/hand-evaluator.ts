@@ -1,4 +1,5 @@
-import { CardRank, CardSuit, Hand, PokerHandType, sortByRank } from "./balatro";
+import { Hand, PokerHandType, sortByRank } from "./balatro";
+import { CardRank, CardSuit } from "./cards/poker-cards";
 
 export function evaluatePokerHand(hand: Hand): PokerHandType {
   if (isRoyalFlush(hand)) return "RoyalFlush";
