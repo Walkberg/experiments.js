@@ -373,7 +373,20 @@ export function sortByRank(hand: Hand): Hand {
 }
 
 export function getCardLabel(card: PokerCard): string {
-  return `${card.rank} of ${card.suit}`;
+  return `${card.rank} of ${getCardSuit(card.suit)}`;
+}
+
+export function getCardSuit(card: CardSuit): string {
+  switch (card) {
+    case "hearts":
+      return "${heartsc}";
+    case "diamonds":
+      return "${diamondsc}";
+    case "clubs":
+      return "${clubsc}";
+    case "spades":
+      return "${spadesc}";
+  }
 }
 
 export function computePlayerHand(player: Player): Score {

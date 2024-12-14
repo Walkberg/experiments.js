@@ -47,9 +47,11 @@ export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
         </AnimatedCard>
       </HoverCardTrigger>
       <HoverCardContent side="top">
-        <div className="flex flex-col items-center gap-4">
-          <Card className="p-4">{getCardLabel(card)}</Card>
-          <Card className="p-4">+ {getBaseChip(card)} chips</Card>
+        <div className="flex flex-col items-center gap-2">
+          <Card className="p-2">{replaceTextByCustom(getCardLabel(card))}</Card>
+          <Card className="p-2">
+            {replaceTextByCustom(getCardDescription(card))}
+          </Card>
         </div>
       </HoverCardContent>
     </HoverCard>
@@ -231,4 +233,38 @@ function getCardSealPosition(type: SealType): Position {
 interface Position {
   x: number;
   y: number;
+}
+
+function replaceTextByCustom(text: string): JSX.Element {
+  const replacements: Record<string, string> = {
+    multc: `<span style='color: #ff4d40'>`,
+    prodc: `<span style='color: #fff; background-color: #ff4d40; border-left: solid; border: solid; border-color: #ff4d40; border-width: 0px 2px 1px 2px; padding-left: 1px; border-radius: 3px;'>X`,
+    chipc: `<span style='color: #009dff'>`,
+    numc: `<span style='color: #ff8f00'>`,
+    moneyc: `<span style='color: #f5b143'>`,
+    probc: `<span style='color: #35bd87'>`,
+    diamondsc: `<span style='color: #f15a27'>Diamonds</span>`,
+    heartsc: `<span style='color: #f11b51'>Hearts</span>`,
+    spadesc: `<span style='color: #242c56'>Spades</span>`,
+    clubsc: `<span style='color: #074540'>Clubs</span>`,
+    endc: `</span>`,
+  };
+
+  const regex = /\${(.*?)}/g;
+
+  const replacedText = text.replace(regex, (_, match) => {
+    return replacements[match] || "";
+  });
+
+  return (
+    <span
+      dangerouslySetInnerHTML={{
+        __html: replacedText,
+      }}
+    />
+  );
+}
+
+function getCardDescription(card: ICard) {
+  return `\${chipc} +${getBaseChip(card)} \${endc} chips`;
 }
