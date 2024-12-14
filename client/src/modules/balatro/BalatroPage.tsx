@@ -52,42 +52,41 @@ export const Balatro = () => {
     });
   }, [balatro]);
 
-  if (phase === "GameOver") {
-    return <GameOver />;
-  }
-
   return (
-    <div className="grid grid-cols-5 bg-green-800 background-tv">
-      <div className="col-span-1">
-        <Sidebar />
+    <>
+      <div className="grid grid-cols-5 bg-green-800 background-tv">
+        <div className="col-span-1">
+          <Sidebar />
+        </div>
+        <div className="grid grid-rows-3  grid-cols-5 col-span-4 m-2 w-full gap-3">
+          <div className="col-span-3">
+            <CardContainer>
+              <Buffons />
+            </CardContainer>
+          </div>
+          <div className="col-span-2">
+            <CardContainer>
+              <ConsumableList />
+            </CardContainer>
+          </div>
+          <div className="col-span-4 row-span-2 col-start-1 row-start-2">
+            {phase === "Blind" ? (
+              <Ante />
+            ) : phase === "Shop" ? (
+              <Shop />
+            ) : (
+              <Board />
+            )}
+          </div>
+          <div className="col-start-5 row-start-3">
+            <CardContainer>
+              <Deck />
+            </CardContainer>
+          </div>
+        </div>
       </div>
-      <div className="grid grid-rows-3  grid-cols-5 col-span-4 m-2 w-full gap-3">
-        <div className="col-span-3">
-          <CardContainer>
-            <Buffons />
-          </CardContainer>
-        </div>
-        <div className="col-span-2">
-          <CardContainer>
-            <ConsumableList />
-          </CardContainer>
-        </div>
-        <div className="col-span-4 row-span-2 col-start-1 row-start-2">
-          {phase === "Blind" ? (
-            <Ante />
-          ) : phase === "Shop" ? (
-            <Shop />
-          ) : (
-            <Board />
-          )}
-        </div>
-        <div className="col-start-5 row-start-3">
-          <CardContainer>
-            <Deck />
-          </CardContainer>
-        </div>
-      </div>
-    </div>
+      {phase === "GameOver" && <GameOver />}
+    </>
   );
 };
 

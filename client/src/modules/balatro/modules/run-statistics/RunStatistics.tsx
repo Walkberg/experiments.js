@@ -4,6 +4,9 @@ import {
   GameStats,
   getStatManagerPlugin,
 } from "../../plugins/stats-manager-plugin";
+import { cn } from "@/lib/utils";
+import React from "react";
+import { Button } from "@/components/ui/button";
 
 function useRunStatistics() {
   const [runStatistics, setRunStatistics] = useState<GameStats>();
@@ -15,14 +18,9 @@ function useRunStatistics() {
 
     const statsManger = getStatManagerPlugin(balatro);
 
-    console.log("statsManger", statsManger.getStats());
-
     setRunStatistics(statsManger.getStats());
 
-    balatro.onEvent("stats-updated", (event) => {
-      console.log("event", event);
-      setRunStatistics(event.stats);
-    });
+    balatro.onEvent("stats-updated", (event) => setRunStatistics(event.stats));
   }, [balatro]);
 
   return { runStatistics };
@@ -40,91 +38,108 @@ export const RunStatistics = () => {
       <h2 className="text-3xl font-bold text-red-500 text-center mb-4">
         PARTIE TERMINÉE
       </h2>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="col-span-2 flex justify-between items-center">
-          <span className="font-semibold text-lg">Meilleure main</span>
-          <span className="text-red-400 text-xl font-bold">
-            {runStatistics.bestHandScore}
-          </span>
+      <div className="flex flex-col gap-4 p-2 bg-gray-900 rounded-2xl">
+        <div className="grid gap-4">
+          <StatItem label="Meilleure main">
+            <span className="text-red-400 text-xl font-bold">
+              {runStatistics.bestHandScore}
+            </span>
+          </StatItem>
+          <StatItem label="Main la plus jouée">
+            <span className=" px-2 py-1 rounded text-sm">
+              {runStatistics.mostPlayedHand}
+            </span>
+          </StatItem>
         </div>
-
-        <div className="col-span-2 flex justify-between items-center">
-          <span className="font-semibold text-lg">Main la plus jouée</span>
-          <span className="bg-gray-700 px-2 py-1 rounded text-sm">
-            {runStatistics.mostPlayedHand}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="font-semibold">Cartes jouées</span>
-          <span className="text-blue-400 font-bold">
-            {runStatistics.totalCardsPlayed}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="font-semibold">Mise initiale</span>
-          <span className="text-yellow-400 font-bold">
-            {runStatistics.ante}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="font-semibold">Cartes défaussées</span>
-          <span className="text-red-400 font-bold">
-            {runStatistics.totalCardsDiscarded}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="font-semibold">Manche</span>
-          <span className="text-yellow-400 font-bold">
-            {runStatistics.levelsCompleted}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="font-semibold">Cartes achetées</span>
-          <span className="text-green-400 font-bold">
-            {runStatistics.totalCardsBought}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="font-semibold">Nombre de renouvellements</span>
-          <span className="text-green-400 font-bold">
-            {runStatistics.shopRerolls}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="font-semibold">Nouvelles découvertes</span>
-          <span className="text-green-400 font-bold">
-            {runStatistics.totalCardsDiscovered}
-          </span>
-        </div>
-
-        <div className="col-span-2 flex justify-between items-center">
-          <span className="font-semibold">Battu par</span>
-          <span className="bg-gray-700 px-2 py-1 rounded text-sm">{"dsd"}</span>
-        </div>
-
-        <div className="col-span-2 flex justify-between items-center">
-          <span className="font-semibold">La seed</span>
-          <span className="bg-gray-700 px-2 py-1 rounded text-sm">
-            {runStatistics.seed}
-          </span>
+        <div className="grid grid-cols-2 grid-rows-7 gap-2">
+          <StatItem className="col-start-1 row-start-1" label="Cartes jouées">
+            <span className="text-blue-400 font-bold">
+              {runStatistics.totalCardsPlayed}
+            </span>
+          </StatItem>
+          <StatItem className="col-start-2 row-start-1" label="Mise initiale">
+            <span className="text-yellow-400 font-bold">
+              {runStatistics.ante}
+            </span>
+          </StatItem>
+          <StatItem
+            className="col-start-1 row-start-2"
+            label="Cartes défaussées"
+          >
+            <span className="text-red-400 font-bold">
+              {runStatistics.totalCardsDiscarded}
+            </span>
+          </StatItem>
+          <StatItem className="col-start-2 row-start-2" label="Manche">
+            <span className="text-yellow-400 font-bold">
+              {runStatistics.levelsCompleted}
+            </span>
+          </StatItem>
+          <StatItem className="col-start-1 row-start-3" label="Cartes achetées">
+            <span className="text-yellow-400 font-bold">
+              {runStatistics.totalCardsBought}
+            </span>
+          </StatItem>
+          <StatItem
+            className="col-start-1 row-start-4"
+            label="Nombre de renouvellements"
+          >
+            <span className="text-green-400 font-bold">
+              {runStatistics.shopRerolls}
+            </span>
+          </StatItem>
+          <StatItem
+            className="col-start-1 row-start-5"
+            label="Nouvelles découvertes"
+          >
+            <span className="text-white font-bold">
+              {runStatistics.totalCardsDiscovered}
+            </span>
+          </StatItem>
+          <StatItem
+            className="col-start-2 row-start-3 row-span-4 flex-col"
+            label="Battu par"
+          >
+            <span className="px-2 py-1 rounded text-sm">{"Grosse Blinde"}</span>
+          </StatItem>
+          <div className=" row-start-6 row-span-2  flex flex-col gap-2">
+            <StatItem label="La seed">
+              <span className="px-2 py-1 rounded text-sm">
+                {runStatistics.seed}
+              </span>
+            </StatItem>
+            <Button className="bg-sky-500">Copie</Button>
+          </div>
         </div>
       </div>
-
-      <div className="flex justify-center gap-4 mt-6">
-        <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+      <div className="flex flex-col justify-center gap-4 mt-6">
+        <button className="bg-orange-700 hover:bg-red-700 px-4 py-2 rounded text-white">
           Nouvelle partie
         </button>
-        <button className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">
+        <button className="bg-orange-700 hover:bg-red-700 px-4 py-2 rounded text-white">
           Menu principal
         </button>
       </div>
+    </div>
+  );
+};
+
+interface StatItemProps {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+const StatItem = ({ children, label, ...props }: StatItemProps) => {
+  return (
+    <div
+      className={cn(
+        "flex justify-between items-center bg-gray-400 p-2 rounded-2xl",
+        props.className
+      )}
+    >
+      <span className="font-semibold text-lg drop-shadow-xl">{label}</span>
+      <div className="bg-gray-800 p-2 rounded-2xl px-6">{children}</div>
     </div>
   );
 };

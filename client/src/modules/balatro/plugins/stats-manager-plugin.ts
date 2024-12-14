@@ -98,21 +98,13 @@ export function createStatManagerPlugin(): StatManagerPlugin {
 
   function init(engine: BalatroEngine) {
     _engine = engine;
-    engine.onEvent("card-played", (event) => {
-      trackCardAction("played");
-    });
+    engine.onEvent("card-played", (event) => trackCardAction("played"));
 
-    engine.onEvent("card-discarded", (event) => {
-      trackCardAction("discarded");
-    });
+    engine.onEvent("card-discarded", (event) => trackCardAction("discarded"));
 
-    engine.onEvent("shop-item-bought", (event) => {
-      trackCardAction("bought");
-    });
+    engine.onEvent("shop-item-bought", (event) => trackCardAction("bought"));
 
-    engine.onEvent("shop-rerolled", () => {
-      trackShopReroll();
-    });
+    engine.onEvent("shop-rerolled", () => trackShopReroll());
 
     engine.onEvent("score-calculated", (event) => {
       if (event.total > _stats.bestHandScore) {
@@ -125,10 +117,7 @@ export function createStatManagerPlugin(): StatManagerPlugin {
     //   trackNewLevel();
     // });
 
-    engine.onEvent("seed-set", (event) => {
-      console.log("event", event);
-      setSeed(event.seed);
-    });
+    engine.onEvent("seed-set", (event) => setSeed(event.seed));
 
     // engine.onEvent("ante-set", (event) => {
     //   setAnte(event.ante);
