@@ -2,6 +2,7 @@ import { v4 as uuid } from "uuid";
 import { Deck } from "../balatro";
 import { PokerCard, CardSuit, CardRank } from "../cards/poker-cards";
 import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
+import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";
 
 export function getPlayerManagerPlugin(
   engine: BalatroEngine
@@ -26,6 +27,7 @@ export interface DeckManagerPlugin extends Plugin {
 }
 
 export function createDeckPlugin(): DeckManagerPlugin {
+  let _seedManagerPlugin: SeedManagerPlugin;
   let _deck: Deck = [];
 
   function generateDeck() {
@@ -68,13 +70,15 @@ export function createDeckPlugin(): DeckManagerPlugin {
 
   function shuffle() {
     for (let i = _deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(_seedManagerPlugin.random() * (i + 1));
       [_deck[i], _deck[j]] = [_deck[j], _deck[i]];
     }
     _deck;
   }
 
-  function init(engine: BalatroEngine) {}
+  function init(engine: BalatroEngine) {
+    _seedManagerPlugin = getSeedManagerPlugin(engine);
+  }
 
   function drawCard(): PokerCard | null {
     return _deck.pop() || null;
@@ -105,6 +109,10 @@ export function createDeckPlugin(): DeckManagerPlugin {
     return false;
   }
 
+  function getDeckSize(): number {
+    return _deck.length;
+  }
+
   return {
     name: "deck",
     init,
@@ -114,6 +122,6 @@ export function createDeckPlugin(): DeckManagerPlugin {
     shuffle,
     addCard,
     removeCard,
-    getDeckSize: () => _deck.length,
+    getDeckSize,
   };
 }

@@ -24,6 +24,7 @@ import { createEditionPlugin } from "./plugins/edition-plugin";
 import { enhancements } from "./cards/enhancements";
 import { creatGoldSeal } from "./cards/seal";
 import { createBaseEdition } from "./cards/editions";
+import { createSeedManagerPlugin } from "./plugins/seed-manager-plugin";
 
 export const useBalatroGame = () => {
   const [balatro, setBalatro] = useState<BalatroEngine | null>(null);
@@ -49,6 +50,7 @@ export const useBalatroGame = () => {
     const enhancementManager = createEnhancementPlugin();
     const sealManager = createSealPlugin();
     const editionManager = createEditionPlugin();
+    const seedManagerPlugin = createSeedManagerPlugin();
 
     poolManagerPlugin.registerBuffons(buffonsPlayer);
     poolManagerPlugin.registerItems(itemsPlayer);
@@ -57,6 +59,9 @@ export const useBalatroGame = () => {
     sealManager.registerSeal(creatGoldSeal());
     editionManager.registerEdition(createBaseEdition());
 
+    seedManagerPlugin.setSeed("JL4365TK");
+
+    balatro.registerPlugin(seedManagerPlugin);
     balatro.registerPlugin(playerManagerPlugin);
     balatro.registerPlugin(economyManagerPlugin);
     balatro.registerPlugin(handScoreManager);
