@@ -64,6 +64,8 @@ export function createScorePlugin(): ScoreManagerPlugin {
     currentChip = handBaseScore.chip;
     currentMultiplier = handBaseScore.multiplier;
 
+    console.log("card", _playedCard.getHand());
+
     for (const card of _playedCard.getHand()) {
       if (!isCardScore(card)) {
         continue;

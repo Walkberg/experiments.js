@@ -8,3 +8,7 @@ export * from "./hand-manager-plugin";
 export * from "./score-manager-plugin";
 export * from "./deck-manager-plugin";
 export * from "./blind-manager-plugin";
+export * from "./edition-plugin";
+export * from "./enhancement-plugin";
+export * from "./seal-plugin";
+export * from "./blind-manager-plugin";

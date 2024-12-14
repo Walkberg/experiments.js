@@ -40,7 +40,7 @@ export const Ante = ({}: AnteProps) => {
       {ante?.blinds.map((blind, index) => (
         <div className="flex flex-col gap-2 w-96" key={index}>
           <Card className="flex flex-col gap-2">
-            <Button onClick={() => gameManager.startNextPhase()}>Select</Button>
+            <Button onClick={() => antePlugin.selectNextBlind()}>Select</Button>
             <Button>{blind.name}</Button>
             <Card>
               <div>Score at least</div>

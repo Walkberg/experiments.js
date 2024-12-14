@@ -14,7 +14,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { animated, useSpring } from "@react-spring/web";
 import { cn } from "@/lib/utils";
 
@@ -26,14 +26,14 @@ interface PlayCardProps {
 
 export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
   return (
-    <HoverCard>
+    <HoverCard openDelay={50} closeDelay={50}>
       <HoverCardTrigger>
         <AnimatedCard card={card}>
           <Card
             onClick={onSelectCard}
             className={cn(
-              "flex flex-col cursor-pointer hover:shadow-indigo-500/60",
-              selected ? "translate-y-2" : ""
+              "flex flex-col cursor-pointer hover:shadow-indigo-500/60 hover:scale-125",
+              selected ? "-translate-y-8 scale-110" : ""
             )}
           >
             <CardEdition card={card}>
@@ -46,7 +46,7 @@ export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
           </Card>
         </AnimatedCard>
       </HoverCardTrigger>
-      <HoverCardContent>
+      <HoverCardContent side="top">
         <div className="flex flex-col items-center gap-4">
           <Card className="p-4">{getCardLabel(card)}</Card>
           <Card className="p-4">+ {getBaseChip(card)} chips</Card>
@@ -132,9 +132,38 @@ export const AnimatedCard = ({ children }: CardBackgroundProps) => {
     []
   );
 
+  const [style, setStyle] = useState({});
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const rotateX = (y - rect.height / 2) / 1;
+    const rotateY = (x - rect.width / 2) / -1;
+
+    setStyle({
+      transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+      transition: "transform 0.1s ease",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setStyle({
+      transform: "rotateX(0) rotateY(0)",
+      transition: "transform 0.5s ease",
+    });
+  };
+
   return (
-    <animated.div style={{ ...styles }} className="bg-purple-200 ">
-      {children}
+    <animated.div style={{ ...styles }}>
+      <div
+        style={style}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        {children}
+      </div>
     </animated.div>
   );
 };

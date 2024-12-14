@@ -45,8 +45,6 @@ export function createHandPlugin(): HandManagerPlugin {
     _playerManagerPlugin = getPlayerManagerPlugin(engine);
 
     reset();
-
-    console.log("Hand plugin initialized");
   }
 
   function addToHand(card: PokerCard) {

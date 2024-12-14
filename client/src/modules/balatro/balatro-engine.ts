@@ -1,9 +1,5 @@
 import { Hand } from "./balatro";
 import { PokerCard } from "./cards/poker-cards";
-import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
-import { ScoreManagerPlugin } from "./plugins";
-import { DeckManagerPlugin } from "./plugins/deck-manager-plugin";
-import { BlindManagerPlugin } from "./plugins/blind-manager-plugin";
 
 export type EventName =
   | "change-phase"
@@ -19,7 +15,7 @@ export type EventName =
   | "card-upgraded"
   | "score-calculated"
   | "score-reset"
-  | "phase-changed"
+  | "phase-next"
   | "played-card-reset"
   | "shop-rerolled"
   | "shop-item-bought"
@@ -33,7 +29,8 @@ export type EventName =
   | "consumable-used"
   | "hand-score-improved"
   | "achievement-unlocked"
-  | "score-card-calculated";
+  | "score-card-calculated"
+  | "blind-selected";
 
 export interface BalatroEngine {
   removePlugin: (modName: string) => void;
@@ -116,7 +113,6 @@ export function createPlayedCardPlugin(): PlayedCardManagerPlugin {
 
   function init(engine: BalatroEngine) {
     _engine = engine;
-    console.log("Hand plugin initialized");
   }
 
   function addToHand(card: PokerCard) {
@@ -140,151 +136,6 @@ export function createPlayedCardPlugin(): PlayedCardManagerPlugin {
     addToHand,
     getHand,
     reset,
-  };
-}
-
-export type Phase = "Pause" | "Play" | "Score" | "Shop" | "Blind" | "GameOver";
-
-export interface GameManagerPlugin extends Plugin {
-  getPhase: () => Phase;
-  startGame: () => void;
-  endTurn: () => void;
-  startNextPhase: () => void;
-}
-
-export function createGamePlugin(): GameManagerPlugin {
-  let _engine: BalatroEngine;
-  let _deck: DeckManagerPlugin;
-  let _hand: HandManagerPlugin;
-  let _playedCard: PlayedCardManagerPlugin;
-  let _score: ScoreManagerPlugin;
-  let _blind: BlindManagerPlugin;
-  let _economyManager: EconomyManagerPlugin;
-
-  let _phase: Phase = "Pause";
-
-  function init(engine: BalatroEngine) {
-    _engine = engine;
-    const deck = engine.getPlugin<DeckManagerPlugin>("deck");
-    const hand = engine.getPlugin<HandManagerPlugin>("hand");
-    const playedCard = engine.getPlugin<PlayedCardManagerPlugin>("played-card");
-    const score = engine.getPlugin<ScoreManagerPlugin>("score");
-    const blind = engine.getPlugin<BlindManagerPlugin>("blind-manager");
-    const economyManager = engine.getPlugin<EconomyManagerPlugin>("economy");
-
-    if (deck && hand && playedCard && score && blind && economyManager) {
-      _deck = deck;
-      _hand = hand;
-      _playedCard = playedCard;
-      _score = score;
-      _blind = blind;
-      _economyManager = economyManager;
-    }
-
-    _economyManager.addMoney(38);
-
-    engine.onEvent("hand-played", playHand);
-
-    engine.onEvent("hand-discarded", () => drawCards(5));
-
-    engine.onEvent("score-calculated", (event) => {
-      if (blind == null || score == null || hand == null) return;
-
-      const currentBlind = blind.getCurrentBlind();
-
-      if (currentBlind == null) return;
-
-      if (score.getRoundScore() < currentBlind.score) {
-        if (hand.getRemainingHands() === 0) {
-          changePhase("GameOver");
-        } else {
-          endTurn();
-        }
-      } else {
-        goToShop();
-      }
-    });
-  }
-
-  function changePhase(phase: Phase) {
-    _phase = phase;
-    _engine.emitEvent("phase-changed", { phase });
-  }
-
-  function goToShop() {
-    setTimeout(() => {
-      changePhase("Shop");
-      _playedCard.reset();
-    }, 1000);
-  }
-
-  function endTurn() {
-    setTimeout(() => {
-      changePhase("Play");
-      _playedCard.reset();
-      drawCards(5);
-    }, 1000);
-  }
-
-  function playHand(hand: Hand) {
-    for (const card of hand) {
-      _playedCard.addToHand(card);
-    }
-
-    changePhase("Score");
-
-    _score.calculateScore();
-  }
-
-  function startGame() {
-    changePhase("Play");
-
-    _deck.generateDeck();
-
-    drawCards(8);
-  }
-
-  function startNextPhase() {
-    if (_phase === "Shop") {
-      changePhase("Blind");
-    } else if (_phase === "Blind") {
-      _blind.selectNextBlind();
-      changePhase("Play");
-
-      _deck.generateDeck();
-      _hand.reset();
-      _score.resetScore();
-      _playedCard.reset();
-
-      drawCards(8);
-    } else {
-      changePhase("Play");
-
-      _deck.generateDeck();
-
-      _hand.reset();
-      _score.resetScore();
-      _playedCard.reset();
-
-      drawCards(8);
-    }
-  }
-
-  function drawCards(count: number) {
-    const cards = _deck.drawCards(count);
-
-    for (const card of cards) {
-      _hand.addToHand(card);
-    }
-  }
-
-  return {
-    name: "game",
-    init,
-    startGame,
-    endTurn: () => console.log("Turn ended"),
-    getPhase: () => _phase,
-    startNextPhase,
   };
 }
 
@@ -356,7 +207,6 @@ export function createEconomyManagerPlugin(): EconomyManagerPlugin {
 
   function init(engine: BalatroEngine) {
     _engine = engine;
-    console.log("Economy plugin initialized with money:", _money);
   }
 
   function getMoney() {

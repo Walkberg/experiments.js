@@ -1,11 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { CardContainer } from "../../BalatroPage";
 import { PlayCard } from "../../Card";
-import { useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { sortByRank, sortBySuit } from "../../balatro";
 import { PokerCard as ICard } from "../../cards/poker-cards";
 import { useCurrentGame } from "../../BalatroProvider";
 import { HandManagerPlugin } from "../../plugins";
+import { Hand as IHand } from "../../balatro";
+
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  MouseSensor,
+  TouchSensor,
+  UniqueIdentifier,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
 
 interface HandProps {}
 
@@ -156,3 +176,87 @@ function PlayerActions({
     </div>
   );
 }
+
+interface SortableItemsProps {
+  children: ReactNode;
+  hand: IHand;
+}
+
+const SortableItems = ({ children, hand }: SortableItemsProps) => {
+  const [items, setItems] = useState(hand.map((card) => card.id.toString()));
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+
+  useEffect(() => {
+    setItems(hand.map((card) => card.id.toString()));
+  }, [hand]);
+
+  console.log("items", items);
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    console.log("drag start", event.active.id);
+    setActiveId(event.active.id.toString());
+  }, []);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setItems((items) => {
+        const oldIndex = items.indexOf(active.id.toString());
+        const newIndex = items.indexOf(over!.id.toString());
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+
+    setActiveId(null);
+  }, []);
+
+  const handleDragCancel = useCallback(() => setActiveId(null), []);
+
+  const activeCard = hand.find((card) => card.id === activeId);
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+    >
+      <SortableContext items={items} strategy={rectSortingStrategy}>
+        {children}
+      </SortableContext>
+      <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
+        {activeCard ? <PlayCard card={activeCard} /> : null}
+      </DragOverlay>
+    </DndContext>
+  );
+};
+
+interface SortableItemProps {
+  id: string;
+  children: ReactNode;
+}
+
+const SortableItem = ({ id, children }: SortableItemProps) => {
+  const {
+    isDragging,
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: id });
+
+  const style = {
+    transition: transition || undefined,
+  };
+
+  return (
+    <div id={id} ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children}
+    </div>
+  );
+};

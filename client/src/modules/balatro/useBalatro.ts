@@ -3,10 +3,10 @@ import {
   BalatroEngine,
   createBalatroEngine,
   createEconomyManagerPlugin,
-  createGamePlugin,
   createPlayedCardPlugin,
   createPlayerManagerPlugin,
 } from "./balatro-engine";
+import { createGamePlugin } from "./plugins/game-manager";
 import { createAnteManagerPlugin } from "./plugins/blind-manager-plugin";
 import { createDeckPlugin } from "./plugins/deck-manager-plugin";
 import { createHandPlugin } from "./plugins/hand-manager-plugin";
@@ -71,8 +71,6 @@ export const useBalatroGame = () => {
     balatro.registerPlugin(shopPlugin);
     balatro.registerPlugin(enhancementManager);
     balatro.registerPlugin(gamePlugin);
-
-    gamePlugin.startGame();
 
     balatro.onEvent("phase-changed", () =>
       setRefreshCounter(refreshCounter + 1)

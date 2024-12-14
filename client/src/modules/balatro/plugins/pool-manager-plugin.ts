@@ -19,9 +19,7 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
   let pool: Buffon[] = [];
   let items: Consumable[] = [];
 
-  function init(engine: BalatroEngine) {
-    console.log("PoolManagerPlugin initialized");
-  }
+  function init(engine: BalatroEngine) {}
 
   function registerBuffon(buffon: Buffon) {
     pool.push(buffon);

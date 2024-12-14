@@ -10,7 +10,6 @@ export const createGoldEnhancement = (): EnhancementHandler => {
 
     context.onEvent("score-card-calculated", (card: PokerCard) => {
       if (card.enhancement === type) {
-        console.log("Gold enhancement applyed");
         scorePlugin.addChip(10000);
       }
     });
@@ -46,6 +45,18 @@ export const createBonusEnhancement = (): EnhancementHandler => {
         scorePlugin.addChip(30);
       }
     });
+  }
+
+  return { type, init };
+};
+
+export const createGlassEnhancement = (): EnhancementHandler => {
+  const type = "bonus";
+
+  function init(context: BalatroEngine) {
+    const scorePlugin = getScoreManagerPlugin(context);
+
+    context.onEvent("score-calculated", () => {});
   }
 
   return { type, init };

@@ -306,14 +306,14 @@ const AnimatedCard = ({ children, ...rest }: AnimatedCardProps) => {
   };
 
   return (
-    <Card
-      className={cn("card", rest.className)}
-      style={style}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      {...rest}
-    >
-      {children}
+    <Card className={cn("card", rest.className)} {...rest}>
+      <div
+        style={style}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        {children}
+      </div>
     </Card>
   );
 };

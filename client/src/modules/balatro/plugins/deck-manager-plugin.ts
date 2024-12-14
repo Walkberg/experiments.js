@@ -54,7 +54,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
           suit,
           rank,
           id: uuid(),
-          enhancement: "none",
+          enhancement: "bonus",
           edition: "base",
           seal: "none",
         });
@@ -74,9 +74,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
     _deck;
   }
 
-  function init(engine: BalatroEngine) {
-    console.log("Deck plugin initialized");
-  }
+  function init(engine: BalatroEngine) {}
 
   function drawCard(): PokerCard | null {
     return _deck.pop() || null;

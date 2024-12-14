@@ -33,6 +33,7 @@ export interface BlindManagerPlugin extends Plugin {
 }
 
 export function createAnteManagerPlugin(): BlindManagerPlugin {
+  let _engine: BalatroEngine;
   let currentBlind: BlindConfig;
 
   let _currentAnte = 1;
@@ -42,10 +43,9 @@ export function createAnteManagerPlugin(): BlindManagerPlugin {
 
   function init(engine: BalatroEngine) {
     currentBlind = createSmallBlind();
-    console.log("BlindManagerPlugin initialized");
 
     _antes = generateAntes();
-    console.log("_antes", _antes);
+    _engine = engine;
   }
 
   function generateAntes(): Ante[] {
@@ -89,17 +89,18 @@ export function createAnteManagerPlugin(): BlindManagerPlugin {
 
   function selectNextBlind(): void {
     const currentAnte = getCurrentAnte();
+    console.log("currentAnte", currentAnte);
+    console.log("_currentBlind", _currentBlind);
     if (currentAnte == null) {
       return;
     }
-
-    console.log("currentAnte", currentAnte);
 
     if (_currentBlind + 1 >= currentAnte.blinds.length) {
       _currentBlind = 0;
       _currentAnte++;
     } else {
       _currentBlind++;
+      _engine.emitEvent("blind-selected", _currentAnte);
     }
   }
 

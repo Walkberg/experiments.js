@@ -1,24 +1,13 @@
 import "./balatro.css";
 import { Card } from "@/components/ui/card";
-import {
-  Hand as IHand,
-  Score as IScore,
-  sortByRank,
-  sortBySuit,
-} from "./balatro";
-import { PokerCard as ICard } from "./cards/poker-cards";
+import { Score as IScore } from "./balatro";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Shop } from "./Shop";
-import { PlayCard } from "./Card";
 import { BalatroProvider, useCurrentGame } from "./BalatroProvider";
 import { evaluatePokerHand } from "./hand-evaluator";
-import {
-  EconomyManagerPlugin,
-  GameManagerPlugin,
-  Phase,
-  PlayedCardManagerPlugin,
-} from "./balatro-engine";
+import { EconomyManagerPlugin } from "./balatro-engine";
+import { GameManagerPlugin, Phase } from "./plugins/game-manager";
 import { BlindManagerPlugin } from "./plugins/blind-manager-plugin";
 import { DeckManagerPlugin } from "./plugins/deck-manager-plugin";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
@@ -30,8 +19,9 @@ import {
   ConsumablesManagerPlugin,
 } from "./plugins/consumables-manager-plugin";
 import { HandScoreDetail } from "./modules/hand-score/HandScoreDetail";
-import { Hand } from "./modules/hand/Hand";
 import { Ante } from "./modules/ante/Ante";
+import { Board } from "./modules/hand/Board";
+import { HandBaseScore } from "./modules/hand-score/HandBaseScore";
 
 export const BalatroPage = () => {
   return (
@@ -47,11 +37,16 @@ export const Balatro = () => {
   const [phase, setPhase] = useState<Phase>("Pause");
 
   useEffect(() => {
-    const game = balatro?.getPlugin<GameManagerPlugin>("game");
+    if (balatro == null) return;
+
+    const game = balatro.getPlugin<GameManagerPlugin>("game");
 
     if (!game) return;
 
-    balatro?.onEvent("phase-changed", () => {
+    setPhase(game.getPhase());
+
+    balatro.onEvent("phase-changed", () => {
+      console.log("phase-changed", game.getPhase());
       setPhase(game.getPhase());
     });
   }, [balatro]);
@@ -95,15 +90,6 @@ export const Balatro = () => {
   );
 };
 
-export const Board = () => {
-  return (
-    <div className="grid grid-rows-2 m-2 gap-4">
-      <PlayHand />
-      <Hand />
-    </div>
-  );
-};
-
 export const Sidebar = () => {
   const { balatro } = useCurrentGame();
 
@@ -125,7 +111,7 @@ export const Sidebar = () => {
 
       <div className="grid grid-rows-2 gap-2 ">
         <Score />
-        <BaseScoreC />
+        <HandBaseScore />
       </div>
       <PlayerInfo />
 
@@ -172,8 +158,6 @@ export const PlayerInfo = () => {
   if (handmanager == null || economyManager == null) {
     return null;
   }
-
-  console.log("economyManager", economyManager.getMoney());
 
   return (
     <div className="grid flex-row gap-4">
@@ -235,33 +219,6 @@ interface ItemCardProps {
 
 export const ItemCard = ({ children, className }: ItemCardProps) => {
   return <Card className={cn(className, "flex flex-col p-2")}>{children}</Card>;
-};
-
-interface BaseScoreCProps {}
-
-export const BaseScoreC = ({}: BaseScoreCProps) => {
-  const { balatro } = useCurrentGame();
-
-  const [score, setScore] = useState<IScore>({ chip: 0, multiplier: 0 });
-
-  useEffect(() => {
-    balatro?.onEvent("score-calculated", (score) => setScore(score));
-
-    balatro?.onEvent("card-selected", (hand) => {
-      console.log("card-selected", hand);
-    });
-  }, [balatro]);
-
-  const hand = balatro?.getPlugin<HandManagerPlugin>("hand")?.getHand();
-
-  if (!hand) return <div>No hand</div>;
-
-  return (
-    <Card className="flex flex-col items-center align-middle p-2 ">
-      <div>{evaluatePokerHand(hand)}</div>
-      <ScoreDetail score={score} />
-    </Card>
-  );
 };
 
 interface ScoreProps {}
@@ -339,11 +296,13 @@ interface CardContainerProps {
 
 export const CardContainer = ({ children }: CardContainerProps) => {
   return (
-    <div className="flex flex-col grow">
-      <Card className="flex grow justify-center p-2 bg-black/20 h-40">
-        {children}
-      </Card>
-      <div className="flex flex-row grow p-2">0/2</div>
+    <div className="grid h-full">
+      <div className="h-full">
+        <Card className="flex grow justify-center p-2 bg-black/20 h-full ">
+          {children}
+        </Card>
+        <div className="flex flex-row grow p-2">0/2</div>
+      </div>
     </div>
   );
 };
@@ -468,7 +427,21 @@ export const Deck = ({}: DeckProps) => {
 
   const deck = balatro?.getPlugin<DeckManagerPlugin>("deck");
 
-  return <div>{deck?.getDeckSize()}</div>;
+  const position = {
+    x: 0,
+    y: 0,
+  };
+
+  const style = {
+    backgroundPositionX: position.x,
+    backgroundPositionY: position.y,
+  };
+
+  return (
+    <div style={style} className="card-enhancer">
+      {deck?.getDeckSize()}
+    </div>
+  );
 };
 
 export function useBuffonManager() {
@@ -522,35 +495,6 @@ export const BuffonCard = ({
       <div>{buffon.name}</div>
       <div>{buffon.description}</div>
     </Card>
-  );
-};
-
-export const PlayHand = () => {
-  const { balatro } = useCurrentGame();
-
-  const playedCardPlugin =
-    balatro?.getPlugin<PlayedCardManagerPlugin>("played-card");
-
-  const [hand, setHand] = useState<IHand>([]);
-
-  useEffect(() => {
-    balatro?.onEvent("phase-changed", () => {
-      setHand(playedCardPlugin?.getHand() ?? []);
-    });
-    balatro?.onEvent("hand-played", () =>
-      setHand(playedCardPlugin?.getHand() ?? [])
-    );
-    balatro?.onEvent("played-card-reset", () =>
-      setHand(playedCardPlugin?.getHand() ?? [])
-    );
-  }, [balatro]);
-
-  return (
-    <div className="flex flex-row items-center gap-2">
-      {hand.map((handCard) => (
-        <PlayCard key={handCard.id} card={handCard} />
-      ))}
-    </div>
   );
 };
 

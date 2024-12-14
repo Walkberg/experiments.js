@@ -1,8 +1,8 @@
 .card-edition {
   background: url("../assets/Editions.png") no-repeat;
 
-  height: 90px;
-  width: 70px;
+  height: 95px;
+  width: 71px;
 }
 
 .card-edition.negative {
@@ -13,13 +13,13 @@
 .card-enhancer {
   background: url("../assets/Enhancers.png") no-repeat;
 
-  height: 90px;
-  width: 70px;
+  height: 95px;
+  width: 71px;
 }
 
 .card-rank {
   background: url("../assets/8BitDeck.png") no-repeat;
 
-  height: 90px;
-  width: 70px;
+  height: 95px;
+  width: 71px;
 }
