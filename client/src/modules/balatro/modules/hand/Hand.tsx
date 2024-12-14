@@ -69,7 +69,7 @@ export const Hand = ({}: HandProps) => {
     if (selectedCard.length === 0 || handPlugin == null) {
       return;
     }
-    handPlugin.playHand(selectedCard);
+    handPlugin.playHand();
 
     setSelectedCard([]);
   }
@@ -90,7 +90,7 @@ export const Hand = ({}: HandProps) => {
     if (handPlugin == null) {
       return;
     }
-    handPlugin.discardHand(selectedCard);
+    handPlugin.discardHand();
 
     setSelectedCard([]);
   }

@@ -9,6 +9,7 @@ export interface SeedManagerPlugin extends Plugin {
 }
 
 export function createSeedManagerPlugin(): SeedManagerPlugin {
+  let _engine: BalatroEngine;
   let _seed: number = 0;
   let _originalSeed: string = "";
 
@@ -19,6 +20,8 @@ export function createSeedManagerPlugin(): SeedManagerPlugin {
     }
     _seed = numericPart;
     _originalSeed = seed;
+
+    _engine.emitEvent("seed-set", { seed: seed });
   }
 
   function getSeed(): string {
@@ -39,7 +42,9 @@ export function createSeedManagerPlugin(): SeedManagerPlugin {
     return array[index];
   }
 
-  function init(engine: BalatroEngine) {}
+  function init(engine: BalatroEngine) {
+    _engine = engine;
+  }
 
   return {
     name: "seed-manager",

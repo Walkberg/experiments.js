@@ -30,7 +30,9 @@ export type EventName =
   | "hand-score-improved"
   | "achievement-unlocked"
   | "score-card-calculated"
-  | "blind-selected";
+  | "blind-selected"
+  | "seed-set"
+  | "stats-updated";
 
 export interface BalatroEngine {
   removePlugin: (modName: string) => void;

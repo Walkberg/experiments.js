@@ -11,8 +11,8 @@ import { getPlayerManagerPlugin } from "./deck-manager-plugin";
 export interface HandManagerPlugin extends Plugin {
   addToHand: (card: PokerCard) => void;
   getHand: () => Hand;
-  playHand: (cardIds: string[]) => void;
-  discardHand: (cardIds: string[]) => void;
+  playHand: () => void;
+  discardHand: () => void;
   getRemainingHandSize: () => number;
   getRemainingHands: () => number;
   getRemainingDiscards: () => number;
@@ -64,34 +64,45 @@ export function createHandPlugin(): HandManagerPlugin {
     return [..._hand];
   }
 
-  function playHand(cardIds: string[]) {
+  function playHand() {
     _engine.emitEvent("hand-play", {});
 
-    const cardPlayed = _hand.filter((c) => cardIds.includes(c.id));
-
-    for (const cardId of cardIds) {
-      _engine.emitEvent("card-play", { cardId });
-      removeFromHand(cardId);
-      _engine.emitEvent("card-played", { cardId });
+    for (const pokerCard of _selectedCards) {
+      playCard(pokerCard);
     }
 
     _remainingHand--;
 
-    _engine.emitEvent("hand-played", cardPlayed);
+    _selectedCards = [];
+
+    _engine.emitEvent("hand-played", _selectedCards);
   }
 
-  function discardHand(cardIds: string[]) {
+  function discardHand() {
     _engine.emitEvent("hand-discard", {});
 
-    for (const cardId of cardIds) {
-      _engine.emitEvent("card-discard", { cardId });
-      removeFromHand(cardId);
-      _engine.emitEvent("card-discarded", { cardId });
+    for (const pokerCard of _selectedCards) {
+      discardCard(pokerCard);
     }
 
     _remainingDiscard--;
 
+    _selectedCards = [];
+
     _engine.emitEvent("hand-discarded", {});
+  }
+
+  function playCard(pokerCard: PokerCard) {
+    _engine.emitEvent("card-play", { cardId: pokerCard.id });
+    console.log("playCard oooii", pokerCard.id);
+    removeFromHand(pokerCard.id);
+    _engine.emitEvent("card-played", { cardId: pokerCard.id });
+  }
+
+  function discardCard(pokerCard: PokerCard) {
+    _engine.emitEvent("card-discard", { cardId: pokerCard.id });
+    removeFromHand(pokerCard.id);
+    _engine.emitEvent("card-discarded", { cardId: pokerCard.id });
   }
 
   function reset() {

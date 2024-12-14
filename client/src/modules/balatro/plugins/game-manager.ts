@@ -67,7 +67,6 @@ export function createGamePlugin(): GameManagerPlugin {
       },
       onEvent(event, payload) {
         if (event === "hand-played") {
-          playHand(payload);
           setTimeout(() => {
             transitionTo("Score");
           }, 1000);
@@ -174,12 +173,6 @@ export function createGamePlugin(): GameManagerPlugin {
   function changePhase(phase: Phase) {
     console.log("emitting phase changed", phase);
     _engine.emitEvent("phase-changed", { phase });
-  }
-
-  function playHand(hand: Hand) {
-    for (const card of hand) {
-      _playedCard.addToHand(card);
-    }
   }
 
   function drawCards(count: number) {

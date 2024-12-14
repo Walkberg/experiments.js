@@ -22,6 +22,7 @@ import { HandScoreDetail } from "./modules/hand-score/HandScoreDetail";
 import { Ante } from "./modules/ante/Ante";
 import { Board } from "./modules/hand/Board";
 import { HandBaseScore } from "./modules/hand-score/HandBaseScore";
+import { GameOver } from "./modules/gameover/GameOver";
 
 export const BalatroPage = () => {
   return (
@@ -52,7 +53,7 @@ export const Balatro = () => {
   }, [balatro]);
 
   if (phase === "GameOver") {
-    return <div> Game Over</div>;
+    return <GameOver />;
   }
 
   return (

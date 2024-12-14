@@ -25,6 +25,7 @@ import { enhancements } from "./cards/enhancements";
 import { creatGoldSeal } from "./cards/seal";
 import { createBaseEdition } from "./cards/editions";
 import { createSeedManagerPlugin } from "./plugins/seed-manager-plugin";
+import { createStatManagerPlugin } from "./plugins/stats-manager-plugin";
 
 export const useBalatroGame = () => {
   const [balatro, setBalatro] = useState<BalatroEngine | null>(null);
@@ -51,6 +52,7 @@ export const useBalatroGame = () => {
     const sealManager = createSealPlugin();
     const editionManager = createEditionPlugin();
     const seedManagerPlugin = createSeedManagerPlugin();
+    const statManagerPlugin = createStatManagerPlugin();
 
     poolManagerPlugin.registerBuffons(buffonsPlayer);
     poolManagerPlugin.registerItems(itemsPlayer);
@@ -59,8 +61,7 @@ export const useBalatroGame = () => {
     sealManager.registerSeal(creatGoldSeal());
     editionManager.registerEdition(createBaseEdition());
 
-    seedManagerPlugin.setSeed("JL4365TK");
-
+    balatro.registerPlugin(statManagerPlugin);
     balatro.registerPlugin(seedManagerPlugin);
     balatro.registerPlugin(playerManagerPlugin);
     balatro.registerPlugin(economyManagerPlugin);
@@ -76,6 +77,8 @@ export const useBalatroGame = () => {
     balatro.registerPlugin(shopPlugin);
     balatro.registerPlugin(enhancementManager);
     balatro.registerPlugin(gamePlugin);
+
+    seedManagerPlugin.setSeed("JL4365TK");
 
     balatro.onEvent("phase-changed", () =>
       setRefreshCounter(refreshCounter + 1)

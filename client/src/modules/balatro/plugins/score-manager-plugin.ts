@@ -82,8 +82,11 @@ export function createScorePlugin(): ScoreManagerPlugin {
     roundScore += currentChip * currentMultiplier;
 
     _engine.emitEvent("score-calculated", {
-      chip: currentChip,
-      multiplier: currentMultiplier,
+      total: currentChip * currentMultiplier,
+      score: {
+        chip: currentChip,
+        multiplier: currentMultiplier,
+      },
     });
   }
 
