@@ -94,7 +94,6 @@ export function createHandPlugin(): HandManagerPlugin {
 
   function playCard(pokerCard: PokerCard) {
     _engine.emitEvent("card-play", { cardId: pokerCard.id });
-    console.log("playCard oooii", pokerCard.id);
     removeFromHand(pokerCard.id);
     _engine.emitEvent("card-played", { cardId: pokerCard.id });
   }
@@ -177,7 +176,7 @@ export function createHandPlugin(): HandManagerPlugin {
       return;
     }
     _hand = _hand.filter((c) => c.id !== cardId);
-    //_engine.emitEvent("card-destroyed", { cardId });
+    _engine.emitEvent("card-destroyed", { cardId });
   }
 
   return {

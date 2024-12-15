@@ -33,16 +33,16 @@ export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
             onClick={onSelectCard}
             className={cn(
               "flex flex-col cursor-pointer hover:shadow-indigo-500/60 hover:scale-125",
-              selected ? "-translate-y-8 scale-110" : ""
+              selected ? "-translate-y-20 scale-110" : ""
             )}
           >
-            <CardEdition card={card}>
-              <CardEnhancer card={card}>
+            <CardEnhancer card={card}>
+              <CardEdition card={card}>
                 <CardView card={card}>
                   <CardSeal card={card} />
                 </CardView>
-              </CardEnhancer>
-            </CardEdition>
+              </CardEdition>
+            </CardEnhancer>
           </Card>
         </AnimatedCard>
       </HoverCardTrigger>
@@ -72,6 +72,8 @@ export const CardEdition = ({ card, ...props }: CardBackgroundProps) => {
   return (
     <div
       style={{
+        ...cardSizeStyle,
+        ...cardEditionBackgroundStyle,
         backgroundPositionX: position.x,
         backgroundPositionY: position.y,
       }}
@@ -86,6 +88,8 @@ export const CardEnhancer = ({ card, ...props }: CardBackgroundProps) => {
   return (
     <div
       style={{
+        ...cardSizeStyle,
+        ...cardBackgroundStyle,
         backgroundPositionX: position.x,
         backgroundPositionY: position.y,
       }}
@@ -100,6 +104,8 @@ export const CardSeal = ({ card, ...props }: CardBackgroundProps) => {
   return (
     <div
       style={{
+        ...cardSizeStyle,
+        ...cardBackgroundStyle,
         backgroundPositionX: position.x,
         backgroundPositionY: position.y,
       }}
@@ -113,6 +119,8 @@ export const CardView = ({ card, ...props }: CardBackgroundProps) => {
   return (
     <div
       style={{
+        ...cardSizeStyle,
+        ...cardRankBackgroundStyle,
         backgroundPositionX: getCardRankPosition(card.rank),
         backgroundPositionY: getCardSuitPosition(card.suit),
       }}
@@ -170,8 +178,10 @@ export const AnimatedCard = ({ children }: CardBackgroundProps) => {
   );
 };
 
-const CARD_X_SIZE = 71;
-const CARD_Y_SIZE = 95;
+const SIZE_FACTOR = 2;
+
+const CARD_X_SIZE = 71 * SIZE_FACTOR;
+const CARD_Y_SIZE = 95 * SIZE_FACTOR;
 
 function getCardSuitPosition(cardSuit: CardSuit): number {
   switch (cardSuit) {
@@ -268,3 +278,20 @@ function replaceTextByCustom(text: string): JSX.Element {
 function getCardDescription(card: ICard) {
   return `\${chipc} +${getBaseChip(card)} \${endc} chips`;
 }
+
+const cardSizeStyle = {
+  width: `${CARD_X_SIZE}px`,
+  height: `${CARD_Y_SIZE}px`,
+};
+
+const cardBackgroundStyle = {
+  backgroundSize: `${CARD_X_SIZE * 7}px ${CARD_Y_SIZE * 5}px`,
+};
+
+const cardRankBackgroundStyle = {
+  backgroundSize: `${CARD_X_SIZE * 13}px ${CARD_Y_SIZE * 4}px`,
+};
+
+const cardEditionBackgroundStyle = {
+  backgroundSize: `${CARD_X_SIZE * 5}px ${CARD_Y_SIZE * 1}px`,
+};

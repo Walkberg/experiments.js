@@ -9,7 +9,6 @@ import { evaluatePokerHand } from "./hand-evaluator";
 import { EconomyManagerPlugin } from "./balatro-engine";
 import { GameManagerPlugin, Phase } from "./plugins/game-manager";
 import { BlindManagerPlugin } from "./plugins/blind-manager-plugin";
-import { DeckManagerPlugin } from "./plugins/deck-manager-plugin";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
 import { ScoreManagerPlugin } from "./plugins";
 import { Buffon, BuffonsManagerPlugin } from "./plugins/buffons-manager-plugin";
@@ -23,6 +22,7 @@ import { Ante } from "./modules/ante/Ante";
 import { Board } from "./modules/hand/Board";
 import { HandBaseScore } from "./modules/hand-score/HandBaseScore";
 import { GameOver } from "./modules/gameover/GameOver";
+import { Deck } from "./modules/deck/Deck";
 
 export const BalatroPage = () => {
   return (
@@ -419,30 +419,6 @@ export function useGameManager() {
 
   return gameManager;
 }
-
-interface DeckProps {}
-
-export const Deck = ({}: DeckProps) => {
-  const { balatro } = useCurrentGame();
-
-  const deck = balatro?.getPlugin<DeckManagerPlugin>("deck");
-
-  const position = {
-    x: 0,
-    y: 0,
-  };
-
-  const style = {
-    backgroundPositionX: position.x,
-    backgroundPositionY: position.y,
-  };
-
-  return (
-    <div style={style} className="card-enhancer">
-      {deck?.getDeckSize()}
-    </div>
-  );
-};
 
 export function useBuffonManager() {
   const { balatro } = useCurrentGame();

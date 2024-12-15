@@ -12,6 +12,7 @@ export type EventName =
   | "card-played"
   | "card-discard"
   | "card-discarded"
+  | "card-destroyed"
   | "card-upgraded"
   | "score-calculated"
   | "score-reset"

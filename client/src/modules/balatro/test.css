@@ -3,6 +3,8 @@
 
   height: 95px;
   width: 71px;
+
+  image-rendering: pixelated;
 }
 
 .card-edition.negative {
@@ -11,10 +13,14 @@
 }
 
 .card-enhancer {
+  width: 144px;
+  height: 190px;
   background: url("../assets/Enhancers.png") no-repeat;
 
   height: 95px;
   width: 71px;
+
+  image-rendering: pixelated;
 }
 
 .card-rank {
@@ -22,4 +28,55 @@
 
   height: 95px;
   width: 71px;
+
+  image-rendering: pixelated;
+}
+
+.card-buffon {
+  background: url("../assets/Jokers.png") no-repeat;
+  height: 95px;
+  width: 71px;
+  object-fit: cover;
+
+  image-rendering: pixelated;
+}
+
+.custom-card {
+  animation: rotate3dEffect 6s infinite ease-in-out;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.particle {
+  transform: rotate(45deg);
+}
+
+@keyframes rotate3dEffect {
+  0% {
+    transform: rotateX(0deg) rotateY(-20deg);
+  }
+  25% {
+    transform: rotateX(20deg) rotateY(0deg);
+  }
+  50% {
+    transform: rotateX(0deg) rotateY(20deg);
+  }
+  75% {
+    transform: rotateX(-20deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(0deg) rotateY(-20deg);
+  }
+}
+
+@keyframes scale-effect {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
 }
