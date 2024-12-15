@@ -111,7 +111,6 @@ export const ParticleSystem = ({
 export const useParticleSystem = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [particlesEnabled, setParticlesEnabled] = useState(false);
 
   useEffect(() => {
     const updatePosition = () => {
@@ -130,10 +129,5 @@ export const useParticleSystem = () => {
     return () => window.removeEventListener("resize", updatePosition);
   }, []);
 
-  const handleClick = () => {
-    setParticlesEnabled(true);
-    setTimeout(() => setParticlesEnabled(false), 1000);
-  };
-
-  return { ref, handleClick, position, particlesEnabled };
+  return { ref, position };
 };

@@ -26,7 +26,15 @@ function useRunStatistics() {
   return { runStatistics };
 }
 
-export const RunStatistics = () => {
+interface RunStatisticsProps {
+  onClickMainMenu: () => void;
+  onClickNewGame: () => void;
+}
+
+export const RunStatistics = ({
+  onClickMainMenu,
+  onClickNewGame,
+}: RunStatisticsProps) => {
   const { runStatistics } = useRunStatistics();
 
   if (runStatistics == null) {
@@ -113,10 +121,16 @@ export const RunStatistics = () => {
         </div>
       </div>
       <div className="flex flex-col justify-center gap-4 mt-6">
-        <button className="bg-orange-700 hover:bg-red-700 px-4 py-2 rounded text-white">
+        <button
+          onClick={onClickNewGame}
+          className="bg-orange-700 hover:bg-red-700 px-4 py-2 rounded text-white"
+        >
           Nouvelle partie
         </button>
-        <button className="bg-orange-700 hover:bg-red-700 px-4 py-2 rounded text-white">
+        <button
+          onClick={onClickMainMenu}
+          className="bg-orange-700 hover:bg-red-700 px-4 py-2 rounded text-white"
+        >
           Menu principal
         </button>
       </div>

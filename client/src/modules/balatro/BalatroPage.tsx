@@ -23,13 +23,34 @@ import { Board } from "./modules/hand/Board";
 import { HandBaseScore } from "./modules/hand-score/HandBaseScore";
 import { GameOver } from "./modules/gameover/GameOver";
 import { Deck } from "./modules/deck/Deck";
+import { BalatroHomePage } from "./modules/menu/HomePage";
 
 export const BalatroPage = () => {
   return (
     <BalatroProvider seed={"1223344"}>
-      <Balatro />
+      <BalatroGame />
     </BalatroProvider>
   );
+};
+
+export const BalatroGame = () => {
+  const { balatro } = useCurrentGame();
+
+  const [phase, setPhase] = useState<Phase>("Pause");
+
+  useEffect(() => {
+    if (balatro == null) return;
+
+    const game = balatro.getPlugin<GameManagerPlugin>("game");
+
+    if (!game) return;
+
+    setPhase(game.getPhase());
+
+    balatro.onEvent("phase-changed", () => setPhase(game.getPhase()));
+  }, [balatro]);
+
+  return <>{phase === "Menu" ? <BalatroHomePage /> : <Balatro />}</>;
 };
 
 export const Balatro = () => {

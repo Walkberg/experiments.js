@@ -8,7 +8,9 @@ import {
 import { evaluatePokerHand } from "../hand-evaluator";
 import {
   BuffonsManagerPlugin,
+  getHandManagerPlugin,
   getHandScorePlugin,
+  HandManagerPlugin,
   HandScoreManagerPlugin,
 } from ".";
 
@@ -29,7 +31,7 @@ export interface ScoreManagerPlugin extends Plugin {
 
 export function createScorePlugin(): ScoreManagerPlugin {
   let _engine: BalatroEngine;
-  let _playedCard: PlayedCardManagerPlugin;
+  let _handManager: HandManagerPlugin;
   let _buffonsManager: BuffonsManagerPlugin;
   let _handScoreManager: HandScoreManagerPlugin;
 
@@ -43,30 +45,27 @@ export function createScorePlugin(): ScoreManagerPlugin {
 
   function init(engine: BalatroEngine) {
     _engine = engine;
-    const playedCard = engine.getPlugin<PlayedCardManagerPlugin>("played-card");
+    _handManager = getHandManagerPlugin(engine);
     const buffonsManager =
       engine.getPlugin<BuffonsManagerPlugin>("buffon-manager");
 
     _handScoreManager = getHandScorePlugin(engine);
 
-    if (playedCard && buffonsManager) {
+    if (buffonsManager) {
       {
-        _playedCard = playedCard;
         _buffonsManager = buffonsManager;
       }
     }
   }
 
   function calculateScore() {
-    const handType = evaluatePokerHand(_playedCard.getHand());
+    const handType = evaluatePokerHand(_handManager.getSelectedCards());
     const handBaseScore = _handScoreManager.getHandScore(handType);
 
     currentChip = handBaseScore.chip;
     currentMultiplier = handBaseScore.multiplier;
 
-    console.log("card", _playedCard.getHand());
-
-    for (const card of _playedCard.getHand()) {
+    for (const card of _handManager.getHand()) {
       if (!isCardScore(card)) {
         continue;
       }

@@ -5,14 +5,27 @@ import {
 } from "../particle-system/ParticleSystem";
 import { RunStatistics } from "../run-statistics/RunStatistics";
 import React, { useState } from "react";
+import { GameManagerPlugin } from "../../plugins/game-manager";
+import { useCurrentGame } from "../../BalatroProvider";
 
 export const GameOver = () => {
+  const { balatro } = useCurrentGame();
+
+  const game = balatro?.getPlugin<GameManagerPlugin>("game");
+
   const { ref, position } = useParticleSystem();
+
+  if (game == null) {
+    return null;
+  }
+
+  const handleClickMenu = () => {
+    game.returnMenu();
+  };
 
   return (
     <div>
       <div className="fixed inset-0 bg-red-500 opacity-80 z-40"></div>
-
       <div className="fixed inset-0 z-50 flex justify-center items-center">
         <div className="flex flex-row items-center gap-40">
           <div className="flex flex-col gap-4 items-center">
@@ -23,7 +36,10 @@ export const GameOver = () => {
               </Card>
             </Card>
           </div>
-          <RunStatistics />
+          <RunStatistics
+            onClickMainMenu={handleClickMenu}
+            onClickNewGame={handleClickMenu}
+          />
         </div>
         <ParticleSystem
           enabled={true}
@@ -51,7 +67,6 @@ const Buffon = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
             backgroundSize: "1000%",
             backgroundPosition: "top left",
             overflow: "hidden",
-            imageRendering: "pixelated",
           }}
         />
       </div>

@@ -13,6 +13,7 @@ import {
 } from ".";
 
 export type Phase =
+  | "Menu"
   | "Start"
   | "Pause"
   | "Play"
@@ -22,6 +23,8 @@ export type Phase =
   | "GameOver";
 
 export interface GameManagerPlugin extends Plugin {
+  startGame: () => void;
+  returnMenu: () => void;
   getPhase: () => Phase;
   endTurn: () => void;
   startNextPhase: () => void;
@@ -41,6 +44,13 @@ export function createGamePlugin(): GameManagerPlugin {
   let _currentState: State;
 
   const states: Record<Phase, State> = {
+    Menu: {
+      onEnter() {
+        changePhase("Menu");
+      },
+      onExit() {},
+      onEvent() {},
+    },
     Start: {
       onEnter() {
         changePhase("Start");
@@ -151,7 +161,7 @@ export function createGamePlugin(): GameManagerPlugin {
     _engine.onEvent("phase-next", () => handleEvent("phase-next"));
     _engine.onEvent("blind-selected", () => handleEvent("blind-selected"));
 
-    transitionTo("Start");
+    transitionTo("Menu");
   }
 
   function transitionTo(phase: Phase) {
@@ -175,6 +185,14 @@ export function createGamePlugin(): GameManagerPlugin {
     _engine.emitEvent("phase-changed", { phase });
   }
 
+  function startGame() {
+    transitionTo("Start");
+  }
+
+  function returnMenu() {
+    transitionTo("Menu");
+  }
+
   function drawCards(count: number) {
     const cards = _deck.drawCards(count);
     for (const card of cards) {
@@ -189,6 +207,8 @@ export function createGamePlugin(): GameManagerPlugin {
   return {
     name: "game",
     init,
+    startGame,
+    returnMenu,
     endTurn: () => console.log("Turn ended"),
     getPhase: () => _phase,
     startNextPhase,

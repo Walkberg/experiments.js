@@ -18,7 +18,7 @@ export interface HandManagerPlugin extends Plugin {
   getRemainingDiscards: () => number;
   selectCard: (cardId: string) => void;
   unSelectCard: (cardId: string) => void;
-  getSelectedCards: () => PokerCard[];
+  getSelectedCards: () => Hand;
   upgradeCardValue: (cardId: string, cardRank: CardRank) => void;
   updateCardSuit: (cardId: string, cardSuit: CardSuit) => void;
   updateCardEnhancement: (
