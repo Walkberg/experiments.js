@@ -54,6 +54,8 @@ export const useBalatroGame = () => {
     const seedManagerPlugin = createSeedManagerPlugin();
     const statManagerPlugin = createStatManagerPlugin();
 
+    console.log("Balatro engine created", itemsPlayer);
+
     poolManagerPlugin.registerBuffons(buffonsPlayer);
     poolManagerPlugin.registerItems(itemsPlayer);
 

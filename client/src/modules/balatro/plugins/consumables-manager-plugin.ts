@@ -20,6 +20,7 @@ export type Consumable = {
   id: string;
   name: string;
   type: ConsumableType;
+  configId: string;
   description: string;
   checkCanUse?: (ctx: BalatroEngine) => boolean;
   onConsumableUsed?: (ctx: BalatroEngine) => void;

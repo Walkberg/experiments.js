@@ -5,10 +5,12 @@ export function createBaseConsumable({
   name,
   description,
   type,
+  configId,
 }: {
   name: string;
   description: string;
   type: ConsumableType;
+  configId: string;
 }): Consumable {
   function getBuyPrice() {
     return 3;
@@ -23,6 +25,7 @@ export function createBaseConsumable({
     name: name,
     type: type,
     description,
+    configId,
     getBuyPrice,
     getSellPrice,
   };

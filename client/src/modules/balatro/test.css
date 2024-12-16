@@ -32,6 +32,15 @@
   image-rendering: pixelated;
 }
 
+.card-consumables {
+  background: url("../assets/Consumables.png") no-repeat;
+
+  height: 95px;
+  width: 71px;
+
+  image-rendering: pixelated;
+}
+
 .card-buffon {
   background: url("../assets/Jokers.png") no-repeat;
   height: 95px;

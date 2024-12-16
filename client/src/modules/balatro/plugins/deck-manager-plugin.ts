@@ -29,6 +29,7 @@ export interface DeckManagerPlugin extends Plugin {
 export function createDeckPlugin(): DeckManagerPlugin {
   let _seedManagerPlugin: SeedManagerPlugin;
   let _deck: Deck = [];
+  let _discard: PokerCard[] = [];
 
   function generateDeck() {
     const suits: CardSuit[] = ["hearts", "diamonds", "clubs", "spades"];
@@ -78,6 +79,15 @@ export function createDeckPlugin(): DeckManagerPlugin {
 
   function init(engine: BalatroEngine) {
     _seedManagerPlugin = getSeedManagerPlugin(engine);
+
+    engine.onEvent("card-discarded", (payload) => {
+      _discard.push(payload.card);
+    });
+  }
+
+  function reset() {
+    _deck = [..._deck, ..._discard];
+    _discard = [];
   }
 
   function drawCard(): PokerCard | null {

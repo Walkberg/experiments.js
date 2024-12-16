@@ -101,7 +101,7 @@ export function createHandPlugin(): HandManagerPlugin {
   function discardCard(pokerCard: PokerCard) {
     _engine.emitEvent("card-discard", { cardId: pokerCard.id });
     removeFromHand(pokerCard.id);
-    _engine.emitEvent("card-discarded", { cardId: pokerCard.id });
+    _engine.emitEvent("card-discarded", { card: pokerCard });
   }
 
   function reset() {

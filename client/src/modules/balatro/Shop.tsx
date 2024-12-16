@@ -2,10 +2,11 @@ import { Shop as IShop, generateShop } from "./balatro";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { BuffonCard, CardContainer, useGameManager } from "./BalatroPage";
-import { ShopPlugin } from "./plugins/shop-plugin";
+import { Buyable, BuyableConsumable, ShopPlugin } from "./plugins/shop-plugin";
 import { useCurrentGame } from "./BalatroProvider";
 import { Card } from "@/components/ui/card";
 import { Consumable } from "./plugins/consumables-manager-plugin";
+import { getTarotConfig } from "./cards/tarots";
 
 function useShopManager() {
   const [shop, setShop] = useState<IShop>(generateShop());
@@ -103,10 +104,73 @@ export const ItemCard = ({
   item: Consumable;
   onClick?: () => void;
 }) => {
+  console.log("item", item);
+  switch (item.type) {
+    case "tarot":
+      return <TarotCard tarot={item} />;
+    default:
+      return (
+        <Card onClick={onClick}>
+          <div>{item.name}</div>
+          <div>{item.description}</div>
+        </Card>
+      );
+  }
+};
+
+interface TarotCardProps {
+  tarot: Consumable;
+}
+
+export const TarotCard = ({ tarot }: TarotCardProps) => {
+  const configId = tarot.configId;
+
+  const config = getTarotConfig(configId);
+
+  if (!config) {
+    return null;
+  }
+
+  const pos = getBackgroundPosition(config.position);
+
+  console.log("pos", pos);
+  console.log("cardConsumableBackgroundStyle", cardConsumableBackgroundStyle);
+
   return (
-    <Card onClick={onClick}>
-      <div>{item.name}</div>
-      <div>{item.description}</div>
-    </Card>
+    <div
+      className="card-consumables"
+      style={{
+        ...cardSizeStyle,
+        ...cardConsumableBackgroundStyle,
+        backgroundPositionX: pos.x,
+        backgroundPositionY: pos.y,
+      }}
+    />
   );
+};
+
+interface Position {
+  x: number;
+  y: number;
+}
+
+const SIZE_FACTOR = 2;
+
+const CARD_X_SIZE = 71 * SIZE_FACTOR;
+const CARD_Y_SIZE = 95 * SIZE_FACTOR;
+
+const cardSizeStyle = {
+  width: `${CARD_X_SIZE}px`,
+  height: `${CARD_Y_SIZE}px`,
+};
+
+function getBackgroundPosition(position: Position): Position {
+  return {
+    x: -(position.x * CARD_X_SIZE),
+    y: -(position.y * CARD_Y_SIZE),
+  };
+}
+
+const cardConsumableBackgroundStyle = {
+  backgroundSize: `${CARD_X_SIZE * 10}px ${CARD_Y_SIZE * 6}px`,
 };

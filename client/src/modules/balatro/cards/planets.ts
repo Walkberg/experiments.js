@@ -21,6 +21,7 @@ export function createPlanetConsumable({
     name,
     description,
     type: "planet",
+    configId: planeteType,
   });
 
   planet.onConsumableUsed = (ctx: BalatroEngine) => {

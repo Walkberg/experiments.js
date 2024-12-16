@@ -10,17 +10,192 @@ import { getNextCardRank, TarorType } from "../balatro";
 import { CardSuit, EnhancementType } from "./poker-cards";
 import { BalatroEngine, getEconomyManagerPlugin } from "../balatro-engine";
 
+type TarotConfigId = string;
+
+type Position = {
+  x: number;
+  y: number;
+};
+
+export type TarotConfig = {
+  id: TarotConfigId;
+  position: Position;
+};
+
+const tarotConfigs: Record<TarotConfigId, TarotConfig> = {
+  t_the_fool: {
+    id: "t_the_fool",
+    position: {
+      x: 0,
+      y: 0,
+    },
+  },
+  t_the_magician: {
+    id: "t_the_magician",
+    position: {
+      x: 1,
+      y: 0,
+    },
+  },
+  t_the_high_priestess: {
+    id: "t_the_high_priestess",
+    position: {
+      x: 2,
+      y: 0,
+    },
+  },
+  t_the_empress: {
+    id: "t_the_empress",
+    position: {
+      x: 3,
+      y: 0,
+    },
+  },
+  t_the_emperor: {
+    id: "t_the_emperor",
+    position: {
+      x: 4,
+      y: 0,
+    },
+  },
+  t_the_hierophant: {
+    id: "t_the_hierophant",
+    position: {
+      x: 5,
+      y: 0,
+    },
+  },
+  t_the_lovers: {
+    id: "t_the_lovers",
+    position: {
+      x: 6,
+      y: 0,
+    },
+  },
+  t_the_chariot: {
+    id: "t_the_chariot",
+    position: {
+      x: 7,
+      y: 0,
+    },
+  },
+  t_justice: {
+    id: "t_justice",
+    position: {
+      x: 8,
+      y: 0,
+    },
+  },
+  t_the_hermit: {
+    id: "t_the_hermit",
+    position: {
+      x: 9,
+      y: 0,
+    },
+  },
+  t_the_wheel_of_fortune: {
+    id: "t_the_wheel_of_fortune",
+    position: {
+      x: 1,
+      y: 0,
+    },
+  },
+  t_strength: {
+    id: "t_strength",
+    position: {
+      x: 1,
+      y: 1,
+    },
+  },
+  t_the_hanged_man: {
+    id: "t_the_hanged_man",
+    position: {
+      x: 1,
+      y: 2,
+    },
+  },
+  t_death: {
+    id: "t_death",
+    position: {
+      x: 1,
+      y: 3,
+    },
+  },
+  t_temperance: {
+    id: "t_temperance",
+    position: {
+      x: 1,
+      y: 4,
+    },
+  },
+  t_the_devil: {
+    id: "t_the_devil",
+    position: {
+      x: 1,
+      y: 5,
+    },
+  },
+  t_the_tower: {
+    id: "t_the_tower",
+    position: {
+      x: 1,
+      y: 6,
+    },
+  },
+  t_the_star: {
+    id: "t_the_star",
+    position: {
+      x: 1,
+      y: 7,
+    },
+  },
+  t_the_moon: {
+    id: "t_the_moon",
+    position: {
+      x: 1,
+      y: 8,
+    },
+  },
+  t_the_sun: {
+    id: "t_the_sun",
+    position: {
+      x: 1,
+      y: 9,
+    },
+  },
+  t_judgment: {
+    id: "t_judgment",
+    position: {
+      x: 2,
+      y: 0,
+    },
+  },
+  t_the_world: {
+    id: "t_the_world",
+    position: {
+      x: 2,
+      y: 1,
+    },
+  },
+};
+export function getTarotConfig(configId: TarotConfigId): TarotConfig {
+  return tarotConfigs[configId];
+}
+
 export function createTarotConsumable({
   name,
   description,
+  configId,
 }: {
   name: TarorType;
   description: string;
+  configId: TarotConfigId;
 }): Consumable {
   const tarot = createBaseConsumable({
     name,
     description,
     type: "tarot",
+    configId,
   });
 
   tarot.getBuyPrice = () => {
@@ -38,6 +213,7 @@ const createTheFool = (): Consumable => {
   const theFool = createTarotConsumable({
     name: "theFool",
     description: "Le Mat",
+    configId: "t_the_fool",
   });
 
   theFool.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -61,6 +237,7 @@ const createTheMagician = (): Consumable => {
     description: "Le Magicien",
     enhancement: "lucky",
     maxCardCount: 2,
+    configId: "t_the_magician",
   });
 };
 
@@ -68,6 +245,7 @@ const createTheHighPriestess = (): Consumable => {
   const theHighPriestess = createTarotConsumable({
     name: "theHighPriestess",
     description: "La Papesse",
+    configId: "t_the_high_priestess",
   });
 
   theHighPriestess.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -89,6 +267,7 @@ const createTheEmpress = (): Consumable => {
     description: "L'Impératrice",
     enhancement: "mult",
     maxCardCount: 2,
+    configId: "t_the_empress",
   });
 };
 
@@ -96,6 +275,7 @@ const createTheEmperor = (): Consumable => {
   return createTarotConsumable({
     name: "theEmperor",
     description: "L'Empereur",
+    configId: "t_the_emperor",
   });
 };
 
@@ -105,6 +285,7 @@ const createTheHierophant = (): Consumable => {
     description: "Le Pape",
     enhancement: "bonus",
     maxCardCount: 2,
+    configId: "t_the_hierophant",
   });
 };
 
@@ -114,6 +295,7 @@ const createTheLovers = (): Consumable => {
     description: "Les Amoureux",
     enhancement: "wildcard",
     maxCardCount: 1,
+    configId: "t_the_lovers",
   });
 };
 
@@ -123,6 +305,7 @@ const createTheChariot = (): Consumable => {
     description: "Le Chariot",
     enhancement: "steel",
     maxCardCount: 1,
+    configId: "t_the_chariot",
   });
 };
 
@@ -132,6 +315,7 @@ const createJustice = (): Consumable => {
     description: "La Justice",
     enhancement: "glass",
     maxCardCount: 1,
+    configId: "t_justice",
   });
 };
 
@@ -139,6 +323,7 @@ const createTheHermit = (): Consumable => {
   const tarot = createTarotConsumable({
     name: "theHermit",
     description: "L'Hermite",
+    configId: "t_the_hermit",
   });
 
   tarot.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -159,6 +344,7 @@ const createTheWheelOfFortune = (): Consumable => {
   return createTarotConsumable({
     name: "wheelOfFortune",
     description: "La Roue de Fortune",
+    configId: "t_the_wheel_of_fortune",
   });
 };
 
@@ -166,6 +352,7 @@ const createStrength = (): Consumable => {
   const tarot = createTarotConsumable({
     name: "strength",
     description: "La Force",
+    configId: "t_strength",
   });
 
   tarot.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -184,6 +371,7 @@ const createTheHangedMan = (): Consumable => {
   const tarot = createTarotConsumable({
     name: "theHangedMan",
     description: "Le Pendu",
+    configId: "t_the_hanged_man",
   });
 
   tarot.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -210,6 +398,7 @@ const createDeath = (): Consumable => {
   const tarot = createTarotConsumable({
     name: "death",
     description: "La Mort",
+    configId: "t_death",
   });
 
   tarot.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -239,6 +428,7 @@ const createTemperance = (): Consumable => {
   const tarot = createTarotConsumable({
     name: "temperance",
     description: "Tempérance",
+    configId: "t_temperance",
   });
 
   tarot.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -263,6 +453,7 @@ const createTheDevil = (): Consumable => {
     description: "Le Diable",
     enhancement: "gold",
     maxCardCount: 1,
+    configId: "t_the_devil",
   });
 };
 
@@ -272,6 +463,7 @@ const createTheTower = (): Consumable => {
     description: "La Maison Dieu",
     enhancement: "stone",
     maxCardCount: 1,
+    configId: "t_the_tower",
   });
 };
 
@@ -280,6 +472,7 @@ const createTheStar = (): Consumable => {
     name: "theStar",
     description: "L'Étoile",
     cardSuit: "diamonds",
+    configId: "t_the_star",
   });
 };
 
@@ -288,6 +481,7 @@ const createTheMoon = (): Consumable => {
     name: "theMoon",
     description: "La Lune",
     cardSuit: "clubs",
+    configId: "t_the_moon",
   });
 };
 
@@ -296,6 +490,7 @@ const createTheSun = (): Consumable => {
     name: "theSun",
     description: "Le Soleil",
     cardSuit: "hearts",
+    configId: "t_the_sun",
   });
 };
 
@@ -303,6 +498,7 @@ const createJudgment = (): Consumable => {
   const tarot = createTarotConsumable({
     name: "judgment",
     description: "Le Jugement",
+    configId: "t_judgment",
   });
 
   tarot.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -331,6 +527,7 @@ const createTheWorld = (): Consumable => {
     name: "theWorld",
     description: "Le Monde",
     cardSuit: "spades",
+    configId: "t_the_world",
   });
 };
 
@@ -338,14 +535,17 @@ function createUpdateSuitTarotCard({
   name,
   description,
   cardSuit,
+  configId,
 }: {
   name: TarorType;
   description: string;
   cardSuit: CardSuit;
+  configId: TarotConfigId;
 }): Consumable {
   const tarot = createTarotConsumable({
     name: name,
     description: description,
+    configId,
   });
 
   tarot.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -373,15 +573,18 @@ function createUpdateEnhancementTarotCard({
   description,
   enhancement,
   maxCardCount,
+  configId,
 }: {
   name: TarorType;
   description: string;
   enhancement: EnhancementType;
   maxCardCount: number;
+  configId: TarotConfigId;
 }): Consumable {
   const tarot = createTarotConsumable({
     name: name,
     description: description,
+    configId: configId,
   });
 
   tarot.onConsumableUsed = (ctx: BalatroEngine) => {

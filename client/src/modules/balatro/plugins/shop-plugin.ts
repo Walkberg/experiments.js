@@ -20,12 +20,12 @@ export interface ShopPlugin extends Plugin {
 
 export type Buyable = BuyableBuffon | BuyableConsumable;
 
-type BuyableBuffon = {
+export type BuyableBuffon = {
   type: "buffon";
   buffon: Buffon;
 } & Price;
 
-type BuyableConsumable = {
+export type BuyableConsumable = {
   type: "consumable";
   item: Consumable;
 } & Price;

@@ -115,7 +115,7 @@ export function createGamePlugin(): GameManagerPlugin {
       },
       onExit() {},
       onEvent(event, payload) {
-        if (event === "next-phase") {
+        if (event === "phase-next") {
           transitionTo("Blind");
         }
       },
