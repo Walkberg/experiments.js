@@ -101,7 +101,8 @@ export function createShopPlugin(): ShopPlugin {
       })
     );
 
-    _items = [...buyableBuffons, ...buyableConsumable];
+    // _items = [...buyableBuffons, ...buyableConsumable];
+    _items = [...buyableConsumable];
   }
 
   function canReroll() {

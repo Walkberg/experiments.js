@@ -6,6 +6,7 @@ import { Buyable, ShopPlugin } from "./plugins/shop-plugin";
 import { useCurrentGame } from "./BalatroProvider";
 import { Card } from "@/components/ui/card";
 import { ConsumableCard } from "./modules/consumables/ConsumableCard";
+import { cn } from "@/lib/utils";
 
 function useShopManager() {
   const [shop, setShop] = useState<IShop>(generateShop());
@@ -44,35 +45,39 @@ export const Shop = ({}: ShopProps) => {
   const items = shopManager.getItems();
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row gap-4">
-        <div className="flex flex-col gap-2">
-          <Button onClick={() => gameManager.startNextPhase()}>
-            Next Round
-          </Button>
-          <Button
-            disabled={!shopManager.canReroll()}
-            onClick={() => shopManager.rerollShop()}
-          >
-            Reroll {shopManager.getRerollPrice()}$
-          </Button>
-        </div>
-        <div>
+    <div className="rounded-2xl bg-zinc-900 grid grid-rows-2 gap-2 p-4 border-red-500 border-2 h-full">
+      <div className="grid grid-cols-4 grid-rows-2 gap-2">
+        <Button
+          className=" bg-red-500 w-full h-full hover:bg-red-700 row-start-1"
+          onClick={() => gameManager.startNextPhase()}
+        >
+          Next Round
+        </Button>
+        <Button
+          className="bg-yellow-600 w-full h-full hover:bg-yellow-800 row-start-2"
+          disabled={!shopManager.canReroll()}
+          onClick={() => shopManager.rerollShop()}
+        >
+          Reroll {shopManager.getRerollPrice()}$
+        </Button>
+        <ShopZone className="col-span-3 row-span-2">
           <CardContainer>
             <CardItemContainer items={items} onBuy={handleBuyItem} />
           </CardContainer>
-        </div>
+        </ShopZone>
       </div>
-      <div className="flex flex-row gap-2">
-        <CardContainer>voucher</CardContainer>
-        <CardContainer>
-          aa
+      <div className="grid grid-cols-2 gap-2 p-8">
+        <ShopZone className="p-3">
+          <div className="bg-zinc-900 p-2 rounded-xl h-full">voucher</div>
+        </ShopZone>
+        <ShopZone>
+          pack
           {/* <div className="flex flex-row gap-2">
             {shop.packs.map((pack, index) => (
               <Card key={index}>{"pack"}</Card>
             ))}
           </div> */}
-        </CardContainer>
+        </ShopZone>
       </div>
     </div>
   );
@@ -85,43 +90,46 @@ const CardItemContainer = ({
   items: Buyable[];
   onBuy: (itemId: string) => void;
 }) => {
-  const [selectedItem, setSelectedItem] = useState<Buyable | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  // Fonction pour gérer la sélection et la désélection
+  const handleSelectItem = (itemId: string) => {
+    setSelectedItemId((prevId) => (prevId === itemId ? null : itemId));
+  };
 
   return (
-    <div className="flex flex-row gap-2">
-      {items.map((shopItem) => (
-        <div className="flex flex-col gap-2">
-          {shopItem.type === "buffon" && (
-            <BuffonCard
-              key={shopItem.buffon.id}
-              buffon={shopItem.buffon}
-              onClick={() => setSelectedItem(shopItem)}
-            />
-          )}
-          {shopItem.type === "consumable" && (
-            <ConsumableCard
-              selected={
-                selectedItem?.type === "consumable" &&
-                selectedItem?.item.id === shopItem.item.id
-              }
-              key={shopItem.item.id}
-              consumable={shopItem.item}
-              onClick={() =>
-                setSelectedItem(
-                  selectedItem?.type === "consumable" &&
-                    selectedItem?.item.id === shopItem.item.id
-                    ? null
-                    : shopItem
-                )
-              }
-              hoverSide="left"
-              topComponent={<PriceIndicator price={shopItem.price} />}
-              rightComponent={<BuyAndUse onBuyAnUse={() => {}} />}
-              bottomComponent={<Buy onBuy={() => onBuy(shopItem.item.id)} />}
-            />
-          )}
-        </div>
-      ))}
+    <div className="flex flex-row gap-2 items-center">
+      {items.map((shopItem) => {
+        const isSelected =
+          (shopItem?.type === "consumable" &&
+            selectedItemId === shopItem.item?.id) ||
+          (shopItem?.type === "buffon" &&
+            selectedItemId === shopItem.buffon?.id);
+
+        return (
+          <div className="flex flex-col gap-2">
+            {shopItem.type === "buffon" && (
+              <BuffonCard
+                key={shopItem.buffon.id}
+                buffon={shopItem.buffon}
+                onClick={() => handleSelectItem(shopItem.buffon.id)}
+              />
+            )}
+            {shopItem.type === "consumable" && (
+              <ConsumableCard
+                selected={isSelected}
+                key={shopItem.item.id}
+                consumable={shopItem.item}
+                onClick={() => handleSelectItem(shopItem.item.id)}
+                hoverSide="left"
+                topComponent={<PriceIndicator price={shopItem.price} />}
+                rightComponent={<BuyAndUse onBuyAnUse={() => {}} />}
+                bottomComponent={<Buy onBuy={() => onBuy(shopItem.item.id)} />}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -156,9 +164,22 @@ const BuyAndUse = ({ onBuyAnUse }: BuyAndUseProps) => {
 export const PriceIndicator = ({ price }: { price: number }) => {
   return (
     <div className="flex flex-row gap-2 bg-zinc-900 p-1 rounded-2xl pb-8">
-      <div className="bg-zinc-700 text-amber-400 rounded-2xl py-2 px-8">
+      <div className="bg-zinc-700 text-amber-400 rounded-2xl py-2 px-4 text-3xl font-bold">
         ${price}
       </div>
+    </div>
+  );
+};
+
+interface ShopZoneProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export const ShopZone = ({ children, className }: ShopZoneProps) => {
+  return (
+    <div className={cn(className, "bg-neutral-600 rounded-2xl")}>
+      {children}
     </div>
   );
 };
