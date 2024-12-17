@@ -35,7 +35,7 @@ export const ConsumableCard = ({
   return (
     <HoverCard openDelay={50} closeDelay={50}>
       <HoverCardTrigger>
-        <div className={cn("relative", { "-translate-y-4": selected })}>
+        <div className={cn("relative", { "-translate-y-4 z-20": selected })}>
           <div className="flex flex-row items-center">
             <div className="flex flex-col items-center">
               <div className="absolute top-[-50px]">{topComponent}</div>

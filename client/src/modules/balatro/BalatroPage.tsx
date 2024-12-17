@@ -80,7 +80,7 @@ export const Balatro = () => {
         <div className="col-span-1">
           <Sidebar />
         </div>
-        <div className="grid grid-rows-3  grid-cols-5 col-span-4 m-2 w-full gap-3">
+        <div className="grid grid-rows-4  grid-cols-5 col-span-4 m-2 w-full gap-3">
           <div className="col-span-3">
             <CardContainer>
               <Buffons />
@@ -91,7 +91,7 @@ export const Balatro = () => {
               <ConsumableList />
             </CardContainer>
           </div>
-          <div className="col-span-4 row-span-2 col-start-1 row-start-2">
+          <div className="col-span-4 row-span-3 col-start-1 row-start-2">
             {phase === "Blind" ? (
               <Ante />
             ) : phase === "Shop" ? (
@@ -100,7 +100,7 @@ export const Balatro = () => {
               <Board />
             )}
           </div>
-          <div className="col-start-5 row-start-3">
+          <div className="col-start-5 row-start-4">
             <CardContainer>
               <Deck />
             </CardContainer>
@@ -319,8 +319,8 @@ interface CardContainerProps {
 export const CardContainer = ({ children }: CardContainerProps) => {
   return (
     <div className="grid h-full">
-      <div className="h-full">
-        <Card className="flex grow justify-center p-2 bg-black/20 h-full ">
+      <div className="h-full py-4">
+        <Card className="flex grow justify-center p-2 bg-black/20 h-full items-center ">
           {children}
         </Card>
         <div className="flex flex-row grow p-2">0/2</div>
