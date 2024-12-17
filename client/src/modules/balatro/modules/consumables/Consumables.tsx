@@ -8,7 +8,7 @@ interface ConsumableListProps {}
 export const ConsumableList = ({}: ConsumableListProps) => {
   const [selectedItem, setSelectedItem] = useState<Consumable | null>(null);
 
-  const consumableManager = useConsumableManager();
+  const { consumableManager, consumables } = useConsumableManager();
 
   if (consumableManager == null) {
     return null;
@@ -24,7 +24,7 @@ export const ConsumableList = ({}: ConsumableListProps) => {
 
   return (
     <div className="flex flex-row gap-2">
-      {consumableManager.getConsumables().map((consumable) => (
+      {consumables.map((consumable) => (
         <ConsumableCard
           selected={selectedItem?.id === consumable.id}
           key={consumable.id}

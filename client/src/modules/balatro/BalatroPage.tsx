@@ -169,11 +169,33 @@ export const PlayerInfo = () => {
 
   const [refresh, setRefresh] = useState(false);
 
+  const [remainingDiscard, setRemainingDiscard] = useState(4);
+
+  const [remainingHand, setRemainingHand] = useState(4);
+
   useEffect(() => {
     if (balatro == null) return;
     balatro.onEvent("economy-updated", () => {
       console.log("economy updated aaaa");
       setRefresh((prev) => !prev);
+    });
+  }, [balatro]);
+
+  useEffect(() => {
+    if (balatro == null) return;
+    if (handmanager == null) return;
+
+    balatro.onEvent("hand-discarded", () => {
+      setRemainingDiscard(handmanager.getRemainingDiscards() ?? 4);
+    });
+  }, [balatro]);
+
+  useEffect(() => {
+    if (balatro == null) return;
+    if (handmanager == null) return;
+
+    balatro.onEvent("hand-played", () => {
+      setRemainingHand(handmanager.getRemainingHands() ?? 4);
     });
   }, [balatro]);
 
@@ -186,10 +208,10 @@ export const PlayerInfo = () => {
       <Button className="row-span-2">Run Info</Button>
       <Button className="col-start-1 row-start-3">Options</Button>
       <ItemContainer className="col-start-2 row-start-1" name="hands">
-        <Button>{handmanager.getRemainingHands()}</Button>
+        <Button>{remainingHand}</Button>
       </ItemContainer>
       <ItemContainer name="discards">
-        <Button>{handmanager.getRemainingDiscards()}</Button>
+        <Button>{remainingDiscard}</Button>
       </ItemContainer>
       <ItemCard className="col-span-2 col-start-2 row-start-2">
         <ItemTest>

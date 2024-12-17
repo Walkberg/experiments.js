@@ -6,7 +6,11 @@ import {
   EnhancementType,
 } from "../cards/poker-cards";
 import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
-import { getPlayerManagerPlugin } from "./deck-manager-plugin";
+import {
+  DeckManagerPlugin,
+  getDeckManagerPlugin,
+  getPlayerManagerPlugin,
+} from "./deck-manager-plugin";
 
 export interface HandManagerPlugin extends Plugin {
   addToHand: (card: PokerCard) => void;
@@ -27,11 +31,13 @@ export interface HandManagerPlugin extends Plugin {
   ) => void;
   destroy: (cardId: string) => void;
   reset: () => void;
+  fillHand: () => void;
 }
 
 export function createHandPlugin(): HandManagerPlugin {
   let _engine: BalatroEngine;
   let _playerManagerPlugin: PlayerManagerPlugin;
+  let _deckManagerPlugin: DeckManagerPlugin;
   let _hand: Hand = [];
 
   let _selectedCards: PokerCard[] = [];
@@ -43,8 +49,19 @@ export function createHandPlugin(): HandManagerPlugin {
   function init(engine: BalatroEngine) {
     _engine = engine;
     _playerManagerPlugin = getPlayerManagerPlugin(engine);
+    _deckManagerPlugin = getDeckManagerPlugin(engine);
+
+    engine.onEvent("hand-discarded", fillHand);
+    engine.onEvent("score-calculated", () => discardPlayedCard());
 
     reset();
+  }
+
+  function discardPlayedCard() {
+    for (const playedCard of _selectedCards) {
+      discardCard(playedCard);
+    }
+    _selectedCards = [];
   }
 
   function addToHand(card: PokerCard) {
@@ -67,15 +84,16 @@ export function createHandPlugin(): HandManagerPlugin {
   function playHand() {
     _engine.emitEvent("hand-play", {});
 
-    for (const pokerCard of _selectedCards) {
-      playCard(pokerCard);
-    }
-
     _remainingHand--;
 
-    _selectedCards = [];
-
     _engine.emitEvent("hand-played", _selectedCards);
+  }
+
+  function fillHand() {
+    const cards = _deckManagerPlugin.drawCards(8 - _hand.length);
+    for (const card of cards) {
+      addToHand(card);
+    }
   }
 
   function discardHand() {
@@ -113,8 +131,6 @@ export function createHandPlugin(): HandManagerPlugin {
 
   function selectCard(cardId: string) {
     const card = _hand.find((c) => c.id === cardId);
-
-    console.log("selectCard", card);
 
     if (card) {
       _selectedCards.push(card);
@@ -182,6 +198,7 @@ export function createHandPlugin(): HandManagerPlugin {
   return {
     name: "hand",
     init,
+    fillHand,
     addToHand,
     getHand,
     playHand,

@@ -57,7 +57,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
           suit,
           rank,
           id: uuid(),
-          enhancement: "bonus",
+          enhancement: "none",
           edition: "base",
           seal: "none",
         });
@@ -134,4 +134,13 @@ export function createDeckPlugin(): DeckManagerPlugin {
     removeCard,
     getDeckSize,
   };
+}
+
+export function getDeckManagerPlugin(engine: BalatroEngine): DeckManagerPlugin {
+  const test = engine.getPlugin<DeckManagerPlugin>("deck");
+
+  if (test == null) {
+    throw new Error("Deck manager plugin not found");
+  }
+  return test;
 }

@@ -1,27 +1,30 @@
 import { useEffect, useState } from "react";
-import { ConsumablesManagerPlugin } from "../../plugins";
+import { Consumable, ConsumablesManagerPlugin } from "../../plugins";
 import { useCurrentGame } from "../../BalatroProvider";
 
 export function useConsumableManager() {
   const { balatro } = useCurrentGame();
 
-  const [refresh, setRefresh] = useState(false);
-
   const consumableManager = balatro?.getPlugin<ConsumablesManagerPlugin>(
     "consumables-manager"
   );
+
+  const [consumables, setConsumable] = useState<Consumable[]>([]);
 
   useEffect(() => {
     if (balatro == null) {
       return;
     }
-    balatro.onEvent("consumable-added", () => setRefresh((prev) => !prev));
-    balatro.onEvent("consumable-removed", () => setRefresh((prev) => !prev));
+    if (consumableManager == null) {
+      return;
+    }
+    balatro.onEvent("consumable-added", () =>
+      setConsumable(consumableManager.getConsumables())
+    );
+    balatro.onEvent("consumable-removed", () =>
+      setConsumable(consumableManager.getConsumables())
+    );
   }, [balatro]);
 
-  if (consumableManager == null) {
-    return null;
-  }
-
-  return consumableManager;
+  return { consumableManager, consumables };
 }

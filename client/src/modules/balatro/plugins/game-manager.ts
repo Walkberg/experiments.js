@@ -55,7 +55,7 @@ export function createGamePlugin(): GameManagerPlugin {
       onEnter() {
         changePhase("Start");
         _deck.generateDeck();
-        drawCards(8);
+        _hand.fillHand();
         transitionTo("Blind");
       },
       onExit() {},
@@ -79,7 +79,7 @@ export function createGamePlugin(): GameManagerPlugin {
         if (event === "hand-played") {
           setTimeout(() => {
             transitionTo("Score");
-          }, 1000);
+          }, 10);
         }
       },
     },
@@ -99,7 +99,7 @@ export function createGamePlugin(): GameManagerPlugin {
               if (_hand.getRemainingHands() === 0) {
                 transitionTo("GameOver");
               } else {
-                drawCards(5);
+                _hand.fillHand();
                 transitionTo("Play");
               }
             } else {
@@ -132,7 +132,7 @@ export function createGamePlugin(): GameManagerPlugin {
           _deck.generateDeck();
           _hand.reset();
           _score.resetScore();
-          drawCards(8);
+          _hand.fillHand();
           transitionTo("Play");
         }
       },
