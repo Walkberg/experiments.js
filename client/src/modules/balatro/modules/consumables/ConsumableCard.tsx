@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 interface ConsumableCardProps {
   consumable: Consumable;
   onClick?: () => void;
-  onUse?: () => void;
   topComponent?: ReactNode;
   bottomComponent?: ReactNode;
   rightComponent?: ReactNode;
