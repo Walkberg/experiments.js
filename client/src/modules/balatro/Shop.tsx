@@ -2,11 +2,10 @@ import { Shop as IShop, generateShop } from "./balatro";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { BuffonCard, CardContainer, useGameManager } from "./BalatroPage";
-import { Buyable, BuyableConsumable, ShopPlugin } from "./plugins/shop-plugin";
+import { Buyable, ShopPlugin } from "./plugins/shop-plugin";
 import { useCurrentGame } from "./BalatroProvider";
 import { Card } from "@/components/ui/card";
-import { Consumable } from "./plugins/consumables-manager-plugin";
-import { getTarotConfig } from "./cards/tarots";
+import { ConsumableCard } from "./modules/consumables/ConsumableCard";
 
 function useShopManager() {
   const [shop, setShop] = useState<IShop>(generateShop());
@@ -42,6 +41,8 @@ export const Shop = ({}: ShopProps) => {
     }
   };
 
+  const items = shopManager.getItems();
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-4">
@@ -58,27 +59,7 @@ export const Shop = ({}: ShopProps) => {
         </div>
         <div>
           <CardContainer>
-            <div className="flex flex-row gap-2">
-              {shopManager.getItems().map((shopItem) => (
-                <div className="flex flex-col gap-2">
-                  <Card className="flex justify-center">{shopItem.price}</Card>
-                  {shopItem.type === "buffon" && (
-                    <BuffonCard
-                      key={shopItem.buffon.id}
-                      buffon={shopItem.buffon}
-                      onClick={() => handleBuyItem(shopItem.buffon.id)}
-                    />
-                  )}
-                  {shopItem.type === "consumable" && (
-                    <ItemCard
-                      key={shopItem.item.id}
-                      item={shopItem.item}
-                      onClick={() => handleBuyItem(shopItem.item.id)}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
+            <CardItemContainer items={items} onBuy={handleBuyItem} />
           </CardContainer>
         </div>
       </div>
@@ -97,80 +78,87 @@ export const Shop = ({}: ShopProps) => {
   );
 };
 
-export const ItemCard = ({
-  item,
-  onClick,
+const CardItemContainer = ({
+  items,
+  onBuy,
 }: {
-  item: Consumable;
-  onClick?: () => void;
+  items: Buyable[];
+  onBuy: (itemId: string) => void;
 }) => {
-  console.log("item", item);
-  switch (item.type) {
-    case "tarot":
-      return <TarotCard tarot={item} />;
-    default:
-      return (
-        <Card onClick={onClick}>
-          <div>{item.name}</div>
-          <div>{item.description}</div>
-        </Card>
-      );
-  }
-};
-
-interface TarotCardProps {
-  tarot: Consumable;
-}
-
-export const TarotCard = ({ tarot }: TarotCardProps) => {
-  const configId = tarot.configId;
-
-  const config = getTarotConfig(configId);
-
-  if (!config) {
-    return null;
-  }
-
-  const pos = getBackgroundPosition(config.position);
-
-  console.log("pos", pos);
-  console.log("cardConsumableBackgroundStyle", cardConsumableBackgroundStyle);
+  const [selectedItem, setSelectedItem] = useState<Buyable | null>(null);
 
   return (
-    <div
-      className="card-consumables"
-      style={{
-        ...cardSizeStyle,
-        ...cardConsumableBackgroundStyle,
-        backgroundPositionX: pos.x,
-        backgroundPositionY: pos.y,
-      }}
-    />
+    <div className="flex flex-row gap-2">
+      {items.map((shopItem) => (
+        <div className="flex flex-col gap-2">
+          {shopItem.type === "buffon" && (
+            <BuffonCard
+              key={shopItem.buffon.id}
+              buffon={shopItem.buffon}
+              onClick={() => setSelectedItem(shopItem)}
+            />
+          )}
+          {shopItem.type === "consumable" && (
+            <ConsumableCard
+              selected={
+                selectedItem?.type === "consumable" &&
+                selectedItem?.item.id === shopItem.item.id
+              }
+              key={shopItem.item.id}
+              consumable={shopItem.item}
+              onClick={() =>
+                setSelectedItem(
+                  selectedItem?.type === "consumable" &&
+                    selectedItem?.item.id === shopItem.item.id
+                    ? null
+                    : shopItem
+                )
+              }
+              hoverSide="left"
+              topComponent={<PriceIndicator price={shopItem.price} />}
+              rightComponent={<BuyAndUse onBuyAnUse={() => {}} />}
+              bottomComponent={<Buy onBuy={() => onBuy(shopItem.item.id)} />}
+            />
+          )}
+        </div>
+      ))}
+    </div>
   );
 };
 
-interface Position {
-  x: number;
-  y: number;
+interface BuyProps {
+  onBuy: () => void;
 }
 
-const SIZE_FACTOR = 2;
-
-const CARD_X_SIZE = 71 * SIZE_FACTOR;
-const CARD_Y_SIZE = 95 * SIZE_FACTOR;
-
-const cardSizeStyle = {
-  width: `${CARD_X_SIZE}px`,
-  height: `${CARD_Y_SIZE}px`,
+const Buy = ({ onBuy }: BuyProps) => {
+  return (
+    <button onClick={onBuy} className="bg-amber-500 text-white rounded-2xl p-2">
+      Acheter
+    </button>
+  );
 };
 
-function getBackgroundPosition(position: Position): Position {
-  return {
-    x: -(position.x * CARD_X_SIZE),
-    y: -(position.y * CARD_Y_SIZE),
-  };
+interface BuyAndUseProps {
+  onBuyAnUse: () => void;
 }
 
-const cardConsumableBackgroundStyle = {
-  backgroundSize: `${CARD_X_SIZE * 10}px ${CARD_Y_SIZE * 6}px`,
+const BuyAndUse = ({ onBuyAnUse }: BuyAndUseProps) => {
+  return (
+    <button
+      onClick={onBuyAnUse}
+      className="bg-orange-700 text-white rounded-2xl p-2"
+    >
+      Acheter <br /> et utiliser
+    </button>
+  );
+};
+
+export const PriceIndicator = ({ price }: { price: number }) => {
+  return (
+    <div className="flex flex-row gap-2 bg-zinc-900 p-1 rounded-2xl pb-8">
+      <div className="bg-zinc-700 text-amber-400 rounded-2xl py-2 px-8">
+        ${price}
+      </div>
+    </div>
+  );
 };

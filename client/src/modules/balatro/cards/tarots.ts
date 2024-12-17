@@ -8,7 +8,8 @@ import {
 import { createBaseConsumable } from "./consumables";
 import { getNextCardRank, TarorType } from "../balatro";
 import { CardSuit, EnhancementType } from "./poker-cards";
-import { BalatroEngine, getEconomyManagerPlugin } from "../balatro-engine";
+import { BalatroEngine } from "../balatro-engine";
+import { getEconomyManagerPlugin } from "../plugins/economy-manager-plugin";
 
 type TarotConfigId = string;
 
@@ -96,8 +97,8 @@ const tarotConfigs: Record<TarotConfigId, TarotConfig> = {
   t_the_wheel_of_fortune: {
     id: "t_the_wheel_of_fortune",
     position: {
-      x: 1,
-      y: 0,
+      x: 0,
+      y: 1,
     },
   },
   t_strength: {
@@ -110,74 +111,75 @@ const tarotConfigs: Record<TarotConfigId, TarotConfig> = {
   t_the_hanged_man: {
     id: "t_the_hanged_man",
     position: {
-      x: 1,
-      y: 2,
+      y: 1,
+      x: 2,
     },
   },
   t_death: {
     id: "t_death",
     position: {
-      x: 1,
-      y: 3,
+      y: 1,
+      x: 3,
     },
   },
   t_temperance: {
     id: "t_temperance",
     position: {
-      x: 1,
-      y: 4,
+      y: 1,
+      x: 4,
     },
   },
   t_the_devil: {
     id: "t_the_devil",
     position: {
-      x: 1,
       y: 5,
+      x: 1,
     },
   },
   t_the_tower: {
     id: "t_the_tower",
     position: {
-      x: 1,
-      y: 6,
+      y: 1,
+      x: 6,
     },
   },
   t_the_star: {
     id: "t_the_star",
     position: {
-      x: 1,
-      y: 7,
+      y: 1,
+      x: 7,
     },
   },
   t_the_moon: {
     id: "t_the_moon",
     position: {
-      x: 1,
-      y: 8,
+      y: 1,
+      x: 8,
     },
   },
   t_the_sun: {
     id: "t_the_sun",
     position: {
-      x: 1,
-      y: 9,
+      y: 1,
+      x: 9,
     },
   },
   t_judgment: {
     id: "t_judgment",
     position: {
-      x: 2,
-      y: 0,
+      y: 2,
+      x: 0,
     },
   },
   t_the_world: {
     id: "t_the_world",
     position: {
-      x: 2,
-      y: 1,
+      y: 2,
+      x: 1,
     },
   },
 };
+
 export function getTarotConfig(configId: TarotConfigId): TarotConfig {
   return tarotConfigs[configId];
 }

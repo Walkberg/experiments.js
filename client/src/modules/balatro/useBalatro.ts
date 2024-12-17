@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import {
   BalatroEngine,
   createBalatroEngine,
-  createEconomyManagerPlugin,
   createPlayedCardPlugin,
   createPlayerManagerPlugin,
 } from "./balatro-engine";
+import { createEconomyManagerPlugin } from "./plugins/economy-manager-plugin";
 import { createGamePlugin } from "./plugins/game-manager";
 import { createAnteManagerPlugin } from "./plugins/blind-manager-plugin";
 import { createDeckPlugin } from "./plugins/deck-manager-plugin";

@@ -2,9 +2,9 @@ import { Hand } from "../balatro";
 import {
   BalatroEngine,
   PlayedCardManagerPlugin,
-  EconomyManagerPlugin,
   Plugin,
 } from "../balatro-engine";
+import { EconomyManagerPlugin } from "./economy-manager-plugin";
 import {
   DeckManagerPlugin,
   HandManagerPlugin,

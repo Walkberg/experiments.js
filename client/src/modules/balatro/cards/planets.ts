@@ -8,20 +8,104 @@ import {
 import { createBaseConsumable } from "./consumables";
 import { tarotCards } from "./tarots";
 
+type PlanetConfigId = string;
+
+type Position = {
+  x: number;
+  y: number;
+};
+
+export type TarotConfig = {
+  id: PlanetConfigId;
+  position: Position;
+};
+
+const planetConfigs: Record<PlanetConfigId, TarotConfig> = {
+  p_mercury: {
+    id: "p_mercury",
+    position: {
+      x: 0,
+      y: 3,
+    },
+  },
+  p_venus: {
+    id: "p_venus",
+    position: {
+      x: 1,
+      y: 3,
+    },
+  },
+  p_earth: {
+    id: "p_earth",
+    position: {
+      x: 2,
+      y: 3,
+    },
+  },
+  p_mars: {
+    id: "p_mars",
+    position: {
+      x: 3,
+      y: 3,
+    },
+  },
+  p_jupiter: {
+    id: "p_jupiter",
+    position: {
+      x: 4,
+      y: 3,
+    },
+  },
+  p_saturn: {
+    id: "p_saturn",
+    position: {
+      x: 5,
+      y: 3,
+    },
+  },
+  p_uranus: {
+    id: "p_uranus",
+    position: {
+      x: 6,
+      y: 3,
+    },
+  },
+  p_neptune: {
+    id: "p_neptune",
+    position: {
+      x: 7,
+      y: 3,
+    },
+  },
+  p_pluto: {
+    id: "p_pluto",
+    position: {
+      x: 8,
+      y: 3,
+    },
+  },
+};
+
+export function getPlanetConfig(configId: PlanetConfigId): TarotConfig {
+  return planetConfigs[configId];
+}
+
 export function createPlanetConsumable({
   name,
   description,
   planeteType,
+  configId,
 }: {
   name: string;
   description: string;
   planeteType: PlanetType;
+  configId: PlanetConfigId;
 }): Consumable {
   const planet = createBaseConsumable({
     name,
     description,
     type: "planet",
-    configId: planeteType,
+    configId,
   });
 
   planet.onConsumableUsed = (ctx: BalatroEngine) => {
@@ -50,6 +134,7 @@ export function createMercury(): Consumable {
     name: "Mercure",
     description: "Niveau supérieur Pair. +1 Multi. et +15 Jetons.",
     planeteType: "mercury",
+    configId: "p_mercury",
   });
 }
 
@@ -58,6 +143,7 @@ export function createVenus(): Consumable {
     name: "Vénus",
     description: "Niveau supérieur Brelan. +2 Multi. et +20 Jetons.",
     planeteType: "venus",
+    configId: "p_venus",
   });
 }
 
@@ -66,6 +152,7 @@ export function createEarth(): Consumable {
     name: "Terre",
     description: "Niveau supérieur Full House. +2 Multi. et +25 Jetons.",
     planeteType: "earth",
+    configId: "p_earth",
   });
 }
 
@@ -74,6 +161,7 @@ export function createMars(): Consumable {
     name: "Mars",
     description: "Niveau supérieur Carré. +3 Multi. et +30 Jetons.",
     planeteType: "mars",
+    configId: "p_mars",
   });
 }
 
@@ -82,6 +170,7 @@ export function createJupiter(): Consumable {
     name: "Jupiter",
     description: "Niveau supérieur Couleur. +2 Multi. et +15 Jetons.",
     planeteType: "jupiter",
+    configId: "p_jupiter",
   });
 }
 
@@ -90,6 +179,7 @@ export function createSaturn(): Consumable {
     name: "Saturne",
     description: "Niveau supérieur Suite. +2 Multi. et +25 Jetons.",
     planeteType: "saturn",
+    configId: "p_saturn",
   });
 }
 
@@ -98,6 +188,7 @@ export function createUranus(): Consumable {
     name: "Uranus",
     description: "Niveau supérieur Deux Paires. +1 Multi. et +20 Jetons.",
     planeteType: "uranus",
+    configId: "p_uranus",
   });
 }
 
@@ -106,6 +197,7 @@ export function createNeptune(): Consumable {
     name: "Neptune",
     description: "Niveau supérieur Quite Flush. +3 Multi. et +40 Jetons.",
     planeteType: "neptune",
+    configId: "p_neptune",
   });
 }
 
@@ -114,6 +206,7 @@ export function createPluto(): Consumable {
     name: "Pluton",
     description: "Niveau supérieur Carte Haute. +1 Multi. et +10 Jetons.",
     planeteType: "pluto",
+    configId: "p_pluto",
   });
 }
 

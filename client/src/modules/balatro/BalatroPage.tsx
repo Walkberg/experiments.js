@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Shop } from "./Shop";
 import { BalatroProvider, useCurrentGame } from "./BalatroProvider";
 import { evaluatePokerHand } from "./hand-evaluator";
-import { EconomyManagerPlugin } from "./balatro-engine";
+import { EconomyManagerPlugin } from "./plugins/economy-manager-plugin";
 import { GameManagerPlugin, Phase } from "./plugins/game-manager";
 import { BlindManagerPlugin } from "./plugins/blind-manager-plugin";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
@@ -24,6 +24,7 @@ import { HandBaseScore } from "./modules/hand-score/HandBaseScore";
 import { GameOver } from "./modules/gameover/GameOver";
 import { Deck } from "./modules/deck/Deck";
 import { BalatroHomePage } from "./modules/menu/HomePage";
+import { ConsumableList } from "./modules/consumables/Consumables";
 
 export const BalatroPage = () => {
   return (
@@ -324,83 +325,6 @@ export const CardContainer = ({ children }: CardContainerProps) => {
         </Card>
         <div className="flex flex-row grow p-2">0/2</div>
       </div>
-    </div>
-  );
-};
-
-export function useConsumableManager() {
-  const { balatro } = useCurrentGame();
-
-  const [refresh, setRefresh] = useState(false);
-
-  const consumableManager = balatro?.getPlugin<ConsumablesManagerPlugin>(
-    "consumables-manager"
-  );
-
-  useEffect(() => {
-    if (balatro == null) {
-      return;
-    }
-    balatro.onEvent("consumable-added", () => setRefresh((prev) => !prev));
-    balatro.onEvent("consumable-removed", () => setRefresh((prev) => !prev));
-  }, [balatro]);
-
-  if (consumableManager == null) {
-    return null;
-  }
-
-  return consumableManager;
-}
-
-interface ConsumableListProps {}
-
-export const ConsumableList = ({}: ConsumableListProps) => {
-  const consumableManager = useConsumableManager();
-
-  if (consumableManager == null) {
-    return null;
-  }
-
-  const handleUseConsumable = (consumableId: string) => {
-    consumableManager.useConsumable(consumableId);
-  };
-
-  return (
-    <div className="flex flex-row gap-2">
-      {consumableManager.getConsumables().map((consumable) => (
-        <ConsumableCard
-          key={consumable.id}
-          consumable={consumable}
-          onUse={handleUseConsumable}
-        />
-      ))}
-    </div>
-  );
-};
-
-export const ConsumableCard = ({
-  className,
-  consumable,
-  onUse,
-}: {
-  className?: string;
-  consumable: Consumable;
-  onUse: (consumableId: string) => void;
-}) => {
-  return (
-    <div>
-      <Card
-        className={cn(
-          className,
-          "flex flex-col items-center p-2",
-          consumable.id
-        )}
-      >
-        {consumable.name}
-      </Card>
-      <Button disabled={false} onClick={() => onUse(consumable.id)}>
-        Use
-      </Button>
     </div>
   );
 };
