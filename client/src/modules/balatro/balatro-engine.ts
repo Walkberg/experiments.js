@@ -1,3 +1,4 @@
+import { LogIn } from "lucide-react";
 import { Hand } from "./balatro";
 import { PokerCard } from "./cards/poker-cards";
 
@@ -49,7 +50,7 @@ export interface Plugin {
   init: (engine: BalatroEngine) => void;
 }
 
-export type EventCallback = (payload: any) => void;
+export type EventCallback = (payload: any) => void | Promise<void>;
 
 export function createBalatroEngine(): BalatroEngine {
   const plugins: Record<string, Plugin> = {};
@@ -64,10 +65,17 @@ export function createBalatroEngine(): BalatroEngine {
     eventListeners.get(eventName)!.push(callback);
   }
 
-  function emit(eventName: string, payload: any): void {
+  async function emit(eventName: string, payload: any): Promise<void> {
     const listeners = eventListeners.get(eventName);
+
+    if (eventName === "score-card-calculated") {
+      console.log("emit", listeners);
+    }
+
     if (listeners) {
-      listeners.forEach((callback) => callback(payload));
+      await Promise.all(
+        listeners.map(async (callback) => await callback(payload))
+      );
     }
   }
 
@@ -102,44 +110,6 @@ export function createBalatroEngine(): BalatroEngine {
   };
 
   return engine;
-}
-
-export interface PlayedCardManagerPlugin extends Plugin {
-  reset: () => void;
-  addToHand: (card: PokerCard) => void;
-  getHand: () => Hand;
-}
-
-export function createPlayedCardPlugin(): PlayedCardManagerPlugin {
-  let _engine: BalatroEngine;
-  let _hand: Hand = [];
-
-  function init(engine: BalatroEngine) {
-    _engine = engine;
-  }
-
-  function addToHand(card: PokerCard) {
-    console.log("Adding card to hand");
-    _hand.push(card);
-  }
-
-  function getHand(): PokerCard[] {
-    return [..._hand];
-  }
-
-  function reset() {
-    _hand = [];
-    console.log("Hand reset");
-    _engine.emitEvent("played-card-reset", {});
-  }
-
-  return {
-    name: "played-card",
-    init,
-    addToHand,
-    getHand,
-    reset,
-  };
 }
 
 export interface PlayerConfig {

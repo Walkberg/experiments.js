@@ -1,9 +1,5 @@
 import { Hand } from "../balatro";
-import {
-  BalatroEngine,
-  PlayedCardManagerPlugin,
-  Plugin,
-} from "../balatro-engine";
+import { BalatroEngine, Plugin } from "../balatro-engine";
 import { EconomyManagerPlugin } from "./economy-manager-plugin";
 import {
   DeckManagerPlugin,
@@ -34,7 +30,6 @@ export function createGamePlugin(): GameManagerPlugin {
   let _engine: BalatroEngine;
   let _deck: DeckManagerPlugin;
   let _hand: HandManagerPlugin;
-  let _playedCard: PlayedCardManagerPlugin;
   let _score: ScoreManagerPlugin;
   let _blind: BlindManagerPlugin;
   let _economyManager: EconomyManagerPlugin;
@@ -72,9 +67,7 @@ export function createGamePlugin(): GameManagerPlugin {
       onEnter() {
         changePhase("Play");
       },
-      onExit() {
-        _playedCard.reset();
-      },
+      onExit() {},
       onEvent(event, payload) {
         if (event === "hand-played") {
           setTimeout(() => {
@@ -151,7 +144,6 @@ export function createGamePlugin(): GameManagerPlugin {
 
     _deck = engine.getPlugin<DeckManagerPlugin>("deck")!;
     _hand = engine.getPlugin<HandManagerPlugin>("hand")!;
-    _playedCard = engine.getPlugin<PlayedCardManagerPlugin>("played-card")!;
     _score = engine.getPlugin<ScoreManagerPlugin>("score")!;
     _blind = engine.getPlugin<BlindManagerPlugin>("blind-manager")!;
     _economyManager = engine.getPlugin<EconomyManagerPlugin>("economy")!;
@@ -175,13 +167,10 @@ export function createGamePlugin(): GameManagerPlugin {
   }
 
   function handleEvent(event: string, payload?: any) {
-    console.log("cuurent state", _phase);
-    console.log("handle event", event, payload);
     _currentState.onEvent?.(event, payload);
   }
 
   function changePhase(phase: Phase) {
-    console.log("emitting phase changed", phase);
     _engine.emitEvent("phase-changed", { phase });
   }
 

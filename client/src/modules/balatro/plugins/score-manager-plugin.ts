@@ -1,10 +1,6 @@
 import { getBaseChip } from "../balatro";
 import { PokerCard } from "../cards/poker-cards";
-import {
-  BalatroEngine,
-  PlayedCardManagerPlugin,
-  Plugin,
-} from "../balatro-engine";
+import { BalatroEngine, Plugin } from "../balatro-engine";
 import { evaluatePokerHand } from "../hand-evaluator";
 import {
   BuffonsManagerPlugin,
@@ -58,7 +54,7 @@ export function createScorePlugin(): ScoreManagerPlugin {
     }
   }
 
-  function calculateScore() {
+  async function calculateScore() {
     const handType = evaluatePokerHand(_handManager.getSelectedCards());
     const handBaseScore = _handScoreManager.getHandScore(handType);
 

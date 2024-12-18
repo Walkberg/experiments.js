@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   BalatroEngine,
   createBalatroEngine,
-  createPlayedCardPlugin,
   createPlayerManagerPlugin,
 } from "./balatro-engine";
 import { createEconomyManagerPlugin } from "./plugins/economy-manager-plugin";
@@ -30,8 +29,6 @@ import { createStatManagerPlugin } from "./plugins/stats-manager-plugin";
 export const useBalatroGame = () => {
   const [balatro, setBalatro] = useState<BalatroEngine | null>(null);
 
-  const [refreshCounter, setRefreshCounter] = useState(0);
-
   useEffect(() => {
     const balatro = createBalatroEngine();
 
@@ -42,7 +39,6 @@ export const useBalatroGame = () => {
     const buffonManagerPlugin = createBuffonManagerPlugin();
     const itemsManagerPlugin = createConsumableManagerPlugin();
     const playerManagerPlugin = createPlayerManagerPlugin();
-    const playedCardPlugin = createPlayedCardPlugin();
     const poolManagerPlugin = createPoolManagerPlugin();
     const shopPlugin = createShopPlugin();
     const gamePlugin = createGamePlugin();
@@ -53,8 +49,6 @@ export const useBalatroGame = () => {
     const editionManager = createEditionPlugin();
     const seedManagerPlugin = createSeedManagerPlugin();
     const statManagerPlugin = createStatManagerPlugin();
-
-    console.log("Balatro engine created", itemsPlayer);
 
     poolManagerPlugin.registerBuffons(buffonsPlayer);
     poolManagerPlugin.registerItems(itemsPlayer);
@@ -70,7 +64,6 @@ export const useBalatroGame = () => {
     balatro.registerPlugin(handScoreManager);
     balatro.registerPlugin(deckPlugin);
     balatro.registerPlugin(handPlugin);
-    balatro.registerPlugin(playedCardPlugin);
     balatro.registerPlugin(buffonManagerPlugin);
     balatro.registerPlugin(itemsManagerPlugin);
     balatro.registerPlugin(scorePlugin);
@@ -82,12 +75,12 @@ export const useBalatroGame = () => {
 
     seedManagerPlugin.setSeed("JL4365TK");
 
-    balatro.onEvent("phase-changed", () =>
-      setRefreshCounter(refreshCounter + 1)
-    );
+    console.log("Balatro game created");
 
     setBalatro(balatro);
   }, []);
 
-  return { balatro, refreshCounter };
+  console.log("Balatro game updated");
+
+  return { balatro };
 };

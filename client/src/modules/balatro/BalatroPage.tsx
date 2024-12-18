@@ -68,10 +68,7 @@ export const Balatro = () => {
 
     setPhase(game.getPhase());
 
-    balatro.onEvent("phase-changed", () => {
-      console.log("phase-changed", game.getPhase());
-      setPhase(game.getPhase());
-    });
+    balatro.onEvent("phase-changed", () => setPhase(game.getPhase()));
   }, [balatro]);
 
   return (

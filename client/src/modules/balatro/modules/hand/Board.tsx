@@ -1,5 +1,4 @@
-import { ReactNode, useCallback, useEffect, useState } from "react";
-import { PlayedCardManagerPlugin } from "../../balatro-engine";
+import { useEffect, useState } from "react";
 import { PlayCard } from "../../Card";
 import { useCurrentGame } from "../../BalatroProvider";
 import { Hand } from "./Hand";
@@ -17,24 +16,26 @@ export const Board = () => {
 export const PlayHand = () => {
   const { balatro } = useCurrentGame();
 
-  const playedCardPlugin =
-    balatro?.getPlugin<PlayedCardManagerPlugin>("played-card");
-
   const [hand, setHand] = useState<IHand>([]);
 
-  useEffect(() => {
-    balatro?.onEvent("phase-changed", () => {
-      setHand(playedCardPlugin?.getHand() ?? []);
-    });
-    balatro?.onEvent("hand-played", () =>
-      setHand(playedCardPlugin?.getHand() ?? [])
-    );
-    balatro?.onEvent("played-card-reset", () =>
-      setHand(playedCardPlugin?.getHand() ?? [])
-    );
-  }, [balatro]);
+  const handleScoreCardCalculated = async () => {
+    console.log("score-card-calculated");
+    await new Promise((resolve) => setTimeout(resolve, 4000)); // Attendre 4 secondes
+  };
 
-  console.log("hand", hand);
+  const handleScoreCalculated = () => {
+    setHand([]);
+  };
+
+  useEffect(() => {
+    if (balatro == null) return;
+
+    balatro.onEvent("hand-played", (hand: IHand) => setHand(hand));
+
+    balatro.onEvent("score-card-calculated", handleScoreCardCalculated);
+
+    balatro.onEvent("score-calculated", handleScoreCalculated);
+  }, [balatro]);
 
   return (
     <div className="flex flex-row items-center gap-2">
