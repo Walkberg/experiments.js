@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { PlayCard } from "../../Card";
+import { PlayCard } from "../cards/Card";
 import { useCurrentGame } from "../../BalatroProvider";
 import { Hand } from "./Hand";
 import { Hand as IHand } from "../../balatro";
+import { PlayCards } from "../cards/PokerCards";
 
 export const Board = () => {
   return (
-    <div className="grid grid-rows-2 m-2 gap-4">
+    <div className="grid grid-rows-3 m-2 gap-4 h-full">
       <PlayHand />
-      <Hand />
+      <div className="row-span-2">
+        <Hand />
+      </div>
     </div>
   );
 };
@@ -37,11 +40,5 @@ export const PlayHand = () => {
     balatro.onEvent("score-calculated", handleScoreCalculated);
   }, [balatro]);
 
-  return (
-    <div className="flex flex-row items-center gap-2">
-      {hand.map((handCard) => (
-        <PlayCard key={handCard.id} card={handCard} />
-      ))}
-    </div>
-  );
+  return <PlayCards pokerCards={hand} />;
 };

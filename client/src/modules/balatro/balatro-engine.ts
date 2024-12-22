@@ -3,6 +3,7 @@ import { Hand } from "./balatro";
 import { PokerCard } from "./cards/poker-cards";
 
 export type EventName =
+  | "deck-generated"
   | "change-phase"
   | "phase-changed"
   | "hand-play"

@@ -84,6 +84,10 @@ export function createHandPlugin(): HandManagerPlugin {
   function playHand() {
     _engine.emitEvent("hand-play", {});
 
+    for (const pokerCard of _selectedCards) {
+      playCard(pokerCard);
+    }
+
     _remainingHand--;
 
     _engine.emitEvent("hand-played", _selectedCards);
@@ -112,7 +116,7 @@ export function createHandPlugin(): HandManagerPlugin {
 
   function playCard(pokerCard: PokerCard) {
     _engine.emitEvent("card-play", { cardId: pokerCard.id });
-    removeFromHand(pokerCard.id);
+    //removeFromHand(pokerCard.id);
     _engine.emitEvent("card-played", { cardId: pokerCard.id });
   }
 

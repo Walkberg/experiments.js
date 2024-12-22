@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CardContainer } from "../../BalatroPage";
-import { PlayCard } from "../../Card";
+import { PlayCard } from "../cards/Card";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { sortByRank, sortBySuit } from "../../balatro";
 import { PokerCard as ICard } from "../../cards/poker-cards";
@@ -26,6 +26,7 @@ import {
   rectSortingStrategy,
   useSortable,
 } from "@dnd-kit/sortable";
+import { PlayCards } from "../cards/PokerCards";
 
 interface HandProps {}
 
@@ -96,20 +97,13 @@ export const Hand = ({}: HandProps) => {
   }
 
   return (
-    <div>
+    <div className=" flex flex-col gap-2">
       <CardContainer>
-        <div className="flex flex-row items-center gap-2">
-          {sortedHand.map((handCard) => (
-            <div className="relative">
-              <PlayCard
-                selected={selectedCard.includes(handCard.id)}
-                key={handCard.id}
-                onSelectCard={() => onSelectCard(handCard)}
-                card={handCard}
-              />
-            </div>
-          ))}
-        </div>
+        <PlayCards
+          pokerCards={sortedHand}
+          selectedCards={selectedCard}
+          onSelectCard={onSelectCard}
+        />
       </CardContainer>
       <PlayerActions
         handlePlayHand={handlePlayHand}

@@ -25,6 +25,17 @@ import { GameOver } from "./modules/gameover/GameOver";
 import { Deck } from "./modules/deck/Deck";
 import { BalatroHomePage } from "./modules/menu/HomePage";
 import { ConsumableList } from "./modules/consumables/Consumables";
+import { PlayCardsTest } from "./modules/cards/PokerCards";
+
+export const BalatroTest = () => {
+  return (
+    <div className="grid grid-cols-3  grid-rows-2 gap-2">
+      <PlayCardsTest />
+
+      <div className="flex flex-row gap-2">dsfdf</div>
+    </div>
+  );
+};
 
 export const BalatroPage = () => {
   return (
@@ -77,7 +88,7 @@ export const Balatro = () => {
         <div className="col-span-1">
           <Sidebar />
         </div>
-        <div className="grid grid-rows-4  grid-cols-5 col-span-4 m-2 w-full gap-3">
+        <div className="grid grid-rows-4 grid-cols-5 col-span-4 m-2 w-full h-screen gap-3">
           <div className="col-span-3">
             <CardContainer>
               <Buffons />
@@ -337,13 +348,11 @@ interface CardContainerProps {
 
 export const CardContainer = ({ children }: CardContainerProps) => {
   return (
-    <div className="grid h-full">
-      <div className="h-full py-4">
-        <Card className="flex grow justify-center p-2 bg-black/20 h-full items-center ">
-          {children}
-        </Card>
-        <div className="flex flex-row grow p-2">0/2</div>
-      </div>
+    <div className="h-full py-4">
+      <Card className="flex grow justify-center p-2 bg-black/20 h-full items-center ">
+        {children}
+      </Card>
+      <div className="flex flex-row grow p-2">0/2</div>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Deck } from "../balatro";
 import { PokerCard, CardSuit, CardRank } from "../cards/poker-cards";
 import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
 import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";
+import { getHandManagerPlugin, HandManagerPlugin } from "./hand-manager-plugin";
 
 export function getPlayerManagerPlugin(
   engine: BalatroEngine
@@ -19,6 +20,8 @@ export function getPlayerManagerPlugin(
 export interface DeckManagerPlugin extends Plugin {
   generateDeck: () => void;
   getDeckSize: () => number;
+  getFullDeck: () => Deck;
+  getCurrentDeck: () => Deck;
   drawCard: () => PokerCard | null;
   drawCards: (count: number) => PokerCard[];
   shuffle: () => void;
@@ -27,8 +30,11 @@ export interface DeckManagerPlugin extends Plugin {
 }
 
 export function createDeckPlugin(): DeckManagerPlugin {
+  let _engine: BalatroEngine;
   let _seedManagerPlugin: SeedManagerPlugin;
+
   let _deck: Deck = [];
+  let _hand: PokerCard[] = [];
   let _discard: PokerCard[] = [];
 
   function generateDeck() {
@@ -67,6 +73,8 @@ export function createDeckPlugin(): DeckManagerPlugin {
     _deck = deck;
 
     shuffle();
+
+    _engine.emitEvent("deck-generated", { deck: _deck });
   }
 
   function shuffle() {
@@ -74,20 +82,26 @@ export function createDeckPlugin(): DeckManagerPlugin {
       const j = Math.floor(_seedManagerPlugin.random() * (i + 1));
       [_deck[i], _deck[j]] = [_deck[j], _deck[i]];
     }
-    _deck;
   }
 
   function init(engine: BalatroEngine) {
+    _engine = engine;
     _seedManagerPlugin = getSeedManagerPlugin(engine);
 
     engine.onEvent("card-discarded", (payload) => {
       _discard.push(payload.card);
+    });
+
+    engine.onEvent("card-played", (payload) => {
+      _hand = _hand.filter((card) => card.id !== payload.card.id);
     });
   }
 
   function reset() {
     _deck = [..._deck, ..._discard];
     _discard = [];
+
+    _engine.emitEvent("deck-generated", { deck: _deck });
   }
 
   function drawCard(): PokerCard | null {
@@ -101,8 +115,11 @@ export function createDeckPlugin(): DeckManagerPlugin {
       const card = drawCard();
       if (card) {
         hand.push(card);
+        _hand.push(card);
       }
     }
+
+    _engine.emitEvent("deck-generated", { deck: _deck });
     return hand;
   }
 
@@ -122,11 +139,20 @@ export function createDeckPlugin(): DeckManagerPlugin {
   function getDeckSize(): number {
     return _deck.length;
   }
+  function getCurrentDeck(): Deck {
+    return _deck;
+  }
+
+  function getFullDeck(): Deck {
+    return [..._deck, ..._hand, ..._discard];
+  }
 
   return {
     name: "deck",
     init,
     generateDeck,
+    getCurrentDeck,
+    getFullDeck,
     drawCard,
     drawCards,
     shuffle,
@@ -137,10 +163,10 @@ export function createDeckPlugin(): DeckManagerPlugin {
 }
 
 export function getDeckManagerPlugin(engine: BalatroEngine): DeckManagerPlugin {
-  const test = engine.getPlugin<DeckManagerPlugin>("deck");
+  const deck = engine.getPlugin<DeckManagerPlugin>("deck");
 
-  if (test == null) {
+  if (deck == null) {
     throw new Error("Deck manager plugin not found");
   }
-  return test;
+  return deck;
 }

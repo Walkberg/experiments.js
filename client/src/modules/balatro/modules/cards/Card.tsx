@@ -1,6 +1,6 @@
-import "./test.css";
+import "../../test.css";
 import { Card } from "@/components/ui/card";
-import { getCardLabel, getBaseChip, getCardChips } from "./balatro";
+import { getCardLabel, getBaseChip, getCardChips } from "../../balatro";
 import {
   PokerCard as ICard,
   CardSuit,
@@ -8,7 +8,7 @@ import {
   EditionType,
   EnhancementType,
   SealType,
-} from "./cards/poker-cards";
+} from "../../cards/poker-cards";
 import {
   HoverCard,
   HoverCardContent,
