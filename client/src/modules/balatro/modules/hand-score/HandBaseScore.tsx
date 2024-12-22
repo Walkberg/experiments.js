@@ -59,8 +59,6 @@ export const HandBaseScore = ({}: HandBaseScoreProps) => {
 
   if (hand == null) return <div>No hand</div>;
 
-  console.log("pokerHandType", pokerHandType);
-
   const baseScore = pokerHandType
     ? handScoreManagerPlugin?.getHandScore(pokerHandType)
     : undefined;
@@ -75,7 +73,7 @@ export const HandBaseScore = ({}: HandBaseScoreProps) => {
   const handLevelText = baseScore != null ? `niv.${baseScore.level}` : "";
 
   return (
-    <Card className="flex flex-col items-center align-middle p-2 ">
+    <Card className="flex flex-col items-center align-middle p-2 bg-slate-900 text-white w-full end">
       <div>
         {getPokerHandName(pokerHandType)} {handLevelText}
       </div>

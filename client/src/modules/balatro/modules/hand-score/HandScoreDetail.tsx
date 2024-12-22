@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { ScoreDetail } from "../../BalatroPage";
 import { PlanetType } from "../../balatro";
 
-const useBalatroHandScore = () => {
+export const useBalatroHandScore = () => {
   const [refresh, setRefresh] = useState(false);
   const [handScoreManager, setHandScoreManager] =
     useState<HandScoreManagerPlugin>();

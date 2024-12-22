@@ -30,11 +30,12 @@ export interface BlindManagerPlugin extends Plugin {
   getCurrentBlind: () => Blind | null;
   getCurrentAnte: () => Ante | null;
   selectNextBlind: () => void;
+  pickBlind: () => void;
+  reset: () => void;
 }
 
 export function createAnteManagerPlugin(): BlindManagerPlugin {
   let _engine: BalatroEngine;
-  let currentBlind: BlindConfig;
 
   let _currentAnte = 1;
   let _currentBlind = 0;
@@ -42,10 +43,8 @@ export function createAnteManagerPlugin(): BlindManagerPlugin {
   let _antes: Ante[] = [];
 
   function init(engine: BalatroEngine) {
-    currentBlind = createSmallBlind();
-
-    _antes = generateAntes();
     _engine = engine;
+    reset();
   }
 
   function generateAntes(): Ante[] {
@@ -87,10 +86,13 @@ export function createAnteManagerPlugin(): BlindManagerPlugin {
     return ante;
   }
 
+  function pickBlind(): void {
+    _engine.emitEvent("blind-selected", _currentAnte);
+  }
+
   function selectNextBlind(): void {
     const currentAnte = getCurrentAnte();
-    console.log("currentAnte", currentAnte);
-    console.log("_currentBlind", _currentBlind);
+
     if (currentAnte == null) {
       return;
     }
@@ -104,12 +106,20 @@ export function createAnteManagerPlugin(): BlindManagerPlugin {
     }
   }
 
+  function reset() {
+    _currentAnte = 1;
+    _currentBlind = 0;
+    _antes = generateAntes();
+  }
+
   return {
     name: "blind-manager",
     init,
     getCurrentBlind,
     getCurrentAnte,
     selectNextBlind,
+    pickBlind,
+    reset: () => {},
   };
 }
 
@@ -130,7 +140,7 @@ function createBlind(config: BlindConfig, currentAnte: number): Blind {
     throw new Error("No ante config found for ante level " + currentAnte);
   }
   return {
-    name: "Blind",
+    name: config.name,
     score: anteConfig.baseChip * config.amountMultiplier,
     reward: config.money,
   };
@@ -142,7 +152,7 @@ function createSmallBlind(): BlindConfig {
   return {
     id: "1",
     amountMultiplier: 1,
-    name: "Blind",
+    name: "small blind",
     description: "Blind",
     mininimumAnte: 0,
     money: 3,
@@ -153,7 +163,7 @@ function createBigBlind(): BlindConfig {
   return {
     id: "1",
     amountMultiplier: 1.5,
-    name: "Blind",
+    name: "big blind",
     description: "Blind",
     mininimumAnte: 0,
     money: 4,
@@ -164,7 +174,7 @@ function createBossBlind1(): BlindConfig {
   return {
     id: "1",
     amountMultiplier: 2,
-    name: "Blind",
+    name: "boss blind",
     description: "Blind",
     mininimumAnte: 0,
     money: 4,

@@ -6,6 +6,7 @@ import {
   HandManagerPlugin,
   ScoreManagerPlugin,
   BlindManagerPlugin,
+  ShopPlugin,
 } from ".";
 
 export type Phase =
@@ -13,6 +14,7 @@ export type Phase =
   | "Start"
   | "Pause"
   | "Play"
+  | "BlindWin"
   | "Score"
   | "Shop"
   | "Blind"
@@ -33,6 +35,7 @@ export function createGamePlugin(): GameManagerPlugin {
   let _score: ScoreManagerPlugin;
   let _blind: BlindManagerPlugin;
   let _economyManager: EconomyManagerPlugin;
+  let _shopManager: ShopPlugin;
 
   let _phase: Phase = "Pause";
 
@@ -96,34 +99,43 @@ export function createGamePlugin(): GameManagerPlugin {
                 transitionTo("Play");
               }
             } else {
-              transitionTo("Shop");
+              transitionTo("BlindWin");
             }
           }, 1000);
         }
       },
     },
+    BlindWin: {
+      onEnter() {
+        changePhase("BlindWin");
+      },
+      onExit() {},
+      onEvent(event, payload) {
+        if (event === "phase-next") {
+          transitionTo("Shop");
+        }
+      },
+    },
     Shop: {
       onEnter() {
+        _shopManager.resetShop();
         changePhase("Shop");
       },
       onExit() {},
       onEvent(event, payload) {
         if (event === "phase-next") {
+          _blind.selectNextBlind();
           transitionTo("Blind");
         }
       },
     },
     Blind: {
       onEnter() {
-        console.log("Blind");
         changePhase("Blind");
       },
       onExit() {},
       onEvent(event, payload) {
-        console.log("blind-selected", event);
         if (event === "blind-selected") {
-          _deck.generateDeck();
-          _hand.reset();
           _score.resetScore();
           _hand.fillHand();
           transitionTo("Play");
@@ -147,6 +159,7 @@ export function createGamePlugin(): GameManagerPlugin {
     _score = engine.getPlugin<ScoreManagerPlugin>("score")!;
     _blind = engine.getPlugin<BlindManagerPlugin>("blind-manager")!;
     _economyManager = engine.getPlugin<EconomyManagerPlugin>("economy")!;
+    _shopManager = engine.getPlugin<ShopPlugin>("shop")!;
 
     _engine.onEvent("hand-played", (hand) => handleEvent("hand-played", hand));
     _engine.onEvent("score-calculated", () => handleEvent("score-calculated"));

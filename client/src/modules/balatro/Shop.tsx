@@ -45,7 +45,7 @@ export const Shop = ({}: ShopProps) => {
   const items = shopManager.getItems();
 
   return (
-    <div className="rounded-2xl bg-zinc-900 grid grid-rows-2 gap-2 p-4 border-red-500 border-2 h-full">
+    <div className="rounded-2xl bg-zinc-900 bg-opacity-90 grid grid-rows-2 gap-2 p-4 border-red-500 border-2 h-full">
       <div className="grid grid-cols-4 grid-rows-2 gap-2">
         <Button
           className=" bg-red-500 w-full h-full hover:bg-red-700 row-start-1"

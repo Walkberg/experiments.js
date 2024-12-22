@@ -14,7 +14,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { ReactNode, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { animated, useSpring } from "@react-spring/web";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,7 @@ export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
   return (
     <HoverCard openDelay={50} closeDelay={50}>
       <HoverCardTrigger>
-        <AnimatedCard card={card}>
+        <AnimatedCard>
           <Card
             onClick={onSelectCard}
             className={cn(
@@ -130,7 +130,11 @@ export const CardView = ({ card, ...props }: CardBackgroundProps) => {
   );
 };
 
-export const AnimatedCard = ({ children }: CardBackgroundProps) => {
+interface AnimatedCardProps {
+  children: ReactNode;
+}
+
+export const AnimatedCard = ({ children }: AnimatedCardProps) => {
   const [styles] = useSpring(
     () => ({
       config: { mass: 0.5, tension: 1, friction: 1, clamp: true },
@@ -165,12 +169,61 @@ export const AnimatedCard = ({ children }: CardBackgroundProps) => {
     });
   };
 
+  const handleMouseHover = () => {
+    setStyle({
+      transform: "rotateX(0) rotateY(0)",
+      transition: "transform 0.5s ease",
+    });
+  };
+
+  const constrain = 5;
+  const cardRef = useRef(null);
+
+  const transforms = (x: number, y: number, el: HTMLDivElement): string => {
+    el.style.transform = "";
+    const box = el.getBoundingClientRect();
+
+    const calcX =
+      -(y - box.y - box.height / 2) /
+      (el.dataset.scale === "2" ? constrain * 2 : constrain);
+    const calcY =
+      (x - box.x - (box.width || 71) / 2) /
+      (el.dataset.scale === "2" ? constrain * 2 : constrain);
+
+    if (box.width === 0) {
+      return (
+        `translate(35.5px) perspective(${94}px) ` +
+        `rotateX(${calcX}deg) ` +
+        `rotateY(${calcY}deg) translate(-35.5px)`
+      );
+    }
+
+    return (
+      `perspective(${94}px) ` + `rotateX(${calcX}deg) ` + `rotateY(${calcY}deg)`
+    );
+  };
+
+  const hoverCard = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const position = [e.clientX, e.clientY];
+
+    target.style.transform = transforms(position[0], position[1], target);
+  };
+
+  const noHoverCard = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.transform = "";
+  };
+
   return (
     <animated.div style={{ ...styles }}>
       <div
+        ref={cardRef}
         style={style}
-        onMouseMove={handleMouseMove}
+        //onMouseMove={handleMouseMove}
+        onMouseMove={hoverCard}
+        onMouseOut={noHoverCard}
         onMouseLeave={handleMouseLeave}
+        onMouseOver={handleMouseHover}
       >
         {children}
       </div>

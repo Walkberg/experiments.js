@@ -26,6 +26,9 @@ import { Deck } from "./modules/deck/Deck";
 import { BalatroHomePage } from "./modules/menu/HomePage";
 import { ConsumableList } from "./modules/consumables/Consumables";
 import { PlayCardsTest } from "./modules/cards/PokerCards";
+import { RunInfo } from "./modules/run-info/RunInfo";
+import { BlindInfo } from "./modules/blinds/BlindInfo";
+import { BlindWin } from "./modules/blinds/BlindWin";
 
 export const BalatroTest = () => {
   return (
@@ -84,7 +87,7 @@ export const Balatro = () => {
 
   return (
     <>
-      <div className="grid grid-cols-5 bg-green-800 background-tv">
+      <div className="grid grid-cols-5  bg-green-800 background-tv overflow-hidden">
         <div className="col-span-1">
           <Sidebar />
         </div>
@@ -104,6 +107,8 @@ export const Balatro = () => {
               <Ante />
             ) : phase === "Shop" ? (
               <Shop />
+            ) : phase === "BlindWin" ? (
+              <BlindWin />
             ) : (
               <Board />
             )}
@@ -136,36 +141,19 @@ export const Sidebar = () => {
   }, [balatro]);
 
   return (
-    <div className="grid grid-rows-3 gap-2">
-      {phase === "Shop" ? <div>SHOP</div> : <Blind />}
-
-      <div className="grid grid-rows-2 gap-2 ">
+    <div className="grid grid-rows-3 bg-zinc-800 bg-opacity-80 p-2 ml-6">
+      {phase === "Shop" ? (
+        <div className="flex flex-col items-center">
+          <img alt="shop" src="../assets/shop.webp" />
+        </div>
+      ) : (
+        <BlindInfo />
+      )}
+      <div className="flex flex-col gap-2 ">
         <Score />
         <HandBaseScore />
       </div>
       <PlayerInfo />
-
-      {/* <Dialog>
-        <DialogTrigger>
-          <Button>Detail</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <BaseScoreDetail baseScoreList={player.baseScoreList} />
-        </DialogContent>
-        <Button onClick={handleImproveHand}>Improve Hand</Button>
-      </Dialog>
-      <div>
-        hand that score :
-        <div className=" flex flex-col ">
-          {getScoringHand(selectedCard).map((hand) => (
-            <div className=" flex flex-row gap-2">
-              {hand.map((card) => (
-                <div>{card.id}</div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div> */}
     </div>
   );
 };
@@ -213,26 +201,43 @@ export const PlayerInfo = () => {
 
   return (
     <div className="grid flex-row gap-4">
-      <Button className="row-span-2">Run Info</Button>
-      <Button className="col-start-1 row-start-3">Options</Button>
+      <RunInfo />
+      <Button className="bg-orange-500 hover:bg-orange-700 h-full col-start-1 row-start-3">
+        Options
+      </Button>
       <ItemContainer className="col-start-2 row-start-1" name="hands">
-        <Button>{remainingHand}</Button>
+        <ItemText className="text-blue-500">{remainingHand}</ItemText>
       </ItemContainer>
       <ItemContainer name="discards">
-        <Button>{remainingDiscard}</Button>
+        <ItemText className="text-red-500">{remainingDiscard}</ItemText>
       </ItemContainer>
       <ItemCard className="col-span-2 col-start-2 row-start-2">
         <ItemTest>
-          <Button>${economyManager.getMoney()}</Button>
+          <ItemText className="text-orange-500">
+            ${economyManager.getMoney()}
+          </ItemText>
         </ItemTest>
       </ItemCard>
       <ItemContainer className="row-start-3" name="antes">
-        <Button>0</Button>
+        <ItemText>1/8</ItemText>
       </ItemContainer>
       <ItemContainer className="row-start-3" name="rounds">
-        <Button>1</Button>
+        <ItemText className="text-orange-500">1</ItemText>
       </ItemContainer>
-      <HandScoreDetail />
+    </div>
+  );
+};
+
+export const ItemText = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <div className={cn(className, "text-center text-3xl font-bold")}>
+      {children}
     </div>
   );
 };
@@ -250,18 +255,25 @@ export const ItemContainer = ({
 }: ItemContainerProps) => {
   return (
     <ItemCard className={className}>
-      <div className="flex items-center justify-center">{name}</div>
+      <div className="flex items-center justify-center text-white text-lg font-semibold">
+        {name}
+      </div>
       <ItemTest>{children}</ItemTest>
     </ItemCard>
   );
 };
 
 interface ItemTestProps {
+  className?: string;
   children: React.ReactNode;
 }
 
-export const ItemTest = ({ children }: ItemTestProps) => {
-  return <div className="flex flex-col">{children}</div>;
+export const ItemTest = ({ children, className }: ItemTestProps) => {
+  return (
+    <div className="bg-slate-700 flex flex-col rounded-3xl  p-2">
+      {children}
+    </div>
+  );
 };
 
 interface ItemCardProps {
@@ -270,7 +282,13 @@ interface ItemCardProps {
 }
 
 export const ItemCard = ({ children, className }: ItemCardProps) => {
-  return <Card className={cn(className, "flex flex-col p-2")}>{children}</Card>;
+  return (
+    <Card
+      className={cn(className, "bg-slate-900 text-white flex flex-col p-2")}
+    >
+      {children}
+    </Card>
+  );
 };
 
 interface ScoreProps {}
@@ -297,48 +315,10 @@ export const Score = ({}: ScoreProps) => {
   }, [balatro]);
 
   return (
-    <Card className="flex flex-row items-center align-middle p-2 justify-center ">
+    <Card className="bg-slate-900 text-white flex flex-row items-center align-middle p-2 justify-center ">
       <div>Round Score</div>
       <ItemCard>{score}</ItemCard>
     </Card>
-  );
-};
-
-interface BlindProps {}
-
-export const Blind = ({}: BlindProps) => {
-  const { balatro } = useCurrentGame();
-
-  if (balatro == null) {
-    return <div>not defiend</div>;
-  }
-
-  const plugin = balatro?.getPlugin<BlindManagerPlugin>("blind-manager");
-
-  const currentBlind = plugin?.getCurrentBlind();
-
-  if (plugin == null || currentBlind == null) {
-    throw new Error("balatro is not defined");
-  }
-
-  return (
-    <div className="grid  flex-col items-center ">
-      <Card className="justify-center">Small Blind</Card>
-      <Card className="flex flex-row items-center justify-center gap-8 p-8">
-        <div>Blind Icon</div>
-        <Card className="flex flex-col">
-          <div>Score at least</div>
-          <div className="flex flex-row">
-            <div>seal Icon</div>
-            <div>{currentBlind.score}</div>
-          </div>
-          <div className="flex flex-row">
-            <div>Reward</div>
-            <div>$$$</div>
-          </div>
-        </Card>
-      </Card>
-    </div>
   );
 };
 
@@ -454,9 +434,13 @@ interface ScoreDetailProps {
 export const ScoreDetail = ({ score }: ScoreDetailProps) => {
   return (
     <div className="flex flex-row items-center gap-2">
-      <Button className="bg-blue-500">{score.chip}</Button>
-      <div>X</div>
-      <Button className="bg-red-500">{score.multiplier}</Button>
+      <div className="bg-blue-500 p-2 rounded-lg text-white w-full text-center text-xl">
+        {score.chip}
+      </div>
+      <div className="text-red-500 text-3xl">X</div>
+      <div className="bg-red-500 p-2 rounded-lg text-white w-full text-center text-xl">
+        {score.multiplier}
+      </div>
     </div>
   );
 };

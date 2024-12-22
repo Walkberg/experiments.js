@@ -17,6 +17,7 @@ export interface ShopPlugin extends Plugin {
   rerollShop: () => void;
   canReroll: () => boolean;
   canBuyItem: (itemId: string) => boolean;
+  resetShop: () => void;
 }
 
 export type Buyable = BuyableBuffon | BuyableConsumable;
@@ -81,6 +82,7 @@ export function createShopPlugin(): ShopPlugin {
   }
 
   function resetShop() {
+    rerollPrice = REROLL_START_PRICE;
     const buffons = _poolManager.getPool();
 
     const consumables = _poolManager.getRandomConsumables(2);
@@ -189,6 +191,7 @@ export function createShopPlugin(): ShopPlugin {
     rerollShop,
     canReroll,
     canBuyItem,
+    resetShop,
   };
 }
 
