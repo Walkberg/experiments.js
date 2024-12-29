@@ -3,7 +3,7 @@ import { Deck } from "../balatro";
 import { PokerCard, CardSuit, CardRank } from "../cards/poker-cards";
 import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
 import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";
-import { getHandManagerPlugin, HandManagerPlugin } from "./hand-manager-plugin";
+import { DeckConfigId, DeckImpl } from "../decks/decks";
 
 export function getPlayerManagerPlugin(
   engine: BalatroEngine
@@ -18,7 +18,6 @@ export function getPlayerManagerPlugin(
 }
 
 export interface DeckManagerPlugin extends Plugin {
-  generateDeck: () => void;
   getDeckSize: () => number;
   getFullDeck: () => Deck;
   getCurrentDeck: () => Deck;
@@ -28,6 +27,8 @@ export interface DeckManagerPlugin extends Plugin {
   addCard: (card: PokerCard) => void;
   removeCard: (cardId: string) => boolean;
   resetDeck: () => void;
+  setDeck: (deck: DeckImpl) => void;
+  getDeckConfig: () => DeckConfigId | null;
 }
 
 export function createDeckPlugin(): DeckManagerPlugin {
@@ -38,13 +39,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
   let _hand: PokerCard[] = [];
   let _discard: PokerCard[] = [];
 
-  function generateDeck() {
-    _deck = generateBasicDeck();
-
-    shuffle();
-
-    _engine.emitEvent("deck-generated", { deck: _deck });
-  }
+  let _deckImpl: DeckImpl;
 
   function shuffle() {
     for (let i = _deck.length - 1; i > 0; i--) {
@@ -122,10 +117,25 @@ export function createDeckPlugin(): DeckManagerPlugin {
     return [..._deck, ..._hand, ..._discard];
   }
 
+  function getDeckConfig(): DeckConfigId | null {
+    if (_deckImpl == null) {
+      return null;
+    }
+    return _deckImpl.configId;
+  }
+
+  function setDeck(deck: DeckImpl) {
+    deck.enable(_engine);
+
+    _deck = deck.deckStrategy(_engine);
+    _deckImpl = deck;
+
+    _engine.emitEvent("deck-selected", { deck: _deck });
+  }
+
   return {
     name: "deck",
     init,
-    generateDeck,
     getCurrentDeck,
     getFullDeck,
     drawCard,
@@ -135,6 +145,8 @@ export function createDeckPlugin(): DeckManagerPlugin {
     removeCard,
     getDeckSize,
     resetDeck: reset,
+    setDeck,
+    getDeckConfig,
   };
 }
 
@@ -155,27 +167,6 @@ const ALL_RANKS: CardRank[] = [
   "K",
   "A",
 ];
-
-function generateBasicDeck() {
-  const suits: CardSuit[] = ALL_SUITS;
-  const ranks: CardRank[] = ALL_RANKS;
-
-  let deck: Deck = [];
-
-  suits.forEach((suit) => {
-    ranks.forEach((rank) => {
-      deck.push({
-        suit,
-        rank,
-        id: uuid(),
-        enhancement: "none",
-        edition: "base",
-        seal: "none",
-      });
-    });
-  });
-  return deck;
-}
 
 export function getDeckManagerPlugin(engine: BalatroEngine): DeckManagerPlugin {
   const deck = engine.getPlugin<DeckManagerPlugin>("deck");

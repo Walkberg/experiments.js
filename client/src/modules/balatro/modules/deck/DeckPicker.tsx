@@ -3,6 +3,9 @@ import { DeckUI } from "./Deck";
 import { Button } from "@/components/ui/button";
 import { useDecks } from "./useDecks";
 import { getDeckConfig } from "../../decks/decks";
+import { useCurrentGame } from "../../BalatroProvider";
+import { GameManagerPlugin } from "../../plugins/game-manager";
+import { getDecksPlugin } from "../../plugins/decks-manager-plugin";
 
 export const DeckPicker = () => {
   const [currentDeck, setCurrentDeck] = useState<string | null>(null);
@@ -15,6 +18,24 @@ export const DeckPicker = () => {
     return null;
   }
 
+  const { balatro } = useCurrentGame();
+
+  const game = balatro?.getPlugin<GameManagerPlugin>("game");
+
+  if (game == null) {
+    return null;
+  }
+
+  if (balatro == null) {
+    return null;
+  }
+
+  const deckManagerPlugin = getDecksPlugin(balatro);
+
+  const handleStartGame = () => {
+    deckManagerPlugin.pickDeck(selectedDeck.id);
+  };
+
   const deckConfig = getDeckConfig(selectedDeck.configId);
 
   const handleNextDeck = () => {
@@ -25,12 +46,12 @@ export const DeckPicker = () => {
 
   const handlePreviousDeck = () => {
     const currentIndex = decks.findIndex((deck) => deck.name === currentDeck);
-    const previousIndex = (currentIndex - 1) % decks.length;
+    const previousIndex = (currentIndex - 1 + decks.length) % decks.length;
     setCurrentDeck(decks[previousIndex].name);
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <ContainerBis>
         <ArrowButton onClick={handlePreviousDeck}>{"<"}</ArrowButton>
         <Container>
@@ -59,7 +80,10 @@ export const DeckPicker = () => {
         </Container>
         <ArrowButton onClick={() => {}}>{">"}</ArrowButton>
       </ContainerBis>
-    </>
+      <Button onClick={handleStartGame} className=" bg-sky-600 m-10">
+        Jouer
+      </Button>
+    </div>
   );
 };
 

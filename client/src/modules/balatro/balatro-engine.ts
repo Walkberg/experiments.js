@@ -1,4 +1,5 @@
 export type EventName =
+  | "deck-selected"
   | "deck-generated"
   | "change-phase"
   | "phase-changed"

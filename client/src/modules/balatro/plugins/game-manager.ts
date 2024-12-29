@@ -11,6 +11,7 @@ import {
 
 export type Phase =
   | "Menu"
+  | "DeckPicker"
   | "Start"
   | "Pause"
   | "Play"
@@ -48,13 +49,29 @@ export function createGamePlugin(): GameManagerPlugin {
         changePhase("Menu");
       },
       onExit() {},
-      onEvent() {},
+      onEvent(event, payload) {
+        console.log("event", event, payload);
+        if (event === "phase-next") {
+          transitionTo("DeckPicker");
+        }
+      },
+    },
+    DeckPicker: {
+      onEnter() {
+        changePhase("DeckPicker");
+      },
+      onExit() {},
+      onEvent(event, payload) {
+        console.log("event", event, payload);
+        if (event === "deck-selected") {
+          transitionTo("Start");
+        }
+      },
     },
     Start: {
       onEnter() {
         changePhase("Start");
         _blind.reset();
-        _deck.generateDeck();
         _hand.fillHand();
         transitionTo("Blind");
       },
@@ -177,13 +194,14 @@ export function createGamePlugin(): GameManagerPlugin {
     _engine.onEvent("score-calculated", () => handleEvent("score-calculated"));
     _engine.onEvent("phase-next", () => handleEvent("phase-next"));
     _engine.onEvent("blind-selected", () => handleEvent("blind-selected"));
+    _engine.onEvent("deck-selected", () => handleEvent("deck-selected"));
 
     transitionTo("Menu");
   }
 
   function transitionTo(phase: Phase) {
     _phase = phase;
-    console.log(`Transitioning to phase: ${phase}`);
+
     if (_currentState) {
       _currentState.onExit?.();
     }

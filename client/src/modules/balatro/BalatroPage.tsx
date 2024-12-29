@@ -58,7 +58,15 @@ export const BalatroGame = () => {
     balatro.onEvent("phase-changed", () => setPhase(game.getPhase()));
   }, [balatro]);
 
-  return <>{phase === "Menu" ? <BalatroHomePage /> : <Balatro />}</>;
+  return (
+    <>
+      {phase === "Menu" || phase == "DeckPicker" ? (
+        <BalatroHomePage />
+      ) : (
+        <Balatro />
+      )}
+    </>
+  );
 };
 
 export const Balatro = () => {

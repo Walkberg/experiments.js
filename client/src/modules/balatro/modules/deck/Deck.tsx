@@ -4,13 +4,12 @@ import { DeckManagerPlugin } from "../../plugins";
 import { useEffect, useState } from "react";
 import { Deck as IDeck } from "../../balatro";
 import { CardRank, CardSuit, PokerCard } from "../../cards/poker-cards";
-import { PlayCard } from "../cards/Card";
 import { PlayCards } from "../cards/PokerCards";
 import { DeckConfigId, getDeckConfig } from "../../decks/decks";
-
 function useDeck() {
   const [fullDeck, setFullDeck] = useState<IDeck | null>(null);
   const [deck, setDeck] = useState<IDeck | null>(null);
+  const [deckConfigId, setDeckConfigId] = useState<DeckConfigId | null>(null);
 
   const { balatro } = useCurrentGame();
 
@@ -28,24 +27,23 @@ function useDeck() {
     balatro.onEvent("deck-generated", () => setDeck(manager.getCurrentDeck()));
     balatro.onEvent("deck-generated", () => setFullDeck(manager.getFullDeck()));
 
-    balatro.onEvent("deck-generated", () => setFullDeck(manager.getFullDeck()));
-
     setDeck(manager.getCurrentDeck());
     setFullDeck(manager.getFullDeck());
+    setDeckConfigId(manager.getDeckConfig());
   }, [balatro]);
 
   console.log("deck", deck);
   console.log("full", fullDeck);
 
-  return { deck, fullDeck };
+  return { deck, fullDeck, deckConfigId };
 }
 
 interface DeckProps {}
 
 export const Deck = ({}: DeckProps) => {
-  const { deck, fullDeck } = useDeck();
+  const { deck, fullDeck, deckConfigId } = useDeck();
 
-  if (deck == null || fullDeck == null) {
+  if (deck == null || fullDeck == null || deckConfigId == null) {
     return null;
   }
 
@@ -53,7 +51,7 @@ export const Deck = ({}: DeckProps) => {
     <div className="flex flex-col items-center gap-2 pb-8">
       <Dialog>
         <DialogTrigger>
-          <DeckUI configId={"d_red_deck"} />
+          <DeckUI configId={deckConfigId} />
         </DialogTrigger>
         <DialogContent className="max-w-screen-2xl ">
           <DeckDetail fullDeck={fullDeck} deck={deck} />

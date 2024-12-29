@@ -35,14 +35,16 @@ export const PlayGame = () => {
     return null;
   }
 
-  const handleStartGame = () => {
-    game.startGame();
+  const handlePlayGame = () => {
+    game.startNextPhase();
   };
 
   return (
     <Dialog>
       <DialogTrigger>
-        <Button className="bg-blue-600">Jouer</Button>
+        <Button className="bg-blue-600" onClick={handlePlayGame}>
+          Jouer
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl">
         <div className="flex flex-col items-center">
@@ -51,12 +53,7 @@ export const PlayGame = () => {
             <Button className="bg-red-500 w-48">Continuer</Button>
             <Button className="bg-red-500 w-48">Défis</Button>
           </div>
-          <div className="flex flex-col gap-4">
-            <DeckPicker />
-            <Button onClick={handleStartGame} className=" bg-sky-600 m-10">
-              Jouer
-            </Button>
-          </div>
+          <DeckPicker />
         </div>
       </DialogContent>
     </Dialog>

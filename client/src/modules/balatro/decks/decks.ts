@@ -1,8 +1,28 @@
 import { v4 as uuid } from "uuid";
 import { Deck } from "../balatro";
-import { CardRank, CardSuit } from "../cards/poker-cards";
-import { SeedManagerPlugin } from "../plugins/seed-manager-plugin";
+import {
+  CardRank,
+  CardSuit,
+  EnhancementType,
+  PokerCard,
+} from "../cards/poker-cards";
+import {
+  getSeedManagerPlugin,
+  SeedManagerPlugin,
+} from "../plugins/seed-manager-plugin";
 import { BalatroEngine } from "../balatro-engine";
+
+const allEnhancements: EnhancementType[] = [
+  "none",
+  "bonus",
+  "mult",
+  "wildcard",
+  "glass",
+  "steel",
+  "stone",
+  "gold",
+  "lucky",
+];
 
 const allSuits: CardSuit[] = ["hearts", "diamonds", "clubs", "spades"];
 
@@ -35,6 +55,21 @@ const noFaceRanks: CardRank[] = [
   "A",
 ];
 
+function createBaseCard(
+  rank: CardRank,
+  suit: CardSuit,
+  enhancement?: EnhancementType
+): PokerCard {
+  return {
+    suit: suit,
+    rank: rank,
+    id: uuid(),
+    enhancement: enhancement ?? "none",
+    edition: "base",
+    seal: "none",
+  };
+}
+
 function generateDeck(): Deck {
   const suits: CardSuit[] = allSuits;
   const ranks: CardRank[] = allRanks;
@@ -43,14 +78,7 @@ function generateDeck(): Deck {
 
   suits.forEach((suit) => {
     ranks.forEach((rank) => {
-      deck.push({
-        suit,
-        rank,
-        id: uuid(),
-        enhancement: "bonus",
-        edition: "base",
-        seal: "none",
-      });
+      deck.push(createBaseCard(rank, suit));
     });
   });
 
@@ -65,14 +93,7 @@ function generateDeckTwoSuit(): Deck {
 
   suits.forEach((suit) => {
     ranks.forEach((rank) => {
-      deck.push({
-        suit,
-        rank,
-        id: uuid(),
-        enhancement: "bonus",
-        edition: "base",
-        seal: "none",
-      });
+      deck.push(createBaseCard(rank, suit));
     });
   });
 
@@ -87,14 +108,7 @@ function generateDeckNoFace(): Deck {
 
   suits.forEach((suit) => {
     ranks.forEach((rank) => {
-      deck.push({
-        suit,
-        rank,
-        id: uuid(),
-        enhancement: "bonus",
-        edition: "base",
-        seal: "none",
-      });
+      deck.push(createBaseCard(rank, suit));
     });
   });
 
@@ -103,20 +117,21 @@ function generateDeckNoFace(): Deck {
 
 function generateRandom(seedManager: SeedManagerPlugin): Deck {
   const suits: CardSuit[] = allSuits;
-  const ranks: CardRank[] = noFaceRanks;
+  const ranks: CardRank[] = allRanks;
 
   let deck: Deck = [];
 
   suits.forEach((suit) => {
     ranks.forEach((rank) => {
-      deck.push({
-        suit: suits[seedManager.random() * suits.length],
-        rank: ranks[seedManager.random() * ranks.length],
-        id: uuid(),
-        enhancement: "bonus",
-        edition: "base",
-        seal: "none",
-      });
+      deck.push(
+        createBaseCard(
+          ranks[Math.floor(seedManager.random() * ranks.length)],
+          suits[Math.floor(seedManager.random() * suits.length)],
+          allEnhancements[
+            Math.floor(seedManager.random() * allEnhancements.length)
+          ]
+        )
+      );
     });
   });
 
@@ -162,6 +177,33 @@ const deckConfigs: Record<DeckConfigId, DeckConfig> = {
       y: 2,
     },
   },
+  d_abandonned_deck: {
+    id: "d_abandonned_deck",
+    name: "Deck abandone",
+    description: "le deck abandone",
+    position: {
+      x: 3,
+      y: 3,
+    },
+  },
+  d_eratic_deck: {
+    id: "d_eratic_deck",
+    name: "Deck eratic",
+    description: "le deck eratic",
+    position: {
+      x: 2,
+      y: 3,
+    },
+  },
+  d_checked_pattern_deck: {
+    id: "d_checked_pattern_deck",
+    name: "Deck damier",
+    description: "le deck damier",
+    position: {
+      x: 1,
+      y: 3,
+    },
+  },
 };
 
 export function getDeckConfig(configId: DeckConfigId): DeckConfig {
@@ -185,7 +227,7 @@ export interface DeckImpl {
   name: string;
   configId: DeckConfigId;
   deckStrategy: (ctx: BalatroEngine) => Deck;
-  enabled: (ctx: BalatroEngine) => void;
+  enable: (ctx: BalatroEngine) => void;
 }
 
 const basicDeckStrategy = generateDeck();
@@ -199,7 +241,7 @@ function createRedDeck(): DeckImpl {
   return {
     ...baseDeck,
     deckStrategy: (ctx: BalatroEngine) => basicDeckStrategy,
-    enabled: (ctx: BalatroEngine) => {},
+    enable: (ctx: BalatroEngine) => {},
   };
 }
 
@@ -210,7 +252,7 @@ function createBlueDeck(): DeckImpl {
   return {
     ...baseDeck,
     deckStrategy: (ctx: BalatroEngine) => basicDeckStrategy,
-    enabled: (ctx: BalatroEngine) => {},
+    enable: (ctx: BalatroEngine) => {},
   };
 }
 
@@ -221,7 +263,7 @@ function createYellowDeck(): DeckImpl {
   return {
     ...baseDeck,
     deckStrategy: (ctx: BalatroEngine) => basicDeckStrategy,
-    enabled: (ctx: BalatroEngine) => {},
+    enable: (ctx: BalatroEngine) => {},
   };
 }
 
@@ -232,7 +274,45 @@ function createGreenDeck(): DeckImpl {
   return {
     ...baseDeck,
     deckStrategy: (ctx: BalatroEngine) => basicDeckStrategy,
-    enabled: (ctx: BalatroEngine) => {},
+    enable: (ctx: BalatroEngine) => {},
+  };
+}
+
+function createAbandonedDeck(): DeckImpl {
+  const baseDeck = createBaseDeck({
+    configId: "d_abandonned_deck",
+  });
+  return {
+    ...baseDeck,
+    deckStrategy: (ctx: BalatroEngine) => noFaceStrategy,
+    enable: (ctx: BalatroEngine) => {},
+  };
+}
+
+function createEraticDeck(): DeckImpl {
+  const baseDeck = createBaseDeck({
+    configId: "d_eratic_deck",
+  });
+  return {
+    ...baseDeck,
+    deckStrategy: (ctx: BalatroEngine) => {
+      const seedManager = getSeedManagerPlugin(ctx);
+
+      console.log("seedManager", seedManager);
+      return generateRandom(seedManager);
+    },
+    enable: (ctx: BalatroEngine) => {},
+  };
+}
+
+function createCheckedPaternDeck(): DeckImpl {
+  const baseDeck = createBaseDeck({
+    configId: "d_checked_pattern_deck",
+  });
+  return {
+    ...baseDeck,
+    deckStrategy: (ctx: BalatroEngine) => twoColorStrategy,
+    enable: (ctx: BalatroEngine) => {},
   };
 }
 
@@ -241,7 +321,7 @@ function createBaseDeck({ configId }: { configId: DeckConfigId }): DeckImpl {
     ...getDeckConfig(configId),
     configId,
     deckStrategy: () => generateDeck(),
-    enabled: () => {},
+    enable: () => {},
   };
 }
 
@@ -250,4 +330,7 @@ export const decks: DeckImpl[] = [
   createBlueDeck(),
   createYellowDeck(),
   createGreenDeck(),
+  createAbandonedDeck(),
+  createEraticDeck(),
+  createCheckedPaternDeck(),
 ];
