@@ -37,24 +37,36 @@ export const ConsumableList = ({}: ConsumableListProps) => {
           }
           rightComponent={
             <div className="flex flex-col gap-2">
-              <button
-                onClick={() => handleSellConsumable(consumable.id)}
-                className="bg-green-500  text-white font-bold py-2 px-4 rounded"
-              >
-                Vendre
-                <br />
-                $5
-              </button>
-              <button
-                onClick={() => handleUseConsumable(consumable.id)}
-                className="bg-red-500  text-white font-bold py-2 px-4 rounded"
-              >
-                Utiliser
-              </button>
+              <SellCard onSell={() => handleSellConsumable(consumable.id)} />
+              <UseCard onUse={() => handleUseConsumable(consumable.id)} />
             </div>
           }
         />
       ))}
     </div>
+  );
+};
+
+export const SellCard = ({ onSell }: { onSell: () => void }) => {
+  return (
+    <button
+      onClick={() => onSell()}
+      className="bg-green-500 hover:bg-green-700  text-white font-bold py-2 px-4 rounded"
+    >
+      Vendre
+      <br />
+      $5
+    </button>
+  );
+};
+
+export const UseCard = ({ onUse }: { onUse: () => void }) => {
+  return (
+    <button
+      onClick={() => onUse()}
+      className="bg-red-500 hover:bg-red-700  text-white font-bold py-2 px-4 rounded"
+    >
+      Utiliser
+    </button>
   );
 };

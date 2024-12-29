@@ -13,6 +13,7 @@ export interface Buyable {
 
 export type Buffon = {
   id: BuffonId;
+  configId: string;
   name: string;
   description: string;
   rarity: BuffonRarity;

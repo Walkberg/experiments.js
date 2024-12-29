@@ -1,12 +1,12 @@
 import { Shop as IShop, generateShop } from "./balatro";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { BuffonCard, CardContainer, useGameManager } from "./BalatroPage";
+import { CardContainer, useGameManager } from "./BalatroPage";
 import { Buyable, ShopPlugin } from "./plugins/shop-plugin";
 import { useCurrentGame } from "./BalatroProvider";
-import { Card } from "@/components/ui/card";
 import { ConsumableCard } from "./modules/consumables/ConsumableCard";
 import { cn } from "@/lib/utils";
+import { BuffonCard } from "./modules/buffons/BuffonCard";
 
 function useShopManager() {
   const [shop, setShop] = useState<IShop>(generateShop());
@@ -19,8 +19,11 @@ function useShopManager() {
   }
 
   useEffect(() => {
-    balatro?.onEvent("shop-rerolled", (shop) => setShop(shop));
-    balatro?.onEvent("shop-item-bought", (shop) => setShop(shop));
+    if (balatro == null) {
+      return;
+    }
+    balatro.onEvent("shop-rerolled", (shop) => setShop(shop));
+    balatro.onEvent("shop-item-bought", (shop) => setShop(shop));
   }, [shopPlugin]);
 
   return shopPlugin;
@@ -92,7 +95,6 @@ const CardItemContainer = ({
 }) => {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
-  // Fonction pour gérer la sélection et la désélection
   const handleSelectItem = (itemId: string) => {
     setSelectedItemId((prevId) => (prevId === itemId ? null : itemId));
   };
@@ -110,9 +112,15 @@ const CardItemContainer = ({
           <div className="flex flex-col gap-2">
             {shopItem.type === "buffon" && (
               <BuffonCard
+                selected={isSelected}
                 key={shopItem.buffon.id}
                 buffon={shopItem.buffon}
                 onClick={() => handleSelectItem(shopItem.buffon.id)}
+                hoverSide="left"
+                topComponent={<PriceIndicator price={shopItem.price} />}
+                bottomComponent={
+                  <Buy onBuy={() => onBuy(shopItem.buffon.id)} />
+                }
               />
             )}
             {shopItem.type === "consumable" && (

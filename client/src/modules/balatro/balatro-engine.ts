@@ -1,7 +1,3 @@
-import { LogIn } from "lucide-react";
-import { Hand } from "./balatro";
-import { PokerCard } from "./cards/poker-cards";
-
 export type EventName =
   | "deck-generated"
   | "change-phase"
@@ -167,4 +163,14 @@ export function createPlayerManagerPlugin(): PlayerManagerPlugin {
     getMaxHandCount,
     getMaxDiscard,
   };
+}
+
+export function getPlayerManagerPlugin(context: BalatroEngine) {
+  const manager = context.getPlugin<PlayerManagerPlugin>("player-manager");
+
+  if (manager == null) {
+    throw new Error("Player manager not found");
+  }
+
+  return manager;
 }

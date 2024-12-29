@@ -8,6 +8,7 @@ import {
   ConsumablesManagerPlugin,
 } from "./consumables-manager-plugin";
 import { PoolManagerPlugin } from "./pool-manager-plugin";
+import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";
 
 export interface ShopPlugin extends Plugin {
   getItems: () => Buyable[];
@@ -40,12 +41,15 @@ export function createShopPlugin(): ShopPlugin {
   const REROLL_START_PRICE = 3;
   const BUFFON_PRICE = 5;
 
+  const _itemCount = 3;
+
   let _engine: BalatroEngine;
   let _economy: EconomyManagerPlugin;
   let _deckManager: DeckManagerPlugin;
   let _poolManager: PoolManagerPlugin;
   let _buffonsManager: BuffonsManagerPlugin;
   let _consumablesManager: ConsumablesManagerPlugin;
+  let _seedManager: SeedManagerPlugin;
 
   let _items: Buyable[] = [];
   let rerollPrice = REROLL_START_PRICE;
@@ -61,6 +65,7 @@ export function createShopPlugin(): ShopPlugin {
     const itemsManager = engine.getPlugin<ConsumablesManagerPlugin>(
       "consumables-manager"
     );
+    _seedManager = getSeedManagerPlugin(engine);
 
     if (
       !economy ||
@@ -83,28 +88,41 @@ export function createShopPlugin(): ShopPlugin {
 
   function resetShop() {
     rerollPrice = REROLL_START_PRICE;
-    const buffons = _poolManager.getPool();
 
-    const consumables = _poolManager.getRandomConsumables(2);
+    let buyable: Buyable[] = [];
 
-    const price = BUFFON_PRICE;
+    for (let i = 0; i < _itemCount; i++) {
+      buyable.push(generateItem());
+    }
 
-    const buyableBuffons: BuyableBuffon[] = buffons.map((buffon) => ({
-      type: "buffon",
-      buffon,
-      price,
-    }));
+    _items = buyable;
+  }
 
-    const buyableConsumable: BuyableConsumable[] = consumables.map(
-      (consumable) => ({
+  function generateItem(): Buyable {
+    const random = _seedManager.random() * 28;
+
+    if (random < 20) {
+      const card = _poolManager.getRandomBuffon();
+      return {
+        type: "buffon",
+        buffon: card,
+        price: BUFFON_PRICE,
+      };
+    } else if (random < 24) {
+      const card = _poolManager.getRandomConsumable("planet");
+      return {
         type: "consumable",
-        item: consumable,
-        price,
-      })
-    );
-
-    // _items = [...buyableBuffons, ...buyableConsumable];
-    _items = [...buyableConsumable];
+        item: card,
+        price: BUFFON_PRICE,
+      };
+    } else {
+      const card = _poolManager.getRandomConsumable("tarot");
+      return {
+        type: "consumable",
+        item: card,
+        price: BUFFON_PRICE,
+      };
+    }
   }
 
   function canReroll() {

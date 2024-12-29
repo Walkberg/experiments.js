@@ -18,6 +18,7 @@ export type Phase =
   | "Score"
   | "Shop"
   | "Blind"
+  | "Reset"
   | "GameOver";
 
 export interface GameManagerPlugin extends Plugin {
@@ -52,6 +53,7 @@ export function createGamePlugin(): GameManagerPlugin {
     Start: {
       onEnter() {
         changePhase("Start");
+        _blind.reset();
         _deck.generateDeck();
         _hand.fillHand();
         transitionTo("Blind");
@@ -78,6 +80,18 @@ export function createGamePlugin(): GameManagerPlugin {
           }, 10);
         }
       },
+    },
+    Reset: {
+      onEnter() {
+        _score.resetScore();
+        _hand.reset();
+        _deck.resetDeck();
+        _hand.fillHand();
+        changePhase("Reset");
+        transitionTo("Shop");
+      },
+      onExit() {},
+      onEvent(event, payload) {},
     },
     Score: {
       onEnter() {
@@ -112,7 +126,7 @@ export function createGamePlugin(): GameManagerPlugin {
       onExit() {},
       onEvent(event, payload) {
         if (event === "phase-next") {
-          transitionTo("Shop");
+          transitionTo("Reset");
         }
       },
     },
@@ -136,8 +150,6 @@ export function createGamePlugin(): GameManagerPlugin {
       onExit() {},
       onEvent(event, payload) {
         if (event === "blind-selected") {
-          _score.resetScore();
-          _hand.fillHand();
           transitionTo("Play");
         }
       },
@@ -193,13 +205,6 @@ export function createGamePlugin(): GameManagerPlugin {
 
   function returnMenu() {
     transitionTo("Menu");
-  }
-
-  function drawCards(count: number) {
-    const cards = _deck.drawCards(count);
-    for (const card of cards) {
-      _hand.addToHand(card);
-    }
   }
 
   function startNextPhase() {

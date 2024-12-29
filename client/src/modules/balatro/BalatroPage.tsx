@@ -5,19 +5,11 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Shop } from "./Shop";
 import { BalatroProvider, useCurrentGame } from "./BalatroProvider";
-import { evaluatePokerHand } from "./hand-evaluator";
 import { EconomyManagerPlugin } from "./plugins/economy-manager-plugin";
 import { GameManagerPlugin, Phase } from "./plugins/game-manager";
-import { BlindManagerPlugin } from "./plugins/blind-manager-plugin";
 import { HandManagerPlugin } from "./plugins/hand-manager-plugin";
 import { ScoreManagerPlugin } from "./plugins";
-import { Buffon, BuffonsManagerPlugin } from "./plugins/buffons-manager-plugin";
 import { cn } from "@/lib/utils";
-import {
-  Consumable,
-  ConsumablesManagerPlugin,
-} from "./plugins/consumables-manager-plugin";
-import { HandScoreDetail } from "./modules/hand-score/HandScoreDetail";
 import { Ante } from "./modules/ante/Ante";
 import { Board } from "./modules/hand/Board";
 import { HandBaseScore } from "./modules/hand-score/HandBaseScore";
@@ -29,6 +21,7 @@ import { PlayCardsTest } from "./modules/cards/PokerCards";
 import { RunInfo } from "./modules/run-info/RunInfo";
 import { BlindInfo } from "./modules/blinds/BlindInfo";
 import { BlindWin } from "./modules/blinds/BlindWin";
+import { Buffons } from "./modules/buffons/Buffons";
 
 export const BalatroTest = () => {
   return (
@@ -87,7 +80,8 @@ export const Balatro = () => {
 
   return (
     <>
-      <div className="grid grid-cols-5  bg-green-800 background-tv overflow-hidden">
+      <div className="vhs-overlay"></div>
+      <div className="grid grid-cols-5 bg-green-800 background-tv overflow-hidden">
         <div className="col-span-1">
           <Sidebar />
         </div>
@@ -145,6 +139,10 @@ export const Sidebar = () => {
       {phase === "Shop" ? (
         <div className="flex flex-col items-center">
           <img alt="shop" src="../assets/shop.webp" />
+        </div>
+      ) : phase === "Blind" ? (
+        <div className="flex flex-col items-center text-white">
+          selecionner la blind
         </div>
       ) : (
         <BlindInfo />
@@ -372,60 +370,6 @@ export function useGameManager() {
 
   return gameManager;
 }
-
-export function useBuffonManager() {
-  const { balatro } = useCurrentGame();
-
-  const [refresh, setRefresh] = useState(false);
-
-  const buffonManager =
-    balatro?.getPlugin<BuffonsManagerPlugin>("buffon-manager");
-
-  useEffect(() => {
-    balatro?.onEvent("buffon-added", () => {
-      setRefresh((prev) => !prev);
-    });
-  }, [buffonManager]);
-
-  if (buffonManager == null) {
-    return null;
-  }
-
-  return buffonManager;
-}
-
-interface BuffonsProps {}
-
-export const Buffons = ({}: BuffonsProps) => {
-  const buffonManager = useBuffonManager();
-
-  if (buffonManager == null) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-row gap-2">
-      {buffonManager.getBuffons().map((buffon) => (
-        <BuffonCard key={buffon.id} buffon={buffon} />
-      ))}
-    </div>
-  );
-};
-
-export const BuffonCard = ({
-  buffon,
-  onClick,
-}: {
-  buffon: Buffon;
-  onClick?: () => void;
-}) => {
-  return (
-    <Card onClick={onClick}>
-      <div>{buffon.name}</div>
-      <div>{buffon.description}</div>
-    </Card>
-  );
-};
 
 interface ScoreDetailProps {
   score: IScore;

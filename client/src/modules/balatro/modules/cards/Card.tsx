@@ -28,23 +28,29 @@ export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
   return (
     <HoverCard openDelay={50} closeDelay={50}>
       <HoverCardTrigger>
-        <AnimatedCard>
-          <Card
-            onClick={onSelectCard}
+        <div className={cn(selected ? "-translate-y-20 scale-110" : "")}>
+          <div
             className={cn(
-              "flex flex-col cursor-pointer hover:shadow-indigo-500/60 hover:scale-125",
-              selected ? "-translate-y-20 scale-110" : ""
+              "absolute inset-0 bg-gray-700 opacity-50 translate-x-2 translate-y-2 rounded-xl"
             )}
-          >
-            <CardEnhancer card={card}>
-              <CardEdition card={card}>
-                <CardView card={card}>
-                  <CardSeal card={card} />
-                </CardView>
-              </CardEdition>
-            </CardEnhancer>
-          </Card>
-        </AnimatedCard>
+          />
+          <AnimatedCard>
+            <Card
+              onClick={onSelectCard}
+              className={cn(
+                "flex flex-col cursor-pointer hover:shadow-indigo-500/60 hover:scale-125"
+              )}
+            >
+              <CardEnhancer card={card}>
+                <CardEdition card={card}>
+                  <CardView card={card}>
+                    <CardSeal card={card} />
+                  </CardView>
+                </CardEdition>
+              </CardEnhancer>
+            </Card>
+          </AnimatedCard>
+        </div>
       </HoverCardTrigger>
       <HoverCardContent side="top">
         <div className="flex flex-col items-center gap-2">

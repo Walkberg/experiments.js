@@ -27,6 +27,7 @@ export interface DeckManagerPlugin extends Plugin {
   shuffle: () => void;
   addCard: (card: PokerCard) => void;
   removeCard: (cardId: string) => boolean;
+  resetDeck: () => void;
 }
 
 export function createDeckPlugin(): DeckManagerPlugin {
@@ -38,39 +39,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
   let _discard: PokerCard[] = [];
 
   function generateDeck() {
-    const suits: CardSuit[] = ["hearts", "diamonds", "clubs", "spades"];
-    const ranks: CardRank[] = [
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "J",
-      "Q",
-      "K",
-      "A",
-    ];
-
-    let deck: Deck = [];
-
-    suits.forEach((suit) => {
-      ranks.forEach((rank) => {
-        deck.push({
-          suit,
-          rank,
-          id: uuid(),
-          enhancement: "none",
-          edition: "base",
-          seal: "none",
-        });
-      });
-    });
-
-    _deck = deck;
+    _deck = generateBasicDeck();
 
     shuffle();
 
@@ -89,6 +58,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
     _seedManagerPlugin = getSeedManagerPlugin(engine);
 
     engine.onEvent("card-discarded", (payload) => {
+      _hand = _hand.filter((card) => card.id !== payload.card.id);
       _discard.push(payload.card);
     });
 
@@ -98,8 +68,11 @@ export function createDeckPlugin(): DeckManagerPlugin {
   }
 
   function reset() {
-    _deck = [..._deck, ..._discard];
+    console.log("reset deck", _deck, _discard);
+    _deck = [..._deck, ..._hand, ..._discard];
     _discard = [];
+    _hand = [];
+    shuffle();
 
     _engine.emitEvent("deck-generated", { deck: _deck });
   }
@@ -113,7 +86,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
 
     for (let i = 0; i < count; i++) {
       const card = drawCard();
-      if (card) {
+      if (card != null) {
         hand.push(card);
         _hand.push(card);
       }
@@ -125,6 +98,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
 
   function addCard(card: PokerCard) {
     _deck.push(card);
+    _engine.emitEvent("deck-generated", { deck: _deck });
   }
 
   function removeCard(cardId: string): boolean {
@@ -139,6 +113,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
   function getDeckSize(): number {
     return _deck.length;
   }
+
   function getCurrentDeck(): Deck {
     return _deck;
   }
@@ -159,7 +134,47 @@ export function createDeckPlugin(): DeckManagerPlugin {
     addCard,
     removeCard,
     getDeckSize,
+    resetDeck: reset,
   };
+}
+
+const ALL_SUITS: CardSuit[] = ["hearts", "diamonds", "clubs", "spades"];
+
+const ALL_RANKS: CardRank[] = [
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "J",
+  "Q",
+  "K",
+  "A",
+];
+
+function generateBasicDeck() {
+  const suits: CardSuit[] = ALL_SUITS;
+  const ranks: CardRank[] = ALL_RANKS;
+
+  let deck: Deck = [];
+
+  suits.forEach((suit) => {
+    ranks.forEach((rank) => {
+      deck.push({
+        suit,
+        rank,
+        id: uuid(),
+        enhancement: "none",
+        edition: "base",
+        seal: "none",
+      });
+    });
+  });
+  return deck;
 }
 
 export function getDeckManagerPlugin(engine: BalatroEngine): DeckManagerPlugin {
@@ -169,4 +184,15 @@ export function getDeckManagerPlugin(engine: BalatroEngine): DeckManagerPlugin {
     throw new Error("Deck manager plugin not found");
   }
   return deck;
+}
+
+export function createRandomPokerCard(): PokerCard {
+  return {
+    suit: ALL_SUITS[Math.floor(Math.random() * ALL_SUITS.length)],
+    rank: ALL_RANKS[Math.floor(Math.random() * ALL_RANKS.length)],
+    id: uuid(),
+    enhancement: "mult",
+    edition: "foil",
+    seal: "none",
+  };
 }

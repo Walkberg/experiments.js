@@ -11,7 +11,9 @@ export interface PoolManagerPlugin extends Plugin {
   getPool: () => Buffon[];
   getConsumablePool: () => Consumable[];
   getRandomConsumables: (count: number, type?: ConsumableType) => Consumable[];
+  getRandomConsumable: (type?: ConsumableType) => Consumable;
   getRandomBuffons: (count: number) => Buffon[];
+  getRandomBuffon: () => Buffon;
   setupPool: (cards: Buffon[]) => void;
 }
 
@@ -54,32 +56,42 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
   }
 
   function getRandomConsumables(count: number, type?: ConsumableType) {
+    const randomConsumables = [];
+
+    for (let i = 0; i < count; i++) {
+      const randomConsumable = getRandomConsumable(type);
+      randomConsumables.push(randomConsumable);
+    }
+    return randomConsumables;
+  }
+
+  function getRandomConsumable(type?: ConsumableType) {
     const filteredConsumables = type
       ? items.filter((item) => item.type === type)
       : items;
 
-    const randomConsumables = [];
+    const randomIndex = Math.floor(Math.random() * filteredConsumables.length);
+    const randomConsumable = filteredConsumables[randomIndex];
 
-    for (let i = 0; i < count; i++) {
-      const randomIndex = Math.floor(
-        Math.random() * filteredConsumables.length
-      );
-      const randomConsumable = filteredConsumables[randomIndex];
-      randomConsumables.push(randomConsumable);
-      filteredConsumables.splice(randomIndex, 1);
-    }
-    return randomConsumables;
+    filteredConsumables.splice(randomIndex, 1);
+
+    return randomConsumable;
   }
 
   function getRandomBuffons(count: number) {
     const randomBuffons = [];
     for (let i = 0; i < count; i++) {
-      const randomIndex = Math.floor(Math.random() * pool.length);
-      const randomBuffon = pool[randomIndex];
+      const randomBuffon = getRandomBuffon();
       randomBuffons.push(randomBuffon);
-      pool.splice(randomIndex, 1);
     }
     return randomBuffons;
+  }
+
+  function getRandomBuffon() {
+    const randomIndex = Math.floor(Math.random() * pool.length);
+    const randomBuffon = pool[randomIndex];
+    //pool.splice(randomIndex, 1);
+    return randomBuffon;
   }
 
   return {
@@ -90,7 +102,10 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     registerItem,
     registerItems,
     removeFromPool,
+    getRandomConsumable,
+
     getPool,
+    getRandomBuffon,
     getConsumablePool: () => items,
     getRandomConsumables,
     setupPool,

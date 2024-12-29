@@ -1,42 +1,87 @@
 import { PokerCard } from "./poker-cards";
-import { BalatroEngine, PlayerManagerPlugin } from "../balatro-engine";
-import { ScoreManagerPlugin } from "../plugins";
+import {
+  BalatroEngine,
+  getPlayerManagerPlugin,
+  PlayerManagerPlugin,
+} from "../balatro-engine";
+import {
+  createRandomPokerCard,
+  getDeckManagerPlugin,
+  ScoreManagerPlugin,
+} from "../plugins";
 import { Buffon } from "../plugins/buffons-manager-plugin";
 
 export type BuffonId = string;
 
 export type Rarety = "common" | "uncommon" | "rare" | "legendary";
 
+export type BuffonConfigId = string;
+
+type Position = {
+  x: number;
+  y: number;
+};
+
 export type BuffonConfig = {
-  id: BuffonId;
+  id: BuffonConfigId;
   name: string;
   rarety: Rarety;
   cost: number;
+  position: Position;
 };
 
-const buffon_1: BuffonConfig = {
-  id: "b_flaviac",
-  name: "Flaviac",
-  rarety: "common",
-  cost: 1,
+const buffonConfigs: Record<BuffonConfigId, BuffonConfig> = {
+  b_buffon1: {
+    id: "b_buffon1",
+    name: "buffon_1",
+    rarety: "common",
+    cost: 1,
+    position: {
+      x: 0,
+      y: 0,
+    },
+  },
+  b_buffon2: {
+    id: "b_buffon2",
+    name: "buffon_2",
+    rarety: "common",
+    cost: 1,
+    position: {
+      x: 1,
+      y: 0,
+    },
+  },
+  b_buffon3: {
+    id: "b_buffon3",
+    name: "buffon_3",
+    rarety: "common",
+    cost: 1,
+    position: {
+      x: 2,
+      y: 0,
+    },
+  },
+  b_buffon4: {
+    id: "b_buffon4",
+    name: "buffon_4",
+    rarety: "common",
+    cost: 1,
+    position: {
+      x: 3,
+      y: 0,
+    },
+  },
 };
 
-const buffon_2: BuffonConfig = {
-  id: "buffon_2",
-  name: "Buffon 2",
-  rarety: "common",
-  cost: 5,
-};
+export function getBuffonConfig(id: BuffonConfigId): BuffonConfig {
+  const config = buffonConfigs[id];
 
-interface BuffonEntity {
-  id: BuffonId;
-  name: string;
-  rarety: Rarety;
-  cost: number;
+  return config;
 }
 
 export function createBuffon1(): Buffon {
   const buffon = createBaseBuffon({
+    configId: "b_buffon1",
     name: "buffon_1",
     description: "add 10 multiplier when 10 is played",
   });
@@ -58,6 +103,7 @@ export function createBuffon1(): Buffon {
 
 export function createBuffon2(): Buffon {
   const buffon = createBaseBuffon({
+    configId: "b_buffon2",
     name: "buffon_2",
     description: "add 100 chips when a heart is played",
   });
@@ -77,24 +123,16 @@ export function createBuffon2(): Buffon {
   return buffon;
 }
 
-function getPlayerManagerPlugin(context: BalatroEngine) {
-  const manager = context.getPlugin<PlayerManagerPlugin>("player");
-
-  if (manager == null) {
-    throw new Error("Player manager not found");
-  }
-
-  return manager;
-}
-
 export function createBuffon3(): Buffon {
   const buffon = createBaseBuffon({
+    configId: "b_buffon3",
     name: "buffon_3",
     description: "ajoute une main",
   });
 
   buffon.onBuffonEnabled = (context: BalatroEngine) => {
     const playerManagerPlugin = getPlayerManagerPlugin(context);
+    console.log("buffon 3 enabled");
     playerManagerPlugin.addMaxHandCount(1);
   };
 
@@ -106,28 +144,53 @@ export function createBuffon3(): Buffon {
   return buffon;
 }
 
+export function createBuffon4(): Buffon {
+  const buffon = createBaseBuffon({
+    configId: "b_buffon4",
+    name: "buffon_4",
+    description: "ajoute 3 carte random au deck",
+  });
+
+  buffon.onBuffonEnabled = (context: BalatroEngine) => {
+    const deckPlugin = getDeckManagerPlugin(context);
+    const pokerCard = createRandomPokerCard();
+    const pokerCard1 = createRandomPokerCard();
+    const pokerCard2 = createRandomPokerCard();
+    deckPlugin.addCard(pokerCard);
+    deckPlugin.addCard(pokerCard1);
+    deckPlugin.addCard(pokerCard2);
+  };
+
+  buffon.onBuffonDisabled = (context: BalatroEngine) => {};
+
+  return buffon;
+}
+
 export function createBaseBuffon({
   name,
   description,
+  configId,
 }: {
   name: string;
   description: string;
+  configId: BuffonConfigId;
 }): Buffon {
-  const _price = 5;
+  const config = getBuffonConfig(configId);
 
   function getBuyPrice() {
-    return _price;
+    return config.cost;
   }
 
   function getSellPrice() {
-    return Math.floor(_price / 2);
+    return Math.floor(getBuyPrice() / 2);
   }
 
   return {
     id: name,
-    name: name,
+    configId,
+    name: config.name,
     description,
-    rarity: "common",
+    rarity: config.rarety,
     onCardComputeScore(context: BalatroEngine, card: PokerCard) {},
     onBuffonEnabled(context: BalatroEngine) {},
     onBuffonDisabled(context: BalatroEngine) {},
@@ -140,4 +203,5 @@ export const buffonsPlayer = [
   createBuffon1(),
   createBuffon2(),
   createBuffon3(),
+  createBuffon4(),
 ];

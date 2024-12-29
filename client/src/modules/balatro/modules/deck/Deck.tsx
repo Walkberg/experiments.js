@@ -6,6 +6,7 @@ import { Deck as IDeck } from "../../balatro";
 import { CardRank, CardSuit, PokerCard } from "../../cards/poker-cards";
 import { PlayCard } from "../cards/Card";
 import { PlayCards } from "../cards/PokerCards";
+import { DeckConfigId, getDeckConfig } from "../../decks/decks";
 
 function useDeck() {
   const [fullDeck, setFullDeck] = useState<IDeck | null>(null);
@@ -44,25 +45,22 @@ interface DeckProps {}
 export const Deck = ({}: DeckProps) => {
   const { deck, fullDeck } = useDeck();
 
-  console.log("deck", deck);
-  console.log("fullDeck", fullDeck);
-
   if (deck == null || fullDeck == null) {
     return null;
   }
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-2 pb-8">
       <Dialog>
         <DialogTrigger>
-          <DeckUI />
+          <DeckUI configId={"d_red_deck"} />
         </DialogTrigger>
-        <DialogContent className="max-w-screen-2xl">
+        <DialogContent className="max-w-screen-2xl ">
           <DeckDetail fullDeck={fullDeck} deck={deck} />
         </DialogContent>
       </Dialog>
       <div className="flex justify-items-end">
-        <div className=" text-white">
+        <div className=" text-white text-right">
           {deck?.length}/{fullDeck?.length}
         </div>
       </div>
@@ -80,19 +78,28 @@ const DeckShadow = () => {
   );
 };
 
-export const DeckUI = () => {
+interface DeckUiProps {
+  configId: DeckConfigId;
+}
+
+export const DeckUI = ({ configId }: DeckUiProps) => {
+  const config = getDeckConfig(configId);
+
+  if (!config) {
+    return null;
+  }
+
+  const pos = getBackgroundPosition(config.position);
   return (
     <div className="flex relative">
       <div
         style={{
-          width: "144px",
-          height: "190px",
-          backgroundSize: "700%",
-          backgroundPosition: "top left",
-          overflow: "hidden",
-          imageRendering: "pixelated",
+          ...cardSizeStyle,
+          ...cardDeckBackgroundStyle,
+          backgroundPositionX: pos.x,
+          backgroundPositionY: pos.y,
         }}
-        className="z-50 cursor-pointer card-enhancer hover:scale-125"
+        className="z-50 cursor-pointer card-enhancer hover:scale-125 deck"
       />
       <DeckShadow />
     </div>
@@ -177,3 +184,34 @@ function groupAndSortDeck(fullDeck: IDeck, deck: IDeck) {
 
   return suits;
 }
+
+const SIZE_FACTOR = 2;
+
+const CARD_X_SIZE = 71 * SIZE_FACTOR;
+const CARD_Y_SIZE = 95 * SIZE_FACTOR;
+
+const SPREADSHEET_X_SIZE = 7;
+const SPREADSHEET_Y_SIZE = 5;
+
+interface Position {
+  x: number;
+  y: number;
+}
+
+const cardSizeStyle = {
+  width: `${CARD_X_SIZE}px`,
+  height: `${CARD_Y_SIZE}px`,
+};
+
+function getBackgroundPosition(position: Position): Position {
+  return {
+    x: -(position.x * CARD_X_SIZE),
+    y: -(position.y * CARD_Y_SIZE),
+  };
+}
+
+const cardDeckBackgroundStyle = {
+  backgroundSize: `${CARD_X_SIZE * SPREADSHEET_X_SIZE}px ${
+    CARD_Y_SIZE * SPREADSHEET_Y_SIZE
+  }px`,
+};
