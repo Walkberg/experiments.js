@@ -1,6 +1,8 @@
+import { v4 as uuid } from "uuid";
 import { BalatroEngine } from "../balatro-engine";
-import { Consumable } from "../plugins";
+import { Consumable, PokerCardPack } from "../plugins";
 import { createBaseConsumable } from "./consumables";
+import { createRandomPokerCard } from "./poker-cards";
 
 export type PackConfigId = string;
 
@@ -43,7 +45,7 @@ export function getPackConfig(configId: PackConfigId): PackConfig {
   return planetConfigs[configId];
 }
 
-export function createPackConsumable({
+export function createBasePack({
   name,
   description,
   packType,
@@ -53,8 +55,8 @@ export function createPackConsumable({
   description: string;
   packType: PackType;
   configId: PackConfigId;
-}): Consumable {
-  const pack = createBaseConsumable({
+}): PokerCardPack {
+  const pack = createBasePackee({
     name,
     description,
     type: "pack",
@@ -78,8 +80,8 @@ export function createPackConsumable({
   return pack;
 }
 
-const createJokerPack = (): Consumable => {
-  const pack = createPackConsumable({
+const createJokerPack = (): PokerCardPack => {
+  const pack = createBasePack({
     name: "Joker",
     description: "Joker",
     packType: "joker",
@@ -89,8 +91,8 @@ const createJokerPack = (): Consumable => {
   return pack;
 };
 
-const createArcanaPack = (): Consumable => {
-  const pack = createPackConsumable({
+const createArcanaPack = (): PokerCardPack => {
+  const pack = createBasePack({
     name: "Aracana",
     description: "Aracana",
     packType: "arcana",
@@ -101,3 +103,44 @@ const createArcanaPack = (): Consumable => {
 };
 
 export const packs = [createJokerPack(), createArcanaPack()];
+
+export function createBasePackee({
+  name,
+  description,
+  type,
+  configId,
+}: {
+  name: string;
+  description: string;
+  type: "pack";
+  configId: string;
+}): PokerCardPack {
+  function getBuyPrice() {
+    return 3;
+  }
+
+  function getSellPrice() {
+    return Math.floor(getBuyPrice() / 2);
+  }
+
+  function generateCards(ctx: BalatroEngine) {
+    return [
+      createRandomPokerCard(),
+      createRandomPokerCard(),
+      createRandomPokerCard(),
+      createRandomPokerCard(),
+      createRandomPokerCard(),
+    ];
+  }
+
+  return {
+    id: uuid(),
+    name: name,
+    type: type,
+    description,
+    configId,
+    getBuyPrice,
+    getSellPrice,
+    generateCards,
+  };
+}

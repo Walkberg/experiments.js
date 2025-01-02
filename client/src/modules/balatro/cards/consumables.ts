@@ -9,7 +9,7 @@ export function createBaseConsumable({
 }: {
   name: string;
   description: string;
-  type: ConsumableType;
+  type: "planet" | "tarot";
   configId: string;
 }): Consumable {
   function getBuyPrice() {

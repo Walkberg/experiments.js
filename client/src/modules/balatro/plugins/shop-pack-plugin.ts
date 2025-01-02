@@ -3,8 +3,11 @@ import { BalatroEngine } from "../balatro-engine";
 import { SeedManagerPlugin } from "./seed-manager-plugin";
 import { createRandomPokerCard, PokerCard } from "../cards/poker-cards";
 import { DeckManagerPlugin, getDeckManagerPlugin } from "./deck-manager-plugin";
+import { CardPack } from "../balatro";
+import { PokerCardPack } from "./consumables-manager-plugin";
 
 export interface ShopPackPlugin extends Plugin {
+  openPack: (pack: PokerCardPack) => void;
   getCards: () => PokerCard[];
   skipCard: () => void;
   pickCard: (cardId: string) => void;
@@ -20,14 +23,6 @@ export function createShopPackPlugin(): ShopPackPlugin {
   function init(engine: BalatroEngine) {
     _engine = engine;
     _deck = getDeckManagerPlugin(engine);
-
-    _cards = [
-      createRandomPokerCard(),
-      createRandomPokerCard(),
-      createRandomPokerCard(),
-      createRandomPokerCard(),
-      createRandomPokerCard(),
-    ];
   }
 
   function getCards() {
@@ -57,12 +52,17 @@ export function createShopPackPlugin(): ShopPackPlugin {
     _engine.emitEvent("pack-skip", {});
   }
 
+  function openPack(pack: PokerCardPack) {
+    _cards = pack.generateCards(_engine);
+  }
+
   return {
     name: "shop-pack",
     init,
     getCards,
     skipCard,
     pickCard,
+    openPack,
   };
 }
 

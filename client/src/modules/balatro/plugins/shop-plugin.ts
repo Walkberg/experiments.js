@@ -9,6 +9,7 @@ import {
 } from "./consumables-manager-plugin";
 import { PoolManagerPlugin } from "./pool-manager-plugin";
 import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";
+import { getShopPackPlugin, ShopPackPlugin } from "./shop-pack-plugin";
 
 export interface ShopPlugin extends Plugin {
   getItems: () => Buyable[];
@@ -57,6 +58,7 @@ export function createShopPlugin(): ShopPlugin {
   let _buffonsManager: BuffonsManagerPlugin;
   let _consumablesManager: ConsumablesManagerPlugin;
   let _seedManager: SeedManagerPlugin;
+  let _shopPackManager: ShopPackPlugin;
 
   let _items: Buyable[] = [];
   let _packs: Buyable[] = [];
@@ -74,6 +76,7 @@ export function createShopPlugin(): ShopPlugin {
       "consumables-manager"
     );
     _seedManager = getSeedManagerPlugin(engine);
+    _shopPackManager = getShopPackPlugin(engine);
 
     if (
       !economy ||
@@ -237,6 +240,7 @@ export function createShopPlugin(): ShopPlugin {
       _buffonsManager.addBuffon(item.buffon);
     } else {
       if (item.item.type === "pack") {
+        _shopPackManager.openPack(item.item);
         _phase = "open-pack";
       } else {
         _consumablesManager.addConsumable(item.item);

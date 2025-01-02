@@ -75,10 +75,11 @@ export const useBalatroGame = () => {
     balatro.registerPlugin(scorePlugin);
     balatro.registerPlugin(bliandManagerPlugin);
     balatro.registerPlugin(poolManagerPlugin);
+    balatro.registerPlugin(shopPackPlugin);
     balatro.registerPlugin(shopPlugin);
     balatro.registerPlugin(enhancementManager);
     balatro.registerPlugin(decksManagerPlugin);
-    balatro.registerPlugin(shopPackPlugin);
+
     balatro.registerPlugin(gamePlugin);
 
     seedManagerPlugin.setSeed("JL4365TK");
