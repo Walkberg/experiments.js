@@ -8,6 +8,7 @@ interface PlayCardsProps {
   onSelectCard?: (card: PokerCard) => void;
   selectedCards?: string[];
   bottomComponent?: React.ReactNode;
+  scaleFactor?: number;
 }
 
 export const PlayCards = ({
@@ -15,6 +16,7 @@ export const PlayCards = ({
   onSelectCard,
   selectedCards,
   bottomComponent,
+  scaleFactor,
 }: PlayCardsProps) => {
   return (
     <div className="relative flex justify-between shrink h-full w-full mr-40">
@@ -26,6 +28,7 @@ export const PlayCards = ({
               onSelectCard={() => onSelectCard?.(card)}
               selected={selectedCards?.includes(card.id)}
               bottomComponent={bottomComponent}
+              scaleFactor={scaleFactor}
             />
           </div>
         </div>

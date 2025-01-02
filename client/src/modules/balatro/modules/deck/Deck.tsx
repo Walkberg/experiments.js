@@ -132,7 +132,7 @@ export const DeckRow = ({
     <div key={suit} className="flex flex-row gap-2 h-40">
       <div className="text-lg font-bold text-black capitalize">{suit}</div>
       <div className="flex flex-row gap-2 w-full">
-        <PlayCards pokerCards={cards} />
+        <PlayCards pokerCards={cards} scaleFactor={1.5} />
       </div>
     </div>
   );
