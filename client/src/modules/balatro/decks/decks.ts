@@ -10,7 +10,7 @@ import {
   getSeedManagerPlugin,
   SeedManagerPlugin,
 } from "../plugins/seed-manager-plugin";
-import { BalatroEngine } from "../balatro-engine";
+import { BalatroEngine, getPlayerManagerPlugin } from "../balatro-engine";
 
 const allEnhancements: EnhancementType[] = [
   "none",
@@ -241,7 +241,9 @@ function createRedDeck(): DeckImpl {
   return {
     ...baseDeck,
     deckStrategy: (ctx: BalatroEngine) => basicDeckStrategy,
-    enable: (ctx: BalatroEngine) => {},
+    enable: (ctx: BalatroEngine) => {
+      getPlayerManagerPlugin(ctx).addMaxDiscardCount(1);
+    },
   };
 }
 
@@ -297,8 +299,6 @@ function createEraticDeck(): DeckImpl {
     ...baseDeck,
     deckStrategy: (ctx: BalatroEngine) => {
       const seedManager = getSeedManagerPlugin(ctx);
-
-      console.log("seedManager", seedManager);
       return generateRandom(seedManager);
     },
     enable: (ctx: BalatroEngine) => {},

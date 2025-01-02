@@ -103,7 +103,6 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     registerItems,
     removeFromPool,
     getRandomConsumable,
-
     getPool,
     getRandomBuffon,
     getConsumablePool: () => items,

@@ -12,6 +12,7 @@ import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";
 
 export interface ShopPlugin extends Plugin {
   getItems: () => Buyable[];
+  getPacks: () => Buyable[];
   buyItem: (itemId: string) => void;
   addItem: (item: Buyable) => void;
   getRerollPrice: () => number;
@@ -52,6 +53,7 @@ export function createShopPlugin(): ShopPlugin {
   let _seedManager: SeedManagerPlugin;
 
   let _items: Buyable[] = [];
+  let _packs: Buyable[] = [];
   let rerollPrice = REROLL_START_PRICE;
 
   function init(engine: BalatroEngine) {
@@ -95,6 +97,22 @@ export function createShopPlugin(): ShopPlugin {
       buyable.push(generateItem());
     }
 
+    let packs: Buyable[] = [];
+    for (let i = 0; i < 2; i++) {
+      packs.push(generatePack());
+    }
+
+    _items = buyable;
+    _packs = packs;
+  }
+
+  function rerollItems() {
+    let buyable: Buyable[] = [];
+
+    for (let i = 0; i < _itemCount; i++) {
+      buyable.push(generateItem());
+    }
+
     _items = buyable;
   }
 
@@ -125,6 +143,21 @@ export function createShopPlugin(): ShopPlugin {
     }
   }
 
+  function generatePack(): Buyable {
+    const random = _seedManager.random() * 28;
+
+    const card = _poolManager.getRandomConsumable("pack");
+    return {
+      type: "consumable",
+      item: card,
+      price: BUFFON_PRICE,
+    };
+  }
+
+  function getPacks() {
+    return _packs;
+  }
+
   function canReroll() {
     return _economy.getMoney() >= rerollPrice;
   }
@@ -136,7 +169,7 @@ export function createShopPlugin(): ShopPlugin {
 
     _economy.removeMoney(rerollPrice);
 
-    resetShop();
+    rerollItems();
 
     rerollPrice += 2;
 
@@ -202,6 +235,7 @@ export function createShopPlugin(): ShopPlugin {
   return {
     name: "shop",
     init,
+    getPacks,
     getRerollPrice: () => rerollPrice,
     getItems,
     addItem,

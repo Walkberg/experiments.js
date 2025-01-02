@@ -46,6 +46,7 @@ export const Shop = ({}: ShopProps) => {
   };
 
   const items = shopManager.getItems();
+  const packs = shopManager.getPacks();
 
   return (
     <div className="rounded-2xl bg-zinc-900 bg-opacity-90 grid grid-rows-2 gap-2 p-4 border-red-500 border-2 h-full">
@@ -74,12 +75,7 @@ export const Shop = ({}: ShopProps) => {
           <div className="bg-zinc-900 p-2 rounded-xl h-full">voucher</div>
         </ShopZone>
         <ShopZone>
-          pack
-          {/* <div className="flex flex-row gap-2">
-            {shop.packs.map((pack, index) => (
-              <Card key={index}>{"pack"}</Card>
-            ))}
-          </div> */}
+          <CardItemContainer items={packs} onBuy={handleBuyItem} />
         </ShopZone>
       </div>
     </div>

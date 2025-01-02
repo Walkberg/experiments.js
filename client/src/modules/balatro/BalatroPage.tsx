@@ -169,17 +169,13 @@ export const PlayerInfo = () => {
   const handmanager = useHandManager();
   const economyManager = useEconomyManager();
 
-  const [refresh, setRefresh] = useState(false);
-
   const [remainingDiscard, setRemainingDiscard] = useState(4);
-
   const [remainingHand, setRemainingHand] = useState(4);
 
   useEffect(() => {
     if (balatro == null) return;
     balatro.onEvent("economy-updated", () => {
       console.log("economy updated aaaa");
-      setRefresh((prev) => !prev);
     });
   }, [balatro]);
 
@@ -188,7 +184,10 @@ export const PlayerInfo = () => {
     if (handmanager == null) return;
 
     balatro.onEvent("hand-discarded", () => {
-      setRemainingDiscard(handmanager.getRemainingDiscards() ?? 4);
+      setRemainingDiscard(handmanager.getRemainingDiscards());
+    });
+    balatro.onEvent("hand-reset", () => {
+      setRemainingDiscard(handmanager.getRemainingDiscards());
     });
   }, [balatro]);
 
@@ -197,7 +196,10 @@ export const PlayerInfo = () => {
     if (handmanager == null) return;
 
     balatro.onEvent("hand-played", () => {
-      setRemainingHand(handmanager.getRemainingHands() ?? 4);
+      setRemainingHand(handmanager.getRemainingHands());
+    });
+    balatro.onEvent("hand-reset", () => {
+      setRemainingHand(handmanager.getRemainingHands());
     });
   }, [balatro]);
 

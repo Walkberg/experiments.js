@@ -6,6 +6,7 @@ import {
   convertPlanetTypeToHandType,
 } from "../plugins";
 import { createBaseConsumable } from "./consumables";
+import { packs } from "./packs";
 import { tarotCards } from "./tarots";
 
 type PlanetConfigId = string;
@@ -15,12 +16,12 @@ type Position = {
   y: number;
 };
 
-export type TarotConfig = {
+export type PlanetConfig = {
   id: PlanetConfigId;
   position: Position;
 };
 
-const planetConfigs: Record<PlanetConfigId, TarotConfig> = {
+const planetConfigs: Record<PlanetConfigId, PlanetConfig> = {
   p_mercury: {
     id: "p_mercury",
     position: {
@@ -86,7 +87,7 @@ const planetConfigs: Record<PlanetConfigId, TarotConfig> = {
   },
 };
 
-export function getPlanetConfig(configId: PlanetConfigId): TarotConfig {
+export function getPlanetConfig(configId: PlanetConfigId): PlanetConfig {
   return planetConfigs[configId];
 }
 
@@ -222,4 +223,4 @@ export const planetCards: Consumable[] = [
   createPluto(),
 ];
 
-export const itemsPlayer = [...planetCards, ...tarotCards];
+export const itemsPlayer = [...planetCards, ...tarotCards, ...packs];

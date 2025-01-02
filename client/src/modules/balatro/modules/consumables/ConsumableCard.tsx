@@ -12,6 +12,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
+import { getPackConfig } from "../../cards/packs";
 
 interface ConsumableCardProps {
   consumable: Consumable;
@@ -82,6 +83,8 @@ export const ConsumableFactory = ({
       return <TarotCard tarot={consumable} onClick={onClick} />;
     case "planet":
       return <PlanetCard planet={consumable} onClick={onClick} />;
+    case "pack":
+      return <Pack pack={consumable} onClick={onClick} />;
     default:
       return (
         <Card onClick={onClick}>
@@ -145,6 +148,36 @@ export const PlanetCard = ({ planet, onClick }: PlanetCardProps) => {
       style={{
         ...cardSizeStyle,
         ...cardConsumableBackgroundStyle,
+        backgroundPositionX: pos.x,
+        backgroundPositionY: pos.y,
+      }}
+    />
+  );
+};
+
+interface PackCardProps {
+  pack: Consumable;
+  onClick?: () => void;
+}
+
+export const Pack = ({ pack, onClick }: PackCardProps) => {
+  const configId = pack.configId;
+
+  const config = getPackConfig(configId);
+
+  if (config == null) {
+    return null;
+  }
+
+  const pos = getBackgroundPosition(config.position);
+
+  return (
+    <button
+      onClick={onClick}
+      className="pack"
+      style={{
+        ...cardSizeStyle,
+        ...packBackgroundStyle,
         backgroundPositionX: pos.x,
         backgroundPositionY: pos.y,
       }}
@@ -228,4 +261,8 @@ const cardConsumableBackgroundStyle = {
 
 const MovableCard = ({ children }: { children: React.ReactNode }) => {
   return <div className="custom-card">{children}</div>;
+};
+
+const packBackgroundStyle = {
+  backgroundSize: `${CARD_X_SIZE * 4}px ${CARD_Y_SIZE * 9}px`,
 };

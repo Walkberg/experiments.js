@@ -53,6 +53,7 @@ export function createHandPlugin(): HandManagerPlugin {
 
     engine.onEvent("hand-discarded", fillHand);
     engine.onEvent("score-calculated", () => discardPlayedCard());
+    engine.onEvent("deck-selected", () => reset());
 
     reset();
   }
@@ -131,6 +132,8 @@ export function createHandPlugin(): HandManagerPlugin {
     _remainingHandSize = _playerManagerPlugin.getMaxHandSize();
     _remainingHand = _playerManagerPlugin.getMaxHandCount();
     _remainingDiscard = _playerManagerPlugin.getMaxDiscard();
+
+    _engine.emitEvent("hand-reset", {});
   }
 
   function selectCard(cardId: string) {

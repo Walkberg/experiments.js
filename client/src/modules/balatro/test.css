@@ -50,6 +50,15 @@
   image-rendering: pixelated;
 }
 
+.pack {
+  background: url("../assets/Pack.png") no-repeat;
+  height: 95px;
+  width: 71px;
+  object-fit: cover;
+
+  image-rendering: pixelated;
+}
+
 .custom-card {
   animation: rotate3dEffect 6s infinite ease-in-out;
   transform-style: preserve-3d;

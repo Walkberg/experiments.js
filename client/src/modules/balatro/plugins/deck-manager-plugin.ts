@@ -63,7 +63,6 @@ export function createDeckPlugin(): DeckManagerPlugin {
   }
 
   function reset() {
-    console.log("reset deck", _deck, _discard);
     _deck = [..._deck, ..._hand, ..._discard];
     _discard = [];
     _hand = [];
@@ -129,6 +128,7 @@ export function createDeckPlugin(): DeckManagerPlugin {
 
     _deck = deck.deckStrategy(_engine);
     _deckImpl = deck;
+    reset();
 
     _engine.emitEvent("deck-selected", { deck: _deck });
   }

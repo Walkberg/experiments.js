@@ -3,6 +3,7 @@ export type EventName =
   | "deck-generated"
   | "change-phase"
   | "phase-changed"
+  | "hand-reset"
   | "hand-play"
   | "hand-played"
   | "hand-discard"
@@ -119,6 +120,8 @@ export interface PlayerConfig {
 export interface PlayerManagerPlugin extends Plugin {
   addMaxHandCount: (size: number) => void;
   removeMaxHandCount: (size: number) => void;
+  addMaxDiscardCount: (size: number) => void;
+  removeMaxDiscardCount: (size: number) => void;
   getMaxHandSize: () => number;
   getMaxHandCount: () => number;
   getMaxDiscard: () => number;
@@ -129,10 +132,18 @@ export function createPlayerManagerPlugin(): PlayerManagerPlugin {
 
   let _maxHandSize: number = 8;
   let _maxHandCount: number = 4;
-  let _maxDiscard: number = 4;
+  let _maxDiscard: number = 3;
 
   function init(engine: BalatroEngine) {
     _engine = engine;
+  }
+
+  function addMaxDiscardCount(size: number) {
+    _maxDiscard += size;
+  }
+
+  function removeMaxDiscardCount(size: number) {
+    _maxDiscard -= size;
   }
 
   function addMaxHandCount(size: number) {
@@ -158,6 +169,8 @@ export function createPlayerManagerPlugin(): PlayerManagerPlugin {
   return {
     name: "player-manager",
     init,
+    addMaxDiscardCount,
+    removeMaxDiscardCount,
     addMaxHandCount,
     removeMaxHandCount,
     getMaxHandSize,
