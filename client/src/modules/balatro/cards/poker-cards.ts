@@ -1,5 +1,5 @@
 import { BalatroEngine } from "../balatro-engine";
-import { getScoreManagerPlugin } from "../plugins";
+import { v4 as uuid } from "uuid";
 
 export type EnhancementType =
   | "none"
@@ -117,4 +117,33 @@ export class SealManager {
   getHandlers(): SealHandler[] {
     return Array.from(this.handlers.values());
   }
+}
+
+const ALL_SUITS: CardSuit[] = ["hearts", "diamonds", "clubs", "spades"];
+
+const ALL_RANKS: CardRank[] = [
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "J",
+  "Q",
+  "K",
+  "A",
+];
+
+export function createRandomPokerCard(): PokerCard {
+  return {
+    suit: ALL_SUITS[Math.floor(Math.random() * ALL_SUITS.length)],
+    rank: ALL_RANKS[Math.floor(Math.random() * ALL_RANKS.length)],
+    id: uuid(),
+    enhancement: "mult",
+    edition: "foil",
+    seal: "none",
+  };
 }

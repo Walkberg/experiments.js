@@ -150,24 +150,6 @@ export function createDeckPlugin(): DeckManagerPlugin {
   };
 }
 
-const ALL_SUITS: CardSuit[] = ["hearts", "diamonds", "clubs", "spades"];
-
-const ALL_RANKS: CardRank[] = [
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "J",
-  "Q",
-  "K",
-  "A",
-];
-
 export function getDeckManagerPlugin(engine: BalatroEngine): DeckManagerPlugin {
   const deck = engine.getPlugin<DeckManagerPlugin>("deck");
 
@@ -175,15 +157,4 @@ export function getDeckManagerPlugin(engine: BalatroEngine): DeckManagerPlugin {
     throw new Error("Deck manager plugin not found");
   }
   return deck;
-}
-
-export function createRandomPokerCard(): PokerCard {
-  return {
-    suit: ALL_SUITS[Math.floor(Math.random() * ALL_SUITS.length)],
-    rank: ALL_RANKS[Math.floor(Math.random() * ALL_RANKS.length)],
-    id: uuid(),
-    enhancement: "mult",
-    edition: "foil",
-    seal: "none",
-  };
 }

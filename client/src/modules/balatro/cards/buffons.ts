@@ -1,14 +1,10 @@
-import { PokerCard } from "./poker-cards";
+import { createRandomPokerCard, PokerCard } from "./poker-cards";
 import {
   BalatroEngine,
   getPlayerManagerPlugin,
   PlayerManagerPlugin,
 } from "../balatro-engine";
-import {
-  createRandomPokerCard,
-  getDeckManagerPlugin,
-  ScoreManagerPlugin,
-} from "../plugins";
+import { getDeckManagerPlugin, ScoreManagerPlugin } from "../plugins";
 import { Buffon } from "../plugins/buffons-manager-plugin";
 
 export type BuffonId = string;

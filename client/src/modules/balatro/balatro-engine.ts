@@ -33,7 +33,10 @@ export type EventName =
   | "score-card-calculated"
   | "blind-selected"
   | "seed-set"
-  | "stats-updated";
+  | "stats-updated"
+  | "shop-phase-changed"
+  | "pack-skip"
+  | "pack-pick";
 
 export interface BalatroEngine {
   removePlugin: (modName: string) => void;

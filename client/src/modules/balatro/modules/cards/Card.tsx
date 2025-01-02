@@ -22,9 +22,17 @@ interface PlayCardProps {
   card: ICard;
   onSelectCard?: () => void;
   selected?: boolean;
+  bottomComponent?: ReactNode;
+  scaleFactor?: number;
 }
 
-export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
+export const PlayCard = ({
+  card,
+  onSelectCard,
+  selected,
+  bottomComponent,
+  scaleFactor = 2,
+}: PlayCardProps) => {
   return (
     <HoverCard openDelay={50} closeDelay={50}>
       <HoverCardTrigger>
@@ -41,16 +49,19 @@ export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
                 "flex flex-col cursor-pointer hover:shadow-indigo-500/60 hover:scale-125"
               )}
             >
-              <CardEnhancer card={card}>
-                <CardEdition card={card}>
-                  <CardView card={card}>
-                    <CardSeal card={card} />
+              <CardEnhancer card={card} scaleFactor={scaleFactor}>
+                <CardEdition card={card} scaleFactor={scaleFactor}>
+                  <CardView card={card} scaleFactor={scaleFactor}>
+                    <CardSeal card={card} scaleFactor={scaleFactor} />
                   </CardView>
                 </CardEdition>
               </CardEnhancer>
             </Card>
           </AnimatedCard>
         </div>
+        {selected && (
+          <div className="-z-20 absolute bottom-[-20px]">{bottomComponent}</div>
+        )}
       </HoverCardTrigger>
       <HoverCardContent side="top">
         <div className="flex flex-col items-center gap-2">
@@ -65,6 +76,7 @@ export const PlayCard = ({ card, onSelectCard, selected }: PlayCardProps) => {
 };
 
 interface CardBackgroundProps {
+  scaleFactor: number;
   card: ICard;
   children?: ReactNode;
 }
@@ -73,15 +85,19 @@ export const CardBackground = ({ card, children }: CardBackgroundProps) => {
   return <div className="test-card">{children}</div>;
 };
 
-export const CardEdition = ({ card, ...props }: CardBackgroundProps) => {
+export const CardEdition = ({
+  card,
+  scaleFactor,
+  ...props
+}: CardBackgroundProps) => {
   const position = getCardEditionPosition(card.edition);
   return (
     <div
       style={{
-        ...cardSizeStyle,
-        ...cardEditionBackgroundStyle,
-        backgroundPositionX: position.x,
-        backgroundPositionY: position.y,
+        ...getCardSizeStyle(scaleFactor),
+        ...cardEditionBackgroundStyle(scaleFactor),
+        backgroundPositionX: position.x * -1 * CARD_X_SIZE * scaleFactor,
+        backgroundPositionY: position.y * -1 * CARD_Y_SIZE * scaleFactor,
       }}
       className={cn("card-edition", { negative: card.edition === "negative" })}
       {...props}
@@ -89,15 +105,19 @@ export const CardEdition = ({ card, ...props }: CardBackgroundProps) => {
   );
 };
 
-export const CardEnhancer = ({ card, ...props }: CardBackgroundProps) => {
+export const CardEnhancer = ({
+  card,
+  scaleFactor,
+  ...props
+}: CardBackgroundProps) => {
   const position = getCardEnhancementPosition(card.enhancement);
   return (
     <div
       style={{
-        ...cardSizeStyle,
-        ...cardBackgroundStyle,
-        backgroundPositionX: position.x,
-        backgroundPositionY: position.y,
+        ...getCardSizeStyle(scaleFactor),
+        ...getCardEnhancementBackgroundStyle(scaleFactor),
+        backgroundPositionX: position.x * -1 * CARD_X_SIZE * scaleFactor,
+        backgroundPositionY: position.y * -1 * CARD_Y_SIZE * scaleFactor,
       }}
       className="card-enhancer"
       {...props}
@@ -105,15 +125,19 @@ export const CardEnhancer = ({ card, ...props }: CardBackgroundProps) => {
   );
 };
 
-export const CardSeal = ({ card, ...props }: CardBackgroundProps) => {
+export const CardSeal = ({
+  card,
+  scaleFactor,
+  ...props
+}: CardBackgroundProps) => {
   const position = getCardSealPosition(card.seal);
   return (
     <div
       style={{
-        ...cardSizeStyle,
-        ...cardBackgroundStyle,
-        backgroundPositionX: position.x,
-        backgroundPositionY: position.y,
+        ...getCardSizeStyle(scaleFactor),
+        ...getCardEnhancementBackgroundStyle(scaleFactor),
+        backgroundPositionX: position.x * -1 * CARD_X_SIZE * scaleFactor,
+        backgroundPositionY: position.y * -1 * CARD_Y_SIZE * scaleFactor,
       }}
       className="card-enhancer"
       {...props}
@@ -121,14 +145,20 @@ export const CardSeal = ({ card, ...props }: CardBackgroundProps) => {
   );
 };
 
-export const CardView = ({ card, ...props }: CardBackgroundProps) => {
+export const CardView = ({
+  card,
+  scaleFactor,
+  ...props
+}: CardBackgroundProps) => {
   return (
     <div
       style={{
-        ...cardSizeStyle,
-        ...cardRankBackgroundStyle,
-        backgroundPositionX: getCardRankPosition(card.rank),
-        backgroundPositionY: getCardSuitPosition(card.suit),
+        ...getCardSizeStyle(scaleFactor),
+        ...cardRankBackgroundStyle(scaleFactor),
+        backgroundPositionX:
+          getCardRankPosition(card.rank) * -1 * CARD_X_SIZE * scaleFactor,
+        backgroundPositionY:
+          getCardSuitPosition(card.suit) * -1 * CARD_Y_SIZE * scaleFactor,
       }}
       className="card-rank"
       {...props}
@@ -237,34 +267,32 @@ export const AnimatedCard = ({ children }: AnimatedCardProps) => {
   );
 };
 
-const SIZE_FACTOR = 2;
-
-const CARD_X_SIZE = 71 * SIZE_FACTOR;
-const CARD_Y_SIZE = 95 * SIZE_FACTOR;
+const CARD_X_SIZE = 71;
+const CARD_Y_SIZE = 95;
 
 function getCardSuitPosition(cardSuit: CardSuit): number {
   switch (cardSuit) {
     case "hearts":
-      return -CARD_Y_SIZE * 0;
+      return 0;
     case "diamonds":
-      return -CARD_Y_SIZE * 2;
+      return 2;
     case "spades":
-      return -CARD_Y_SIZE * 3;
+      return 3;
     case "clubs":
-      return -CARD_Y_SIZE * 1;
+      return 1;
   }
 }
 
 function getCardRankPosition(cardRank: CardRank): number {
-  return (getCardChips(cardRank) - 2) * -CARD_X_SIZE;
+  return getCardChips(cardRank) - 2;
 }
 
 const editionPosition = {
-  base: { x: 0 * -CARD_X_SIZE, y: 0 * -CARD_Y_SIZE },
-  foil: { x: -CARD_X_SIZE, y: 0 * -CARD_Y_SIZE },
-  holographic: { x: -CARD_X_SIZE * 2, y: 0 * -CARD_Y_SIZE },
-  polychrome: { x: -CARD_X_SIZE * 3, y: 0 * -CARD_Y_SIZE },
-  negative: { x: 0 * -CARD_X_SIZE, y: 0 * -CARD_Y_SIZE },
+  base: { x: 0, y: 0 },
+  foil: { x: 1, y: 0 },
+  holographic: { x: 2, y: 0 },
+  polychrome: { x: 3, y: 0 },
+  negative: { x: 0, y: 0 },
 };
 
 function getCardEditionPosition(type: EditionType): Position {
@@ -272,15 +300,15 @@ function getCardEditionPosition(type: EditionType): Position {
 }
 
 const enhancementPosition = {
-  none: { x: 0, y: 1 * CARD_Y_SIZE },
-  bonus: { x: -CARD_X_SIZE, y: 1 * -CARD_Y_SIZE },
-  mult: { x: -CARD_X_SIZE * 2, y: 1 * -CARD_Y_SIZE },
-  wildcard: { x: -CARD_X_SIZE * 3, y: 1 * -CARD_Y_SIZE },
-  glass: { x: -CARD_X_SIZE * 5, y: 1 * -CARD_Y_SIZE },
-  steel: { x: -CARD_X_SIZE * 6, y: 1 * -CARD_Y_SIZE },
-  stone: { x: -CARD_X_SIZE * 5, y: 0 * -CARD_Y_SIZE },
-  gold: { x: -CARD_X_SIZE * 6, y: 0 * -CARD_Y_SIZE },
-  lucky: { x: -CARD_X_SIZE * 4, y: 2 * -CARD_Y_SIZE },
+  none: { x: 1, y: 0 },
+  bonus: { x: 1, y: 1 },
+  mult: { x: 2, y: 1 },
+  wildcard: { x: 3, y: 1 },
+  glass: { x: 5, y: 1 },
+  steel: { x: 6, y: 1 },
+  stone: { x: 5, y: 0 },
+  gold: { x: 6, y: 0 },
+  lucky: { x: 4, y: 2 },
 };
 
 function getCardEnhancementPosition(type: EnhancementType): Position {
@@ -288,11 +316,11 @@ function getCardEnhancementPosition(type: EnhancementType): Position {
 }
 
 const sealPosition = {
-  none: { x: -1 * -CARD_X_SIZE, y: -1 * -CARD_X_SIZE },
-  gold: { x: 2 * -CARD_X_SIZE, y: 0 * -CARD_X_SIZE },
-  red: { x: -CARD_X_SIZE * 5, y: 4 * -CARD_X_SIZE },
-  blue: { x: -CARD_X_SIZE * 6, y: 4 * -CARD_X_SIZE },
-  purple: { x: -CARD_X_SIZE * 4, y: 4 * -CARD_X_SIZE },
+  none: { x: -1, y: -1 },
+  gold: { x: 2, y: 0 },
+  red: { x: 5, y: 4 },
+  blue: { x: 6, y: 4 },
+  purple: { x: 4, y: 4 },
 };
 
 function getCardSealPosition(type: SealType): Position {
@@ -334,23 +362,40 @@ function replaceTextByCustom(text: string): JSX.Element {
   );
 }
 
+const ENHANCEMENT_TILE_SIZE_X = 7;
+const ENHANCEMENT_TILE_SIZE_Y = 5;
+
+const CARD_RANK_TILE_SIZE_X = 13;
+const CARD_RANK_TILE_SIZE_Y = 4;
+
+const EDITION_TILE_SIZE_X = 5;
+const EDITION_TILE_SIZE_Y = 1;
+
 function getCardDescription(card: ICard) {
   return `\${chipc} +${getBaseChip(card)} \${endc} chips`;
 }
 
-const cardSizeStyle = {
-  width: `${CARD_X_SIZE}px`,
-  height: `${CARD_Y_SIZE}px`,
+const getCardSizeStyle = (scaleFactor: number) => {
+  return {
+    width: `${CARD_X_SIZE * scaleFactor}px`,
+    height: `${CARD_Y_SIZE * scaleFactor}px`,
+  };
 };
 
-const cardBackgroundStyle = {
-  backgroundSize: `${CARD_X_SIZE * 7}px ${CARD_Y_SIZE * 5}px`,
-};
+const getCardEnhancementBackgroundStyle = (scaleFactor: number) => ({
+  backgroundSize: `${CARD_X_SIZE * ENHANCEMENT_TILE_SIZE_X * scaleFactor}px ${
+    CARD_Y_SIZE * ENHANCEMENT_TILE_SIZE_Y * scaleFactor
+  }px`,
+});
 
-const cardRankBackgroundStyle = {
-  backgroundSize: `${CARD_X_SIZE * 13}px ${CARD_Y_SIZE * 4}px`,
-};
+const cardRankBackgroundStyle = (scaleFactor: number) => ({
+  backgroundSize: `${CARD_X_SIZE * CARD_RANK_TILE_SIZE_X * scaleFactor}px ${
+    CARD_Y_SIZE * CARD_RANK_TILE_SIZE_Y * scaleFactor
+  }px`,
+});
 
-const cardEditionBackgroundStyle = {
-  backgroundSize: `${CARD_X_SIZE * 5}px ${CARD_Y_SIZE * 1}px`,
-};
+const cardEditionBackgroundStyle = (scaleFactor: number) => ({
+  backgroundSize: `${CARD_X_SIZE * EDITION_TILE_SIZE_X * scaleFactor}px ${
+    CARD_Y_SIZE * EDITION_TILE_SIZE_Y * scaleFactor
+  }px`,
+});

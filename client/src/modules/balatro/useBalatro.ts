@@ -27,6 +27,7 @@ import { createSeedManagerPlugin } from "./plugins/seed-manager-plugin";
 import { createStatManagerPlugin } from "./plugins/stats-manager-plugin";
 import { createDecksPlugin } from "./plugins/decks-manager-plugin";
 import { decks } from "./decks/decks";
+import { createShopPackPlugin } from "./plugins/shop-pack-plugin";
 
 export const useBalatroGame = () => {
   const [balatro, setBalatro] = useState<BalatroEngine | null>(null);
@@ -52,6 +53,7 @@ export const useBalatroGame = () => {
     const seedManagerPlugin = createSeedManagerPlugin();
     const statManagerPlugin = createStatManagerPlugin();
     const decksManagerPlugin = createDecksPlugin();
+    const shopPackPlugin = createShopPackPlugin();
 
     poolManagerPlugin.registerBuffons(buffonsPlayer);
     poolManagerPlugin.registerItems(itemsPlayer);
@@ -76,6 +78,7 @@ export const useBalatroGame = () => {
     balatro.registerPlugin(shopPlugin);
     balatro.registerPlugin(enhancementManager);
     balatro.registerPlugin(decksManagerPlugin);
+    balatro.registerPlugin(shopPackPlugin);
     balatro.registerPlugin(gamePlugin);
 
     seedManagerPlugin.setSeed("JL4365TK");

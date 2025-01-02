@@ -20,6 +20,8 @@ export interface ShopPlugin extends Plugin {
   canReroll: () => boolean;
   canBuyItem: (itemId: string) => boolean;
   resetShop: () => void;
+  getPhase: () => ShopPhase;
+  skipOpenPack: () => void;
 }
 
 export type Buyable = BuyableBuffon | BuyableConsumable;
@@ -38,11 +40,15 @@ interface Price {
   price: number;
 }
 
+export type ShopPhase = "buy" | "open-pack";
+
 export function createShopPlugin(): ShopPlugin {
   const REROLL_START_PRICE = 3;
   const BUFFON_PRICE = 5;
 
   const _itemCount = 3;
+
+  let _phase: ShopPhase = "buy";
 
   let _engine: BalatroEngine;
   let _economy: EconomyManagerPlugin;
@@ -84,6 +90,9 @@ export function createShopPlugin(): ShopPlugin {
     _poolManager = poolManager;
     _buffonsManager = buffonManager;
     _consumablesManager = itemsManager;
+
+    _engine.onEvent("pack-skip", skipOpenPack);
+    _engine.onEvent("pack-pick", skipOpenPack);
 
     resetShop();
   }
@@ -185,7 +194,10 @@ export function createShopPlugin(): ShopPlugin {
   }
 
   function getItem(itemId: string) {
-    return _items.find((i) => getBuyableId(i) === itemId);
+    return (
+      _items.find((i) => getBuyableId(i) === itemId) ??
+      _packs.find((i) => getBuyableId(i) === itemId)
+    );
   }
 
   function canBuyItem(itemId: string) {
@@ -224,12 +236,29 @@ export function createShopPlugin(): ShopPlugin {
     if (item.type === "buffon") {
       _buffonsManager.addBuffon(item.buffon);
     } else {
-      _consumablesManager.addConsumable(item.item);
+      if (item.item.type === "pack") {
+        _phase = "open-pack";
+      } else {
+        _consumablesManager.addConsumable(item.item);
+      }
     }
 
     _items = _items.filter((i) => getBuyableId(i) !== itemId);
+    _packs = _packs.filter((i) => getBuyableId(i) !== itemId);
 
     _engine.emitEvent("shop-item-bought", { item });
+  }
+
+  function getPhase() {
+    return _phase;
+  }
+
+  function skipOpenPack() {
+    if (_phase !== "open-pack") {
+      return;
+    }
+    _phase = "buy";
+    _engine.emitEvent("shop-phase-changed", { phase: _phase });
   }
 
   return {
@@ -244,6 +273,8 @@ export function createShopPlugin(): ShopPlugin {
     canReroll,
     canBuyItem,
     resetShop,
+    getPhase,
+    skipOpenPack,
   };
 }
 
