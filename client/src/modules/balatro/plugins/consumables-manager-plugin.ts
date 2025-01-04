@@ -1,7 +1,8 @@
 import { Plugin } from "../balatro-engine";
 import { BalatroEngine } from "../balatro-engine";
+import { PokerCardPack } from "../cards/packs";
 import { PokerCard } from "../cards/poker-cards";
-import { Buyable } from "./buffons-manager-plugin";
+import { Buyable, Sellable } from "./buffons-manager-plugin";
 
 export interface ConsumablesManagerPlugin extends Plugin {
   addConsumables: (items: Consumable[]) => void;
@@ -26,19 +27,9 @@ export type Consumable =
       description: string;
       checkCanUse?: (ctx: BalatroEngine) => boolean;
       onConsumableUsed?: (ctx: BalatroEngine) => void;
-    } & Buyable)
+    } & Buyable &
+      Sellable)
   | PokerCardPack;
-
-export type PokerCardPack = {
-  id: string;
-  name: string;
-  type: "pack";
-  configId: string;
-  description: string;
-  checkCanUse?: (ctx: BalatroEngine) => boolean;
-  onConsumableUsed?: (ctx: BalatroEngine) => void;
-  generateCards: (ctx: BalatroEngine) => PokerCard[];
-} & Buyable;
 
 export function createConsumableManagerPlugin(): ConsumablesManagerPlugin {
   const MAX_COUNT_START = 2;

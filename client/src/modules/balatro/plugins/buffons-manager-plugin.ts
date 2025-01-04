@@ -8,6 +8,9 @@ export type BuffonRarity = "common" | "uncommon" | "rare" | "legendary";
 
 export interface Buyable {
   getBuyPrice: () => number;
+}
+
+export interface Sellable {
   getSellPrice: () => number;
 }
 
@@ -20,7 +23,8 @@ export type Buffon = {
   onCardComputeScore: (ctx: BalatroEngine, card: PokerCard) => void;
   onBuffonEnabled: (ctx: BalatroEngine) => void;
   onBuffonDisabled: (ctx: BalatroEngine) => void;
-} & Buyable;
+} & Buyable &
+  Sellable;
 
 export interface BuffonsManagerPlugin extends Plugin {
   addBuffons: (buffons: Buffon[]) => void;
