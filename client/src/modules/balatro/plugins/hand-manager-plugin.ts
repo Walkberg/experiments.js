@@ -5,7 +5,8 @@ import {
   CardRank,
   EnhancementType,
 } from "../cards/poker-cards";
-import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
+import { BalatroEngine, Plugin } from "../balatro-engine";
+import { PlayerManagerPlugin } from "./player-manager-plugin";
 import {
   DeckManagerPlugin,
   getDeckManagerPlugin,

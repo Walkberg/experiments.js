@@ -6,11 +6,10 @@ import {
   EnhancementType,
   PokerCard,
 } from "../cards/poker-cards";
-import {
-  getSeedManagerPlugin,
-  SeedManagerPlugin,
-} from "../plugins/seed-manager-plugin";
-import { BalatroEngine, getPlayerManagerPlugin } from "../balatro-engine";
+import { getSeedManagerPlugin } from "../plugins/seed-manager-plugin";
+import { BalatroEngine } from "../balatro-engine";
+import { getPlayerManagerPlugin } from "../plugins/player-manager-plugin";
+import { getEconomyManagerPlugin } from "../plugins/economy-manager-plugin";
 
 const allEnhancements: EnhancementType[] = [
   "none",
@@ -55,7 +54,7 @@ const noFaceRanks: CardRank[] = [
   "A",
 ];
 
-function createBaseCard(
+export function createBaseCard(
   rank: CardRank,
   suit: CardSuit,
   enhancement?: EnhancementType
@@ -68,6 +67,19 @@ function createBaseCard(
     edition: "base",
     seal: "none",
   };
+}
+
+export function createRandomCard(randomStrategy: RandomStrategy): PokerCard {
+  const suits: CardSuit[] = allSuits;
+  const ranks: CardRank[] = allRanks;
+
+  return createBaseCard(
+    ranks[Math.floor(randomStrategy.random() * ranks.length)],
+    suits[Math.floor(randomStrategy.random() * suits.length)],
+    allEnhancements[
+      Math.floor(randomStrategy.random() * allEnhancements.length)
+    ]
+  );
 }
 
 function generateDeck(): Deck {
@@ -115,7 +127,11 @@ function generateDeckNoFace(): Deck {
   return deck;
 }
 
-function generateRandom(seedManager: SeedManagerPlugin): Deck {
+interface RandomStrategy {
+  random(): number;
+}
+
+function generateRandomDeck(randomStrategy: RandomStrategy): Deck {
   const suits: CardSuit[] = allSuits;
   const ranks: CardRank[] = allRanks;
 
@@ -123,15 +139,7 @@ function generateRandom(seedManager: SeedManagerPlugin): Deck {
 
   suits.forEach((suit) => {
     ranks.forEach((rank) => {
-      deck.push(
-        createBaseCard(
-          ranks[Math.floor(seedManager.random() * ranks.length)],
-          suits[Math.floor(seedManager.random() * suits.length)],
-          allEnhancements[
-            Math.floor(seedManager.random() * allEnhancements.length)
-          ]
-        )
-      );
+      deck.push(createRandomCard(randomStrategy));
     });
   });
 
@@ -265,7 +273,7 @@ function createYellowDeck(): DeckImpl {
   return {
     ...baseDeck,
     deckStrategy: (ctx: BalatroEngine) => basicDeckStrategy,
-    enable: (ctx: BalatroEngine) => {},
+    enable: (ctx: BalatroEngine) => getEconomyManagerPlugin(ctx).addMoney(10),
   };
 }
 
@@ -299,7 +307,7 @@ function createEraticDeck(): DeckImpl {
     ...baseDeck,
     deckStrategy: (ctx: BalatroEngine) => {
       const seedManager = getSeedManagerPlugin(ctx);
-      return generateRandom(seedManager);
+      return generateRandomDeck(seedManager);
     },
     enable: (ctx: BalatroEngine) => {},
   };

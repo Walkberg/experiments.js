@@ -36,7 +36,8 @@ export type EventName =
   | "stats-updated"
   | "shop-phase-changed"
   | "pack-skip"
-  | "pack-pick";
+  | "pack-pick"
+  | "player-stats-updated";
 
 export interface BalatroEngine {
   removePlugin: (modName: string) => void;
@@ -69,10 +70,6 @@ export function createBalatroEngine(): BalatroEngine {
 
   async function emit(eventName: string, payload: any): Promise<void> {
     const listeners = eventListeners.get(eventName);
-
-    if (eventName === "score-card-calculated") {
-      console.log("emit", listeners);
-    }
 
     if (listeners) {
       await Promise.all(
@@ -112,82 +109,4 @@ export function createBalatroEngine(): BalatroEngine {
   };
 
   return engine;
-}
-
-export interface PlayerConfig {
-  maxHandSize: number;
-  maxHandCount: number;
-  maxDiscard: number;
-}
-
-export interface PlayerManagerPlugin extends Plugin {
-  addMaxHandCount: (size: number) => void;
-  removeMaxHandCount: (size: number) => void;
-  addMaxDiscardCount: (size: number) => void;
-  removeMaxDiscardCount: (size: number) => void;
-  getMaxHandSize: () => number;
-  getMaxHandCount: () => number;
-  getMaxDiscard: () => number;
-}
-
-export function createPlayerManagerPlugin(): PlayerManagerPlugin {
-  let _engine: BalatroEngine;
-
-  let _maxHandSize: number = 8;
-  let _maxHandCount: number = 4;
-  let _maxDiscard: number = 3;
-
-  function init(engine: BalatroEngine) {
-    _engine = engine;
-  }
-
-  function addMaxDiscardCount(size: number) {
-    _maxDiscard += size;
-  }
-
-  function removeMaxDiscardCount(size: number) {
-    _maxDiscard -= size;
-  }
-
-  function addMaxHandCount(size: number) {
-    _maxHandCount += size;
-  }
-
-  function removeMaxHandCount(size: number) {
-    _maxHandCount -= size;
-  }
-
-  function getMaxHandSize() {
-    return _maxHandSize;
-  }
-
-  function getMaxHandCount() {
-    return _maxHandCount;
-  }
-
-  function getMaxDiscard() {
-    return _maxDiscard;
-  }
-
-  return {
-    name: "player-manager",
-    init,
-    addMaxDiscardCount,
-    removeMaxDiscardCount,
-    addMaxHandCount,
-    removeMaxHandCount,
-    getMaxHandSize,
-    getMaxHandCount,
-    getMaxDiscard,
-  };
-}
-
-export function getPlayerManagerPlugin(context: BalatroEngine) {
-  const manager = context.getPlugin<PlayerManagerPlugin>("player-manager");
-
-  if (manager == null) {
-    throw new Error("Player manager not found");
-  }
-
-  return manager;
 }

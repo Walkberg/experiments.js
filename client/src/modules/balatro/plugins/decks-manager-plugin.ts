@@ -1,4 +1,5 @@
-import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
+import { BalatroEngine, Plugin } from "../balatro-engine";
+import { PlayerManagerPlugin } from "./player-manager-plugin";
 import { DeckImpl } from "../decks/decks";
 import { DeckManagerPlugin, getDeckManagerPlugin } from "./deck-manager-plugin";
 import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";

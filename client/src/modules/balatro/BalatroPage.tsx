@@ -189,6 +189,9 @@ export const PlayerInfo = () => {
     balatro.onEvent("hand-reset", () => {
       setRemainingDiscard(handmanager.getRemainingDiscards());
     });
+    balatro.onEvent("player-stats-updated", () => {
+      setRemainingDiscard(handmanager.getRemainingDiscards());
+    });
   }, [balatro]);
 
   useEffect(() => {
@@ -200,6 +203,9 @@ export const PlayerInfo = () => {
     });
     balatro.onEvent("hand-reset", () => {
       setRemainingHand(handmanager.getRemainingHands());
+    });
+    balatro.onEvent("player-stats-updated", () => {
+      setRemainingDiscard(handmanager.getRemainingDiscards());
     });
   }, [balatro]);
 

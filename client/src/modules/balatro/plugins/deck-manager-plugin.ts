@@ -1,7 +1,8 @@
 import { v4 as uuid } from "uuid";
 import { Deck } from "../balatro";
 import { PokerCard, CardSuit, CardRank } from "../cards/poker-cards";
-import { BalatroEngine, PlayerManagerPlugin, Plugin } from "../balatro-engine";
+import { BalatroEngine, Plugin } from "../balatro-engine";
+import { PlayerManagerPlugin } from "./player-manager-plugin";
 import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";
 import { DeckConfigId, DeckImpl } from "../decks/decks";
 

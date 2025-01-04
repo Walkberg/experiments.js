@@ -1,9 +1,9 @@
 import { createRandomPokerCard, PokerCard } from "./poker-cards";
+import { BalatroEngine } from "../balatro-engine";
 import {
-  BalatroEngine,
   getPlayerManagerPlugin,
   PlayerManagerPlugin,
-} from "../balatro-engine";
+} from "../plugins/player-manager-plugin";
 import { getDeckManagerPlugin, ScoreManagerPlugin } from "../plugins";
 import { Buffon } from "../plugins/buffons-manager-plugin";
 

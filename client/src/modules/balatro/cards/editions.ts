@@ -10,7 +10,6 @@ export const createBaseEdition = (): EditionHandler => {
 
     context.onEvent("score-card-calculated", (card: PokerCard) => {
       if (card.edition === type) {
-        console.log("Base edition applyed");
         scorePlugin.addChip(10000);
       }
     });

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  BalatroEngine,
-  createBalatroEngine,
-  createPlayerManagerPlugin,
-} from "./balatro-engine";
+import { BalatroEngine, createBalatroEngine } from "./balatro-engine";
+import { createPlayerManagerPlugin } from "./plugins/player-manager-plugin";
 import { createEconomyManagerPlugin } from "./plugins/economy-manager-plugin";
 import { createGamePlugin } from "./plugins/game-manager";
 import { createAnteManagerPlugin } from "./plugins/blind-manager-plugin";
