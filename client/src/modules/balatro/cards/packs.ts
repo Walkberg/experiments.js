@@ -1,9 +1,8 @@
 import { v4 as uuid } from "uuid";
 import { BalatroEngine } from "../balatro-engine";
-import { Buffon } from "../plugins";
 import { createRandomPokerCard, PokerCard } from "./poker-cards";
-import { PlanetCard, TarotCard } from "../balatro";
-import { Buyable } from "../plugins/buffons-manager-plugin";
+import { Buffon, PlanetCard, TarotCard } from "../balatro";
+import { Buyable } from "./cards";
 
 export type PackConfigId = string;
 
@@ -45,7 +44,7 @@ const packConfigs: Record<PackConfigId, PackConfig> = {
     id: "p_arcana",
     name: "Joker",
     description: "Joker",
-    cardCount: 1,
+    cardCount: 5,
     position: {
       x: 0,
       y: 3,
@@ -55,7 +54,7 @@ const packConfigs: Record<PackConfigId, PackConfig> = {
     id: "p_joker",
     name: "Joker",
     description: "Joker",
-    cardCount: 2,
+    cardCount: 5,
     position: {
       x: 1,
       y: 3,

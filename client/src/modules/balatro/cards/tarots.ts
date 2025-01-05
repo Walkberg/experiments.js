@@ -1,15 +1,17 @@
+import { v4 as uuid } from "uuid";
 import {
-  Consumable,
   getBuffonManagerPlugin,
   getConsumablesPlugin,
   getHandManagerPlugin,
   getPoolManagerPlugin,
 } from "../plugins";
-import { createBaseConsumable } from "./consumables";
 import { getNextCardRank, TarorType } from "../balatro";
 import { CardSuit, EnhancementType } from "./poker-cards";
 import { BalatroEngine } from "../balatro-engine";
 import { getEconomyManagerPlugin } from "../plugins/economy-manager-plugin";
+import { Buyable, Sellable, Useable } from "./cards";
+
+type TarotId = string;
 
 type TarotConfigId = string;
 
@@ -17,6 +19,16 @@ type Position = {
   x: number;
   y: number;
 };
+
+export type TarotCard = {
+  id: TarotId;
+  name: string;
+  type: "tarot";
+  description: string;
+  configId: TarotConfigId;
+} & Buyable &
+  Useable &
+  Sellable;
 
 export type TarotConfig = {
   id: TarotConfigId;
@@ -192,26 +204,35 @@ export function createTarotConsumable({
   name: TarorType;
   description: string;
   configId: TarotConfigId;
-}): Consumable {
-  const tarot = createBaseConsumable({
-    name,
-    description,
-    type: "tarot",
-    configId,
-  });
+}): TarotCard {
+  function onConsumableUsed(ctx: BalatroEngine) {}
 
-  tarot.getBuyPrice = () => {
+  function checkCanUse(ctx: BalatroEngine) {
+    return true;
+  }
+
+  function getBuyPrice() {
     return 3;
-  };
+  }
 
-  tarot.getSellPrice = () => {
-    return Math.floor(tarot.getBuyPrice() / 2);
-  };
+  function getSellPrice() {
+    return Math.floor(getBuyPrice() / 2);
+  }
 
-  return tarot;
+  return {
+    id: uuid(),
+    name: name,
+    type: "tarot",
+    description,
+    configId,
+    onConsumableUsed,
+    checkCanUse,
+    getBuyPrice,
+    getSellPrice,
+  };
 }
 
-const createTheFool = (): Consumable => {
+const createTheFool = (): TarotCard => {
   const theFool = createTarotConsumable({
     name: "theFool",
     description: "Le Mat",
@@ -233,7 +254,7 @@ const createTheFool = (): Consumable => {
   return theFool;
 };
 
-const createTheMagician = (): Consumable => {
+const createTheMagician = (): TarotCard => {
   return createUpdateEnhancementTarotCard({
     name: "theMagician",
     description: "Le Magicien",
@@ -243,7 +264,7 @@ const createTheMagician = (): Consumable => {
   });
 };
 
-const createTheHighPriestess = (): Consumable => {
+const createTheHighPriestess = (): TarotCard => {
   const theHighPriestess = createTarotConsumable({
     name: "theHighPriestess",
     description: "La Papesse",
@@ -263,7 +284,7 @@ const createTheHighPriestess = (): Consumable => {
 
   return theHighPriestess;
 };
-const createTheEmpress = (): Consumable => {
+const createTheEmpress = (): TarotCard => {
   return createUpdateEnhancementTarotCard({
     name: "theEmpress",
     description: "L'Impératrice",
@@ -273,7 +294,7 @@ const createTheEmpress = (): Consumable => {
   });
 };
 
-const createTheEmperor = (): Consumable => {
+const createTheEmperor = (): TarotCard => {
   return createTarotConsumable({
     name: "theEmperor",
     description: "L'Empereur",
@@ -281,7 +302,7 @@ const createTheEmperor = (): Consumable => {
   });
 };
 
-const createTheHierophant = (): Consumable => {
+const createTheHierophant = (): TarotCard => {
   return createUpdateEnhancementTarotCard({
     name: "theHierophant",
     description: "Le Pape",
@@ -291,7 +312,7 @@ const createTheHierophant = (): Consumable => {
   });
 };
 
-const createTheLovers = (): Consumable => {
+const createTheLovers = (): TarotCard => {
   return createUpdateEnhancementTarotCard({
     name: "theLovers",
     description: "Les Amoureux",
@@ -301,7 +322,7 @@ const createTheLovers = (): Consumable => {
   });
 };
 
-const createTheChariot = (): Consumable => {
+const createTheChariot = (): TarotCard => {
   return createUpdateEnhancementTarotCard({
     name: "theChariot",
     description: "Le Chariot",
@@ -311,7 +332,7 @@ const createTheChariot = (): Consumable => {
   });
 };
 
-const createJustice = (): Consumable => {
+const createJustice = (): TarotCard => {
   return createUpdateEnhancementTarotCard({
     name: "justice",
     description: "La Justice",
@@ -321,7 +342,7 @@ const createJustice = (): Consumable => {
   });
 };
 
-const createTheHermit = (): Consumable => {
+const createTheHermit = (): TarotCard => {
   const tarot = createTarotConsumable({
     name: "theHermit",
     description: "L'Hermite",
@@ -342,7 +363,7 @@ const createTheHermit = (): Consumable => {
   return tarot;
 };
 
-const createTheWheelOfFortune = (): Consumable => {
+const createTheWheelOfFortune = (): TarotCard => {
   return createTarotConsumable({
     name: "wheelOfFortune",
     description: "La Roue de Fortune",
@@ -350,7 +371,7 @@ const createTheWheelOfFortune = (): Consumable => {
   });
 };
 
-const createStrength = (): Consumable => {
+const createStrength = (): TarotCard => {
   const tarot = createTarotConsumable({
     name: "strength",
     description: "La Force",
@@ -369,7 +390,7 @@ const createStrength = (): Consumable => {
   return tarot;
 };
 
-const createTheHangedMan = (): Consumable => {
+const createTheHangedMan = (): TarotCard => {
   const tarot = createTarotConsumable({
     name: "theHangedMan",
     description: "Le Pendu",
@@ -396,7 +417,7 @@ const createTheHangedMan = (): Consumable => {
   return tarot;
 };
 
-const createDeath = (): Consumable => {
+const createDeath = (): TarotCard => {
   const tarot = createTarotConsumable({
     name: "death",
     description: "La Mort",
@@ -426,7 +447,7 @@ const createDeath = (): Consumable => {
   return tarot;
 };
 
-const createTemperance = (): Consumable => {
+const createTemperance = (): TarotCard => {
   const tarot = createTarotConsumable({
     name: "temperance",
     description: "Tempérance",
@@ -449,7 +470,7 @@ const createTemperance = (): Consumable => {
   return tarot;
 };
 
-const createTheDevil = (): Consumable => {
+const createTheDevil = (): TarotCard => {
   return createUpdateEnhancementTarotCard({
     name: "theDevil",
     description: "Le Diable",
@@ -459,7 +480,7 @@ const createTheDevil = (): Consumable => {
   });
 };
 
-const createTheTower = (): Consumable => {
+const createTheTower = (): TarotCard => {
   return createUpdateEnhancementTarotCard({
     name: "theTower",
     description: "La Maison Dieu",
@@ -469,7 +490,7 @@ const createTheTower = (): Consumable => {
   });
 };
 
-const createTheStar = (): Consumable => {
+const createTheStar = (): TarotCard => {
   return createUpdateSuitTarotCard({
     name: "theStar",
     description: "L'Étoile",
@@ -478,7 +499,7 @@ const createTheStar = (): Consumable => {
   });
 };
 
-const createTheMoon = (): Consumable => {
+const createTheMoon = (): TarotCard => {
   return createUpdateSuitTarotCard({
     name: "theMoon",
     description: "La Lune",
@@ -487,7 +508,7 @@ const createTheMoon = (): Consumable => {
   });
 };
 
-const createTheSun = (): Consumable => {
+const createTheSun = (): TarotCard => {
   return createUpdateSuitTarotCard({
     name: "theSun",
     description: "Le Soleil",
@@ -496,7 +517,7 @@ const createTheSun = (): Consumable => {
   });
 };
 
-const createJudgment = (): Consumable => {
+const createJudgment = (): TarotCard => {
   const tarot = createTarotConsumable({
     name: "judgment",
     description: "Le Jugement",
@@ -524,7 +545,7 @@ const createJudgment = (): Consumable => {
   return tarot;
 };
 
-const createTheWorld = (): Consumable => {
+const createTheWorld = (): TarotCard => {
   return createUpdateSuitTarotCard({
     name: "theWorld",
     description: "Le Monde",
@@ -543,7 +564,7 @@ function createUpdateSuitTarotCard({
   description: string;
   cardSuit: CardSuit;
   configId: TarotConfigId;
-}): Consumable {
+}): TarotCard {
   const tarot = createTarotConsumable({
     name: name,
     description: description,
@@ -582,7 +603,7 @@ function createUpdateEnhancementTarotCard({
   enhancement: EnhancementType;
   maxCardCount: number;
   configId: TarotConfigId;
-}): Consumable {
+}): TarotCard {
   const tarot = createTarotConsumable({
     name: name,
     description: description,

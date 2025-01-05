@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useCurrentGame } from "../../BalatroProvider";
-import { Buffon, BuffonsManagerPlugin } from "../../plugins";
+import { BuffonsManagerPlugin } from "../../plugins";
+import { BuffonCard } from "../../cards/buffons";
 
 export function useBuffonManager() {
   const { balatro } = useCurrentGame();
 
-  const [buffons, setBuffons] = useState<Buffon[]>([]);
+  const [buffons, setBuffons] = useState<BuffonCard[]>([]);
 
   const buffonManager =
     balatro?.getPlugin<BuffonsManagerPlugin>("buffon-manager");
@@ -22,6 +23,10 @@ export function useBuffonManager() {
     }
 
     balatro.onEvent("buffon-added", () => {
+      setBuffons(buffonManager.getBuffons());
+    });
+
+    balatro.onEvent("buffon-removed", () => {
       setBuffons(buffonManager.getBuffons());
     });
   }, [balatro, buffonManager]);

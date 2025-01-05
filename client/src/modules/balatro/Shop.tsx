@@ -10,6 +10,7 @@ import { BuffonCard } from "./modules/buffons/BuffonCard";
 import { getShopPackPlugin, ShopPackPlugin } from "./plugins/shop-pack-plugin";
 import { PlayCards } from "./modules/cards/PokerCards";
 import { PokerCard } from "./cards/poker-cards";
+import { isBuyable } from "./cards/cards";
 
 function useShopManager() {
   const [shop, setShop] = useState<IShop>(generateShop());
@@ -177,38 +178,38 @@ const CardItemContainer = ({
   return (
     <div className="flex flex-row gap-2 items-center">
       {items.map((shopItem) => {
-        const isSelected =
-          (shopItem?.type === "consumable" &&
-            selectedItemId === shopItem.item?.id) ||
-          (shopItem?.type === "buffon" &&
-            selectedItemId === shopItem.buffon?.id);
+        const isSelected = selectedItemId === shopItem?.id;
 
         return (
           <div className="flex flex-col gap-2">
             {shopItem.type === "buffon" && (
               <BuffonCard
                 selected={isSelected}
-                key={shopItem.buffon.id}
-                buffon={shopItem.buffon}
-                onClick={() => handleSelectItem(shopItem.buffon.id)}
+                key={shopItem.id}
+                buffon={shopItem}
+                onClick={() => handleSelectItem(shopItem.id)}
                 hoverSide="left"
-                topComponent={<PriceIndicator price={shopItem.price} />}
+                topComponent={<PriceIndicator price={shopItem.getBuyPrice()} />}
                 bottomComponent={
-                  <Buy canBuy={true} onBuy={() => onBuy(shopItem.buffon.id)} />
+                  <Buy canBuy={true} onBuy={() => onBuy(shopItem.id)} />
                 }
               />
             )}
-            {shopItem.type === "consumable" && (
+            {(shopItem.type === "tarot" ||
+              shopItem.type === "planet" ||
+              shopItem.type === "pack") && (
               <ConsumableCard
                 selected={isSelected}
-                key={shopItem.item.id}
-                consumable={shopItem.item}
-                onClick={() => handleSelectItem(shopItem.item.id)}
+                key={shopItem.id}
+                consumable={shopItem}
+                onClick={() => handleSelectItem(shopItem.id)}
                 hoverSide="left"
-                topComponent={<PriceIndicator price={shopItem.price} />}
+                topComponent={<PriceIndicator price={shopItem.getBuyPrice()} />}
                 rightComponent={<BuyAndUse onBuyAnUse={() => {}} />}
                 bottomComponent={
-                  <Buy canBuy={true} onBuy={() => onBuy(shopItem.item.id)} />
+                  isBuyable(shopItem) && (
+                    <Buy canBuy={true} onBuy={() => onBuy(shopItem.id)} />
+                  )
                 }
               />
             )}

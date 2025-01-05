@@ -5,11 +5,24 @@ import {
   PlayerManagerPlugin,
 } from "../plugins/player-manager-plugin";
 import { getDeckManagerPlugin, ScoreManagerPlugin } from "../plugins";
-import { Buffon } from "../plugins/buffons-manager-plugin";
+import { Buyable, Sellable } from "./cards";
 
 export type BuffonId = string;
 
-export type Rarety = "common" | "uncommon" | "rare" | "legendary";
+export type BuffonRarity = "common" | "uncommon" | "rare" | "legendary";
+
+export type BuffonCard = {
+  id: string;
+  name: string;
+  type: "buffon";
+  description: string;
+  configId: string;
+  rarity: BuffonRarity;
+  onCardComputeScore: (ctx: BalatroEngine, card: PokerCard) => void;
+  onBuffonEnabled: (ctx: BalatroEngine) => void;
+  onBuffonDisabled: (ctx: BalatroEngine) => void;
+} & Buyable &
+  Sellable;
 
 export type BuffonConfigId = string;
 
@@ -21,7 +34,7 @@ type Position = {
 export type BuffonConfig = {
   id: BuffonConfigId;
   name: string;
-  rarety: Rarety;
+  rarety: BuffonRarity;
   cost: number;
   position: Position;
 };
@@ -75,7 +88,7 @@ export function getBuffonConfig(id: BuffonConfigId): BuffonConfig {
   return config;
 }
 
-export function createBuffon1(): Buffon {
+export function createBuffon1(): BuffonCard {
   const buffon = createBaseBuffon({
     configId: "b_buffon1",
     name: "buffon_1",
@@ -97,7 +110,7 @@ export function createBuffon1(): Buffon {
   return buffon;
 }
 
-export function createBuffon2(): Buffon {
+export function createBuffon2(): BuffonCard {
   const buffon = createBaseBuffon({
     configId: "b_buffon2",
     name: "buffon_2",
@@ -119,7 +132,7 @@ export function createBuffon2(): Buffon {
   return buffon;
 }
 
-export function createBuffon3(): Buffon {
+export function createBuffon3(): BuffonCard {
   const buffon = createBaseBuffon({
     configId: "b_buffon3",
     name: "buffon_3",
@@ -140,7 +153,7 @@ export function createBuffon3(): Buffon {
   return buffon;
 }
 
-export function createBuffon4(): Buffon {
+export function createBuffon4(): BuffonCard {
   const buffon = createBaseBuffon({
     configId: "b_buffon4",
     name: "buffon_4",
@@ -170,7 +183,7 @@ export function createBaseBuffon({
   name: string;
   description: string;
   configId: BuffonConfigId;
-}): Buffon {
+}): BuffonCard {
   const config = getBuffonConfig(configId);
 
   function getBuyPrice() {
@@ -187,6 +200,7 @@ export function createBaseBuffon({
     name: config.name,
     description,
     rarity: config.rarety,
+    type: "buffon",
     onCardComputeScore(context: BalatroEngine, card: PokerCard) {},
     onBuffonEnabled(context: BalatroEngine) {},
     onBuffonDisabled(context: BalatroEngine) {},

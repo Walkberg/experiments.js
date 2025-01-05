@@ -1,8 +1,19 @@
 import { Plugin } from "../balatro-engine";
 import { BalatroEngine } from "../balatro-engine";
+import {
+  Buyable,
+  isSellable,
+  Sellable,
+  SpectralCard,
+  Useable,
+} from "../cards/cards";
 import { PokerCardPack } from "../cards/packs";
-import { PokerCard } from "../cards/poker-cards";
-import { Buyable, Sellable } from "./buffons-manager-plugin";
+import { PlanetCard } from "../cards/planets";
+import { TarotCard } from "../cards/tarots";
+import {
+  EconomyManagerPlugin,
+  getEconomyManagerPlugin,
+} from "./economy-manager-plugin";
 
 export interface ConsumablesManagerPlugin extends Plugin {
   addConsumables: (items: Consumable[]) => void;
@@ -12,29 +23,21 @@ export interface ConsumablesManagerPlugin extends Plugin {
   getLastConsumableUsed: () => Consumable | null;
   canAddConsumable: () => boolean;
   useConsumable: (id: string) => void;
+  sellConsumable: (id: string) => void;
   setMaxCount: (maxCount: number) => void;
   getMaxCount: () => number;
 }
 
 export type ConsumableType = "planet" | "tarot" | "pack" | "spectral";
 
-export type Consumable =
-  | ({
-      id: string;
-      name: string;
-      type: "planet" | "tarot" | "spectral";
-      configId: string;
-      description: string;
-      checkCanUse?: (ctx: BalatroEngine) => boolean;
-      onConsumableUsed?: (ctx: BalatroEngine) => void;
-    } & Buyable &
-      Sellable)
-  | PokerCardPack;
+export type Consumable = TarotCard | SpectralCard | PlanetCard | PokerCardPack;
 
 export function createConsumableManagerPlugin(): ConsumablesManagerPlugin {
   const MAX_COUNT_START = 2;
 
   let _engine: BalatroEngine;
+  let _economyManager: EconomyManagerPlugin;
+
   let _consumables: Consumable[] = [];
 
   let _lastConsumableUsed: Consumable | null = null;
@@ -43,6 +46,7 @@ export function createConsumableManagerPlugin(): ConsumablesManagerPlugin {
 
   function init(engine: BalatroEngine) {
     _engine = engine;
+    _economyManager = getEconomyManagerPlugin(engine);
   }
 
   function canAddConsumable() {
@@ -98,6 +102,24 @@ export function createConsumableManagerPlugin(): ConsumablesManagerPlugin {
     _lastConsumableUsed = consumable;
   }
 
+  function sellConsumable(id: string) {
+    const consumable = _consumables.find((consumable) => consumable.id === id);
+    if (consumable == null) {
+      return;
+    }
+
+    removeConsumable(id);
+
+    _engine.emitEvent("consumable-used", { item: consumable });
+
+    if (isSellable(consumable)) {
+      const price = consumable.getSellPrice();
+      _economyManager.removeMoney(price);
+    }
+
+    _lastConsumableUsed = consumable;
+  }
+
   function getLastConsumableUsed() {
     return _lastConsumableUsed;
   }
@@ -119,6 +141,7 @@ export function createConsumableManagerPlugin(): ConsumablesManagerPlugin {
     getLastConsumableUsed,
     canAddConsumable,
     useConsumable,
+    sellConsumable,
     init,
     addConsumables,
     addConsumable,

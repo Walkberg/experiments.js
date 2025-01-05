@@ -5,8 +5,7 @@ import {
 } from "@/components/ui/hover-card";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { Buffon } from "../../plugins";
-import { getBuffonConfig } from "../../cards/buffons";
+import { BuffonCard as Buffon, getBuffonConfig } from "../../cards/buffons";
 
 interface BuffonCardProps {
   buffon: Buffon;

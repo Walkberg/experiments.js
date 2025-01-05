@@ -1,52 +1,37 @@
 import { Plugin } from "../balatro-engine";
-import { PokerCard } from "../cards/poker-cards";
 import { BalatroEngine } from "../balatro-engine";
-
-export type BuffonId = string;
-
-export type BuffonRarity = "common" | "uncommon" | "rare" | "legendary";
-
-export interface Buyable {
-  getBuyPrice: () => number;
-}
-
-export interface Sellable {
-  getSellPrice: () => number;
-}
-
-export type Buffon = {
-  id: BuffonId;
-  configId: string;
-  name: string;
-  description: string;
-  rarity: BuffonRarity;
-  onCardComputeScore: (ctx: BalatroEngine, card: PokerCard) => void;
-  onBuffonEnabled: (ctx: BalatroEngine) => void;
-  onBuffonDisabled: (ctx: BalatroEngine) => void;
-} & Buyable &
-  Sellable;
+import { BuffonCard } from "../cards/buffons";
+import { PokerCard } from "../cards/poker-cards";
+import {
+  EconomyManagerPlugin,
+  getEconomyManagerPlugin,
+} from "./economy-manager-plugin";
 
 export interface BuffonsManagerPlugin extends Plugin {
-  addBuffons: (buffons: Buffon[]) => void;
-  addBuffon: (buffon: Buffon) => void;
+  addBuffons: (buffons: BuffonCard[]) => void;
+  addBuffon: (buffon: BuffonCard) => void;
   removeBuffon: (id: string) => void;
+  sellBuffon: (id: string) => void;
   canAddBuffon: () => boolean;
-  getBuffons: () => Buffon[];
+  getBuffons: () => BuffonCard[];
   setMaxCount: (maxCount: number) => void;
   getMaxCount: () => number;
-  applyBuffonEffectCardPlay: (buffon: Buffon, card: PokerCard) => void;
+  applyBuffonEffectCardPlay: (buffon: BuffonCard, card: PokerCard) => void;
 }
 
 export function createBuffonManagerPlugin(): BuffonsManagerPlugin {
   let _engine: BalatroEngine;
-  let buffons: Buffon[] = [];
+  let buffons: BuffonCard[] = [];
   let maxCount = 5;
+
+  let _economyManager: EconomyManagerPlugin;
 
   function init(engine: BalatroEngine) {
     _engine = engine;
+    _economyManager = getEconomyManagerPlugin(engine);
   }
 
-  function addBuffons(buffons: Buffon[]) {
+  function addBuffons(buffons: BuffonCard[]) {
     if (buffons.length >= maxCount) {
       return;
       console.warn("Cannot add Buffons: Max count reached");
@@ -60,7 +45,7 @@ export function createBuffonManagerPlugin(): BuffonsManagerPlugin {
     return buffons.length < maxCount;
   }
 
-  function addBuffon(buffon: Buffon) {
+  function addBuffon(buffon: BuffonCard) {
     if (!canAddBuffon()) {
       console.warn("Cannot add Buffon: Max count reached");
       return;
@@ -81,6 +66,8 @@ export function createBuffonManagerPlugin(): BuffonsManagerPlugin {
 
     buffons = buffons.filter((buffon) => buffon.id !== id);
 
+    _engine.emitEvent("buffon-removed", { buffon });
+
     buffon.onBuffonDisabled(_engine);
   }
 
@@ -96,8 +83,19 @@ export function createBuffonManagerPlugin(): BuffonsManagerPlugin {
     return maxCount;
   }
 
-  function applyBuffonEffectCardPlay(buffon: Buffon, pokerCard: PokerCard) {
+  function applyBuffonEffectCardPlay(buffon: BuffonCard, pokerCard: PokerCard) {
     buffon.onCardComputeScore(_engine, pokerCard);
+  }
+
+  function sellBuffon(id: string) {
+    const buffon = buffons.find((buffon) => buffon.id === id);
+
+    if (buffon == null) {
+      return;
+    }
+    removeBuffon(id);
+
+    _economyManager.removeMoney(buffon.getSellPrice());
   }
 
   return {
@@ -111,6 +109,7 @@ export function createBuffonManagerPlugin(): BuffonsManagerPlugin {
     setMaxCount,
     getMaxCount,
     applyBuffonEffectCardPlay,
+    sellBuffon,
   };
 }
 

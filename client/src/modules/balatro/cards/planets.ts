@@ -1,10 +1,12 @@
 import { BalatroEngine } from "../balatro-engine";
+import { v4 as uuid } from "uuid";
 import {
   PlanetType,
   Consumable,
   getHandScorePlugin,
   convertPlanetTypeToHandType,
 } from "../plugins";
+import { Buyable, Sellable, Useable } from "./cards";
 import { createBaseConsumable } from "./consumables";
 import { packs } from "./packs";
 import { tarotCards } from "./tarots";
@@ -15,6 +17,16 @@ type Position = {
   x: number;
   y: number;
 };
+
+export type PlanetCard = {
+  id: string;
+  name: string;
+  type: "planet";
+  description: string;
+  configId: PlanetConfigId;
+} & Buyable &
+  Useable &
+  Sellable;
 
 export type PlanetConfig = {
   id: PlanetConfigId;
@@ -101,33 +113,36 @@ export function createPlanetConsumable({
   description: string;
   planeteType: PlanetType;
   configId: PlanetConfigId;
-}): Consumable {
-  const planet = createBaseConsumable({
-    name,
-    description,
-    type: "planet",
-    configId,
-  });
-
-  planet.onConsumableUsed = (ctx: BalatroEngine) => {
+}): PlanetCard {
+  function onConsumableUsed(ctx: BalatroEngine) {
     const handScoreManager = getHandScorePlugin(ctx);
 
     handScoreManager.improveHandScore(convertPlanetTypeToHandType(planeteType));
-  };
+  }
 
-  planet.checkCanUse = (ctx: BalatroEngine) => {
+  function checkCanUse(ctx: BalatroEngine) {
     return true;
-  };
+  }
 
-  planet.getBuyPrice = () => {
+  function getBuyPrice() {
     return 3;
-  };
+  }
 
-  planet.getSellPrice = () => {
-    return Math.floor(planet.getBuyPrice() / 2);
-  };
+  function getSellPrice() {
+    return Math.floor(getBuyPrice() / 2);
+  }
 
-  return planet;
+  return {
+    id: uuid(),
+    name: name,
+    type: "planet",
+    description,
+    configId,
+    onConsumableUsed,
+    checkCanUse,
+    getBuyPrice,
+    getSellPrice,
+  };
 }
 
 export function createMercury(): Consumable {

@@ -1,5 +1,6 @@
 import { BalatroEngine } from "../balatro-engine";
 import { v4 as uuid } from "uuid";
+import { Buyable } from "./cards";
 
 export type EnhancementType =
   | "none"
@@ -46,11 +47,13 @@ export type Seal = { seal: SealType };
 
 export type PokerCard = {
   id: string;
+  type: "poker-card";
   suit: CardSuit;
   rank: CardRank;
 } & Edition &
   Enhancement &
-  Seal;
+  Seal &
+  Buyable;
 
 export interface EnhancementTest {
   init(engine: BalatroEngine): void;
@@ -138,12 +141,17 @@ const ALL_RANKS: CardRank[] = [
 ];
 
 export function createRandomPokerCard(): PokerCard {
+  function getBuyPrice(): number {
+    return 1;
+  }
   return {
+    type: "poker-card",
     suit: ALL_SUITS[Math.floor(Math.random() * ALL_SUITS.length)],
     rank: ALL_RANKS[Math.floor(Math.random() * ALL_RANKS.length)],
     id: uuid(),
     enhancement: "mult",
     edition: "foil",
     seal: "none",
+    getBuyPrice,
   };
 }

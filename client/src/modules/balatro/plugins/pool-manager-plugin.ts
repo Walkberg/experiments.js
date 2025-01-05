@@ -1,33 +1,39 @@
-import { Buffon } from "./buffons-manager-plugin";
 import { BalatroEngine, Plugin } from "../balatro-engine";
+import { BuffonCard } from "../cards/buffons";
+import { PokerCardPack } from "../cards/packs";
+import { PlanetCard } from "../cards/planets";
+import { TarotCard } from "../cards/tarots";
 import { Consumable, ConsumableType } from "./consumables-manager-plugin";
 
 export interface PoolManagerPlugin extends Plugin {
-  registerBuffon: (buffon: Buffon) => void;
-  registerBuffons: (buffons: Buffon[]) => void;
+  registerBuffon: (buffon: BuffonCard) => void;
+  registerBuffons: (buffons: BuffonCard[]) => void;
   registerItem: (item: Consumable) => void;
   registerItems: (items: Consumable[]) => void;
   removeFromPool: (cardId: string) => void;
-  getPool: () => Buffon[];
+  getPool: () => BuffonCard[];
   getConsumablePool: () => Consumable[];
   getRandomConsumables: (count: number, type?: ConsumableType) => Consumable[];
   getRandomConsumable: (type?: ConsumableType) => Consumable;
-  getRandomBuffons: (count: number) => Buffon[];
-  getRandomBuffon: () => Buffon;
-  setupPool: (cards: Buffon[]) => void;
+  getRandomBuffons: (count: number) => BuffonCard[];
+  getRandomBuffon: () => BuffonCard;
+  getRandomPlanet: () => PlanetCard;
+  getRandomTarot: () => TarotCard;
+  getRandomPack: () => PokerCardPack;
+  setupPool: (cards: BuffonCard[]) => void;
 }
 
 export function createPoolManagerPlugin(): PoolManagerPlugin {
-  let pool: Buffon[] = [];
+  let pool: BuffonCard[] = [];
   let items: Consumable[] = [];
 
   function init(engine: BalatroEngine) {}
 
-  function registerBuffon(buffon: Buffon) {
+  function registerBuffon(buffon: BuffonCard) {
     pool.push(buffon);
   }
 
-  function registerBuffons(buffons: Buffon[]) {
+  function registerBuffons(buffons: BuffonCard[]) {
     for (const buffon of buffons) {
       registerBuffon(buffon);
     }
@@ -51,7 +57,7 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     return [...pool];
   }
 
-  function setupPool(cards: Buffon[]) {
+  function setupPool(cards: BuffonCard[]) {
     pool = [...cards];
   }
 
@@ -69,6 +75,39 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     const filteredConsumables = type
       ? items.filter((item) => item.type === type)
       : items;
+
+    const randomIndex = Math.floor(Math.random() * filteredConsumables.length);
+    const randomConsumable = filteredConsumables[randomIndex];
+
+    filteredConsumables.splice(randomIndex, 1);
+
+    return randomConsumable;
+  }
+
+  function getRandomPlanet(): PlanetCard {
+    const filteredConsumables = items.filter((item) => item.type === "planet");
+
+    const randomIndex = Math.floor(Math.random() * filteredConsumables.length);
+    const randomConsumable = filteredConsumables[randomIndex];
+
+    filteredConsumables.splice(randomIndex, 1);
+
+    return randomConsumable;
+  }
+
+  function getRandomTarot(): TarotCard {
+    const filteredConsumables = items.filter((item) => item.type === "tarot");
+
+    const randomIndex = Math.floor(Math.random() * filteredConsumables.length);
+    const randomConsumable = filteredConsumables[randomIndex];
+
+    filteredConsumables.splice(randomIndex, 1);
+
+    return randomConsumable;
+  }
+
+  function getRandomPack() {
+    const filteredConsumables = items.filter((item) => item.type === "pack");
 
     const randomIndex = Math.floor(Math.random() * filteredConsumables.length);
     const randomConsumable = filteredConsumables[randomIndex];
@@ -109,6 +148,9 @@ export function createPoolManagerPlugin(): PoolManagerPlugin {
     getRandomConsumables,
     setupPool,
     getRandomBuffons,
+    getRandomPlanet,
+    getRandomTarot,
+    getRandomPack,
   };
 }
 

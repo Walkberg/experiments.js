@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { Consumable, ConsumableType } from "../plugins";
+import { BalatroEngine } from "../balatro-engine";
 
 export function createBaseConsumable({
   name,
@@ -26,6 +27,10 @@ export function createBaseConsumable({
     type: type,
     description,
     configId,
+    onConsumableUsed: (ctx: BalatroEngine) => {},
+    checkCanUse: (ctx: BalatroEngine) => {
+      return true;
+    },
     getBuyPrice,
     getSellPrice,
   };

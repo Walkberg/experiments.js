@@ -2,7 +2,7 @@ import { Plugin } from "../balatro-engine";
 import { BalatroEngine } from "../balatro-engine";
 import { EconomyManagerPlugin } from "./economy-manager-plugin";
 import { DeckManagerPlugin } from "./deck-manager-plugin";
-import { Buffon, BuffonsManagerPlugin } from "./buffons-manager-plugin";
+import { BuffonsManagerPlugin } from "./buffons-manager-plugin";
 import {
   Consumable,
   ConsumablesManagerPlugin,
@@ -10,10 +10,14 @@ import {
 import { PoolManagerPlugin } from "./pool-manager-plugin";
 import { getSeedManagerPlugin, SeedManagerPlugin } from "./seed-manager-plugin";
 import { getShopPackPlugin, ShopPackPlugin } from "./shop-pack-plugin";
+import { BuffonCard } from "../cards/buffons";
+import { TarotCard } from "../cards/tarots";
+import { PlanetCard } from "../cards/planets";
+import { PokerCardPack } from "../cards/packs";
 
 export interface ShopPlugin extends Plugin {
   getItems: () => Buyable[];
-  getPacks: () => Buyable[];
+  getPacks: () => PokerCardPack[];
   buyItem: (itemId: string) => void;
   addItem: (item: Buyable) => void;
   getRerollPrice: () => number;
@@ -25,21 +29,7 @@ export interface ShopPlugin extends Plugin {
   skipOpenPack: () => void;
 }
 
-export type Buyable = BuyableBuffon | BuyableConsumable;
-
-export type BuyableBuffon = {
-  type: "buffon";
-  buffon: Buffon;
-} & Price;
-
-export type BuyableConsumable = {
-  type: "consumable";
-  item: Consumable;
-} & Price;
-
-interface Price {
-  price: number;
-}
+export type Buyable = BuffonCard | TarotCard | PlanetCard | PokerCardPack;
 
 export type ShopPhase = "buy" | "open-pack";
 
@@ -61,7 +51,7 @@ export function createShopPlugin(): ShopPlugin {
   let _shopPackManager: ShopPackPlugin;
 
   let _items: Buyable[] = [];
-  let _packs: Buyable[] = [];
+  let _packs: PokerCardPack[] = [];
   let rerollPrice = REROLL_START_PRICE;
 
   function init(engine: BalatroEngine) {
@@ -109,7 +99,7 @@ export function createShopPlugin(): ShopPlugin {
       buyable.push(generateItem());
     }
 
-    let packs: Buyable[] = [];
+    let packs: PokerCardPack[] = [];
     for (let i = 0; i < 2; i++) {
       packs.push(generatePack());
     }
@@ -133,37 +123,18 @@ export function createShopPlugin(): ShopPlugin {
 
     if (random < 20) {
       const card = _poolManager.getRandomBuffon();
-      return {
-        type: "buffon",
-        buffon: card,
-        price: BUFFON_PRICE,
-      };
+      return card;
     } else if (random < 24) {
-      const card = _poolManager.getRandomConsumable("planet");
-      return {
-        type: "consumable",
-        item: card,
-        price: BUFFON_PRICE,
-      };
+      return _poolManager.getRandomPlanet();
     } else {
-      const card = _poolManager.getRandomConsumable("tarot");
-      return {
-        type: "consumable",
-        item: card,
-        price: BUFFON_PRICE,
-      };
+      return _poolManager.getRandomTarot();
     }
   }
 
-  function generatePack(): Buyable {
+  function generatePack(): PokerCardPack {
     const random = _seedManager.random() * 28;
 
-    const card = _poolManager.getRandomConsumable("pack");
-    return {
-      type: "consumable",
-      item: card,
-      price: BUFFON_PRICE,
-    };
+    return _poolManager.getRandomPack();
   }
 
   function getPacks() {
@@ -210,7 +181,7 @@ export function createShopPlugin(): ShopPlugin {
       return false;
     }
 
-    if (item.type === "consumable") {
+    if (item.type === "planet" || item.type === "tarot") {
       if (!_consumablesManager.canAddConsumable()) {
         return false;
       }
@@ -220,7 +191,7 @@ export function createShopPlugin(): ShopPlugin {
       }
     }
 
-    return item ? _economy.getMoney() >= item.price : false;
+    return item ? _economy.getMoney() >= item.getBuyPrice() : false;
   }
 
   function buyItem(itemId: string) {
@@ -234,16 +205,16 @@ export function createShopPlugin(): ShopPlugin {
       return;
     }
 
-    _economy.removeMoney(item.price);
+    _economy.removeMoney(item.getBuyPrice());
 
     if (item.type === "buffon") {
-      _buffonsManager.addBuffon(item.buffon);
+      _buffonsManager.addBuffon(item);
     } else {
-      if (item.item.type === "pack") {
-        _shopPackManager.openPack(item.item);
+      if (item.type === "pack") {
+        _shopPackManager.openPack(item);
         _phase = "open-pack";
       } else {
-        _consumablesManager.addConsumable(item.item);
+        _consumablesManager.addConsumable(item);
       }
     }
 
@@ -284,8 +255,8 @@ export function createShopPlugin(): ShopPlugin {
 
 function getBuyableId(buy: Buyable) {
   if (buy.type === "buffon") {
-    return buy.buffon.id;
+    return buy.id;
   } else {
-    return buy.item.id;
+    return buy.id;
   }
 }

@@ -95,14 +95,10 @@ export const Balatro = () => {
         </div>
         <div className="grid grid-rows-4 grid-cols-5 col-span-4 m-2 w-full h-screen gap-3">
           <div className="col-span-3">
-            <CardContainer>
-              <Buffons />
-            </CardContainer>
+            <Buffons />
           </div>
           <div className="col-span-2">
-            <CardContainer>
-              <ConsumableList />
-            </CardContainer>
+            <ConsumableList />
           </div>
           <div className="col-span-4 row-span-3 col-start-1 row-start-2">
             {phase === "Blind" ? (
@@ -337,16 +333,24 @@ export const Score = ({}: ScoreProps) => {
 };
 
 interface CardContainerProps {
+  currentCount?: number;
+  maxCount?: number;
   children: React.ReactNode;
 }
 
-export const CardContainer = ({ children }: CardContainerProps) => {
+export const CardContainer = ({
+  children,
+  currentCount = 0,
+  maxCount = 0,
+}: CardContainerProps) => {
   return (
     <div className="h-full py-4">
       <Card className="flex grow justify-center p-2 bg-black/20 h-full items-center ">
         {children}
       </Card>
-      <div className="flex flex-row grow p-2">0/2</div>
+      <div>
+        {currentCount}/{maxCount}
+      </div>
     </div>
   );
 };
