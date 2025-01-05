@@ -3,7 +3,9 @@ import { ConsumableCard } from "./ConsumableCard";
 import { useConsumableManager } from "./useConsumable";
 import { Consumable } from "../../plugins";
 import { CardContainer } from "../../BalatroPage";
-import { isSellable, Sellable } from "../../cards/cards";
+import { isSellable } from "../../cards/cards";
+import { SellCard } from "./SellCard";
+import { UseCard } from "./UseCard";
 
 interface ConsumableListProps {}
 
@@ -56,34 +58,5 @@ export const ConsumableList = ({}: ConsumableListProps) => {
         ))}
       </div>
     </CardContainer>
-  );
-};
-
-export const SellCard = ({
-  onSell,
-  sellable,
-}: {
-  onSell: () => void;
-  sellable: Sellable;
-}) => {
-  return (
-    <button
-      onClick={() => onSell()}
-      className="bg-green-500 hover:bg-green-700  text-white font-bold py-2 px-4 rounded"
-    >
-      Vendre
-      <br />${sellable.getSellPrice()}
-    </button>
-  );
-};
-
-export const UseCard = ({ onUse }: { onUse: () => void }) => {
-  return (
-    <button
-      onClick={() => onUse()}
-      className="bg-red-500 hover:bg-red-700  text-white font-bold py-2 px-4 rounded"
-    >
-      Utiliser
-    </button>
   );
 };

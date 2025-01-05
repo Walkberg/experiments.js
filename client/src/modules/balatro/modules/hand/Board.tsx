@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { PlayCard } from "../cards/Card";
+import { PokerCard } from "../cards/PokerCard";
 import { useCurrentGame } from "../../BalatroProvider";
 import { Hand } from "./Hand";
 import { Hand as IHand } from "../../balatro";

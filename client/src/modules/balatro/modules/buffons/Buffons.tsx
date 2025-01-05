@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SellCard } from "../consumables/Consumables";
+import { SellCard } from "../consumables/SellCard";
 import { BuffonCard } from "./BuffonCard";
 import { useBuffonManager } from "./useBuffonManager";
 import { BuffonCard as Buffon } from "../../cards/buffons";

@@ -17,7 +17,6 @@ import { GameOver } from "./modules/gameover/GameOver";
 import { Deck } from "./modules/deck/Deck";
 import { BalatroHomePage } from "./modules/menu/HomePage";
 import { ConsumableList } from "./modules/consumables/Consumables";
-import { PlayCardsTest } from "./modules/cards/PokerCards";
 import { RunInfo } from "./modules/run-info/RunInfo";
 import { BlindInfo } from "./modules/blinds/BlindInfo";
 import { BlindWin } from "./modules/blinds/BlindWin";
@@ -26,8 +25,6 @@ import { Buffons } from "./modules/buffons/Buffons";
 export const BalatroTest = () => {
   return (
     <div className="grid grid-cols-3  grid-rows-2 gap-2">
-      <PlayCardsTest />
-
       <div className="flex flex-row gap-2">dsfdf</div>
     </div>
   );

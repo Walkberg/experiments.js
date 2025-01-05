@@ -18,7 +18,7 @@ import { ReactNode, useRef, useState } from "react";
 import { animated, useSpring } from "@react-spring/web";
 import { cn } from "@/lib/utils";
 
-interface PlayCardProps {
+interface PokerCardProps {
   card: ICard;
   onSelectCard?: () => void;
   selected?: boolean;
@@ -26,13 +26,13 @@ interface PlayCardProps {
   scaleFactor?: number;
 }
 
-export const PlayCard = ({
+export const PokerCard = ({
   card,
   onSelectCard,
   selected,
   bottomComponent,
   scaleFactor = 2,
-}: PlayCardProps) => {
+}: PokerCardProps) => {
   return (
     <HoverCard openDelay={50} closeDelay={50}>
       <HoverCardTrigger>

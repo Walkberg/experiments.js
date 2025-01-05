@@ -7,7 +7,6 @@ import {
   convertPlanetTypeToHandType,
 } from "../plugins";
 import { Buyable, Sellable, Useable } from "./cards";
-import { createBaseConsumable } from "./consumables";
 import { packs } from "./packs";
 import { tarotCards } from "./tarots";
 

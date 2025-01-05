@@ -1,18 +1,15 @@
-import {
-  Consumable,
-  ConsumableType,
-} from "../../plugins/consumables-manager-plugin";
-import { getTarotConfig } from "../../cards/tarots";
-import { getPlanetConfig } from "../../cards/planets";
+import { Consumable } from "../../plugins/consumables-manager-plugin";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Card } from "@/components/ui/card";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { getPackConfig } from "../../cards/packs";
+import { PlanetCard } from "./PlanetCard";
+import { Pack } from "./Pack";
+import { TarotCard } from "./TarotCard";
+import { ConsumableDescription } from "./ConsumableDescription";
 
 interface ConsumableCardProps {
   consumable: Consumable;
@@ -86,183 +83,10 @@ export const ConsumableFactory = ({
     case "pack":
       return <Pack pack={consumable} onClick={onClick} />;
     default:
-      return (
-        <Card onClick={onClick}>
-          <div>{consumable.name}</div>
-          <div>{consumable.description}</div>
-        </Card>
-      );
+      return null;
   }
-};
-
-interface TarotCardProps {
-  tarot: Consumable;
-  onClick?: () => void;
-}
-
-export const TarotCard = ({ tarot, onClick }: TarotCardProps) => {
-  const configId = tarot.configId;
-
-  const config = getTarotConfig(configId);
-
-  if (!config) {
-    return null;
-  }
-
-  const pos = getBackgroundPosition(config.position);
-
-  return (
-    <button
-      onClick={onClick}
-      className="card-consumables"
-      style={{
-        ...cardSizeStyle,
-        ...cardConsumableBackgroundStyle,
-        backgroundPositionX: pos.x,
-        backgroundPositionY: pos.y,
-      }}
-    />
-  );
-};
-
-interface PlanetCardProps {
-  planet: Consumable;
-  onClick?: () => void;
-}
-
-export const PlanetCard = ({ planet, onClick }: PlanetCardProps) => {
-  const configId = planet.configId;
-
-  const config = getPlanetConfig(configId);
-
-  if (config == null) {
-    return null;
-  }
-
-  const pos = getBackgroundPosition(config.position);
-
-  return (
-    <button
-      onClick={onClick}
-      className="card-consumables"
-      style={{
-        ...cardSizeStyle,
-        ...cardConsumableBackgroundStyle,
-        backgroundPositionX: pos.x,
-        backgroundPositionY: pos.y,
-      }}
-    />
-  );
-};
-
-interface PackCardProps {
-  pack: Consumable;
-  onClick?: () => void;
-}
-
-export const Pack = ({ pack, onClick }: PackCardProps) => {
-  const configId = pack.configId;
-
-  const config = getPackConfig(configId);
-
-  if (config == null) {
-    return null;
-  }
-
-  const pos = getBackgroundPosition(config.position);
-
-  return (
-    <button
-      onClick={onClick}
-      className="pack"
-      style={{
-        ...cardSizeStyle,
-        ...packBackgroundStyle,
-        backgroundPositionX: pos.x,
-        backgroundPositionY: pos.y,
-      }}
-    />
-  );
-};
-
-interface ConsumableDescriptionProps {
-  consumable: Consumable;
-}
-
-export const ConsumableDescription = ({
-  consumable,
-}: ConsumableDescriptionProps) => {
-  return (
-    <div className="flex flex-col items-center gap-2 ">
-      <div className="text-white">{consumable.name}</div>
-      <div className="min-w-fit bg-white rounded-2xl p-2">
-        {consumable.description}
-      </div>
-      <ConsumableTypeTag type={consumable.type} />
-    </div>
-  );
-};
-
-export const ConsumableTypeTag = ({ type }: { type: ConsumableType }) => {
-  const color = getConsumableTypeToColor(type);
-  return (
-    <div
-      className="text-white px-8 py-2 rounded-2xl"
-      style={{ backgroundColor: color }}
-    >
-      {getConsumableTypeToText(type)}
-    </div>
-  );
-};
-
-export function getConsumableTypeToText(type: ConsumableType) {
-  switch (type) {
-    case "tarot":
-      return "Tarot";
-    case "planet":
-      return "Planet";
-  }
-}
-
-export function getConsumableTypeToColor(type: ConsumableType) {
-  switch (type) {
-    case "tarot":
-      return "#448811";
-    case "planet":
-      return "#148811";
-  }
-}
-
-interface Position {
-  x: number;
-  y: number;
-}
-
-const SIZE_FACTOR = 2;
-
-const CARD_X_SIZE = 71 * SIZE_FACTOR;
-const CARD_Y_SIZE = 95 * SIZE_FACTOR;
-
-const cardSizeStyle = {
-  width: `${CARD_X_SIZE}px`,
-  height: `${CARD_Y_SIZE}px`,
-};
-
-function getBackgroundPosition(position: Position): Position {
-  return {
-    x: -(position.x * CARD_X_SIZE),
-    y: -(position.y * CARD_Y_SIZE),
-  };
-}
-
-const cardConsumableBackgroundStyle = {
-  backgroundSize: `${CARD_X_SIZE * 10}px ${CARD_Y_SIZE * 6}px`,
 };
 
 const MovableCard = ({ children }: { children: React.ReactNode }) => {
   return <div className="custom-card">{children}</div>;
-};
-
-const packBackgroundStyle = {
-  backgroundSize: `${CARD_X_SIZE * 4}px ${CARD_Y_SIZE * 9}px`,
 };
