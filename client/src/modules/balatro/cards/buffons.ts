@@ -44,7 +44,7 @@ const buffonConfigs: Record<BuffonConfigId, BuffonConfig> = {
     id: "b_buffon1",
     name: "buffon_1",
     rarety: "common",
-    cost: 1,
+    cost: 3,
     position: {
       x: 0,
       y: 0,
@@ -54,7 +54,7 @@ const buffonConfigs: Record<BuffonConfigId, BuffonConfig> = {
     id: "b_buffon2",
     name: "buffon_2",
     rarety: "common",
-    cost: 1,
+    cost: 3,
     position: {
       x: 1,
       y: 0,
@@ -64,7 +64,7 @@ const buffonConfigs: Record<BuffonConfigId, BuffonConfig> = {
     id: "b_buffon3",
     name: "buffon_3",
     rarety: "common",
-    cost: 1,
+    cost: 3,
     position: {
       x: 2,
       y: 0,
@@ -74,7 +74,7 @@ const buffonConfigs: Record<BuffonConfigId, BuffonConfig> = {
     id: "b_buffon4",
     name: "buffon_4",
     rarety: "common",
-    cost: 1,
+    cost: 3,
     position: {
       x: 3,
       y: 0,

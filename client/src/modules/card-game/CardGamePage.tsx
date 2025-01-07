@@ -1,80 +1,16 @@
 import "./CardGamePage.css";
 import { Button } from "@/components/ui/button";
+import { ReactNode, createContext, useContext } from "react";
+import { Engine } from "./game";
+import { ShopPlugin } from "./plugins/shop-plugin";
+import { PlayerPlugin } from "./plugins/player-plugin";
+import { EconomyPlugin } from "./plugins/economy-plugin";
+import { OpponentsPlugin } from "./plugins/opponent";
+import { useGame } from "./modules/game/useGame";
 import { Card } from "@/components/ui/card";
-import {
-  useState,
-  useEffect,
-  ReactNode,
-  createContext,
-  useContext,
-} from "react";
-import {
-  createEngine,
-  Engine,
-  removeMod,
-  Card as CardI,
-  createCard,
-  createShopPlugin,
-  ShopPlugin,
-  createPlayerPlugin,
-  PlayerPlugin,
-  createOpponentPlugin,
-  OpponentsPlugin,
-  createEconomyPlugin,
-  EconomyPlugin,
-  createPoolManagerPlugin,
-} from "./game";
-import { cn } from "@/lib/utils";
-
-const useGame = () => {
-  const [game, setGame] = useState<Engine | null>(null);
-  const [messages, setMessages] = useState<string[]>([]);
-
-  const [refreshCounter, setRefreshCounter] = useState(0);
-
-  useEffect(() => {
-    const myGame = createEngine();
-
-    const playerPlugin = createPlayerPlugin();
-    const opponentPlugin = createOpponentPlugin({ count: 8 });
-    const shopPlugin = createShopPlugin();
-    const economyPlugin = createEconomyPlugin();
-    const poolManagerPlugin = createPoolManagerPlugin();
-
-    poolManagerPlugin.addCard(maSuperCard);
-    poolManagerPlugin.addCard(maSuperCard2);
-
-    poolManagerPlugin.initialize();
-
-    myGame.registerPlugin(playerPlugin);
-    myGame.registerPlugin(opponentPlugin);
-    myGame.registerPlugin(shopPlugin);
-    myGame.registerPlugin(economyPlugin);
-    myGame.registerPlugin(poolManagerPlugin);
-
-    myGame.onEvent("test", (payload) => {
-      setRefreshCounter((prev) => prev + 1);
-    });
-
-    myGame.onEvent("shop-rolled", (card) =>
-      setRefreshCounter((prev) => prev + 1)
-    );
-
-    myGame.onEvent("card-bought", (card) =>
-      setRefreshCounter((prev) => prev + 1)
-    );
-
-    myGame.onEvent("cardPlayed", (card) =>
-      setRefreshCounter((prev) => prev + 1)
-    );
-
-    setGame(myGame);
-
-    return () => removeMod("mon-mod", myGame);
-  }, []);
-
-  return { messages, game, refreshCounter };
-};
+import { Card as CardI } from "./core/cards/card";
+import { Minion } from "./modules/cards/Minion";
+import { GameStateMachine } from "./modules/game/GameStateMachine";
 
 interface GameContextType {
   game: Engine | null;
@@ -112,7 +48,7 @@ export const useCurrentGame = () => {
 export const CardGamePage = () => {
   return (
     <GameProvider>
-      <Shop />
+      <GameStateMachine />
     </GameProvider>
   );
 };
@@ -127,8 +63,6 @@ export const Shop = () => {
   const shop = game.getPlugin<ShopPlugin>("shop");
   const playerSide = game.getPlugin<PlayerPlugin>("player");
   const economy = game.getPlugin<EconomyPlugin>("economy");
-
-  console.log("shop", shop);
 
   if (shop == null || playerSide == null || economy == null) {
     return <div>Loading...</div>;
@@ -259,72 +193,8 @@ const CardList = ({
   return (
     <div className="flex flex-row bg-green-600 p-8 gap-3 justify-center">
       {cards.map((card) => (
-        <AnimatedCard
-          className="p-2 "
-          key={card.id}
-          onClick={() => onClickCard?.(card)}
-        >
-          <div className="w-60 h-32 gradient " />
-          <div className="pt-4 ps-8">
-            <div className="text-xl">{card.name}</div>
-            <div className="text-base">{card.description}</div>
-          </div>
-        </AnimatedCard>
+        <Minion onClickCard={onClickCard} card={card} />
       ))}
     </div>
   );
 };
-
-interface AnimatedCardProps extends React.ButtonHTMLAttributes<HTMLDivElement> {
-  children: ReactNode;
-  className?: string;
-  onClick?: () => void;
-}
-
-const AnimatedCard = ({ children, ...rest }: AnimatedCardProps) => {
-  const [style, setStyle] = useState({});
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const rotateX = (y - rect.height / 2) / 3;
-    const rotateY = (x - rect.width / 2) / -3;
-
-    setStyle({
-      transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-      transition: "transform 0.1s ease",
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setStyle({
-      transform: "rotateX(0) rotateY(0)",
-      transition: "transform 0.5s ease",
-    });
-  };
-
-  return (
-    <Card className={cn("card", rest.className)} {...rest}>
-      <div
-        style={style}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
-        {children}
-      </div>
-    </Card>
-  );
-};
-
-const maSuperCard = createCard();
-
-const maSuperCard2 = createCard();
-
-maSuperCard.addBattleCry((game) => {
-  const shop = game.getPlugin<ShopPlugin>("shop");
-  shop?.getCards().forEach((card) => {
-    shop.removeCard(card.id);
-  });
-});

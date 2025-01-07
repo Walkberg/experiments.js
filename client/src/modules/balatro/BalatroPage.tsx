@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Score as IScore } from "./balatro";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Shop } from "./Shop";
+import { Shop } from "./modules/shop/Shop";
 import { BalatroProvider, useCurrentGame } from "./BalatroProvider";
 import { EconomyManagerPlugin } from "./plugins/economy-manager-plugin";
 import { GameManagerPlugin, Phase } from "./plugins/game-manager";

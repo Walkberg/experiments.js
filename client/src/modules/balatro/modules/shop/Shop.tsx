@@ -1,16 +1,22 @@
-import { Shop as IShop, generateShop } from "./balatro";
+import { Shop as IShop, generateShop } from "../../balatro";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { CardContainer, useGameManager } from "./BalatroPage";
-import { Buyable, ShopPlugin } from "./plugins/shop-plugin";
-import { useCurrentGame } from "./BalatroProvider";
-import { ConsumableCard } from "./modules/consumables/ConsumableCard";
+import { CardContainer, useGameManager } from "../../BalatroPage";
+import { Buyable, ShopPlugin } from "../../plugins/shop-plugin";
+import { useCurrentGame } from "../../BalatroProvider";
+import { ConsumableCard } from "../consumables/ConsumableCard";
 import { cn } from "@/lib/utils";
-import { BuffonCard } from "./modules/buffons/BuffonCard";
-import { getShopPackPlugin, ShopPackPlugin } from "./plugins/shop-pack-plugin";
-import { PlayCards } from "./modules/cards/PokerCards";
-import { PokerCard } from "./cards/poker-cards";
-import { isBuyable } from "./cards/cards";
+import { BuffonCard } from "../buffons/BuffonCard";
+import {
+  getShopPackPlugin,
+  ShopPackPlugin,
+} from "../../plugins/shop-pack-plugin";
+import { PlayCards } from "../cards/PokerCards";
+import { PokerCard } from "../../cards/poker-cards";
+import { isBuyable } from "../../cards/cards";
+import { PriceIndicator } from "./PriceIndicator";
+import { Buy } from "./Buy";
+import { BuyAndUse } from "./BuyAndUse";
 
 function useShopManager() {
   const [shop, setShop] = useState<IShop>(generateShop());
@@ -216,50 +222,6 @@ const CardItemContainer = ({
           </div>
         );
       })}
-    </div>
-  );
-};
-
-interface BuyProps {
-  canBuy: boolean;
-  onBuy: () => void;
-}
-
-const Buy = ({ onBuy, canBuy }: BuyProps) => {
-  return (
-    <button
-      disabled={!canBuy}
-      onClick={onBuy}
-      className={cn("bg-amber-500 text-white rounded-2xl p-2", {
-        "bg-amber-700": !canBuy,
-      })}
-    >
-      Acheter
-    </button>
-  );
-};
-
-interface BuyAndUseProps {
-  onBuyAnUse: () => void;
-}
-
-const BuyAndUse = ({ onBuyAnUse }: BuyAndUseProps) => {
-  return (
-    <button
-      onClick={onBuyAnUse}
-      className="bg-orange-700 text-white rounded-2xl p-2"
-    >
-      Acheter <br /> et utiliser
-    </button>
-  );
-};
-
-export const PriceIndicator = ({ price }: { price: number }) => {
-  return (
-    <div className="flex flex-row gap-2 bg-zinc-900 p-1 rounded-2xl pb-8">
-      <div className="bg-zinc-700 text-amber-400 rounded-2xl py-2 px-4 text-3xl font-bold">
-        ${price}
-      </div>
     </div>
   );
 };
