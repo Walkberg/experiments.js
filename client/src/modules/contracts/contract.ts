@@ -20,5 +20,5 @@ export interface ContractCreated {
 export interface ContractClient {
   getContract: (id: string) => Promise<Contract>;
   getContracts: (filtering: ContractFiltering) => Promise<Contract[]>;
-  createContract: (contractNew: ContractNew) => Promise<ContractCreated>;
+  createContract: (contractNew: ContractNew) => Promise<Contract>;
 }

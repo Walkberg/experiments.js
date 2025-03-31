@@ -8,6 +8,7 @@ import { DrivePage } from "@/modules/drive/page/DrivePage";
 import { FormPage } from "@/modules/form/FormPage";
 import { OperationWrapper } from "@/modules/operations/components/OperationWrapper";
 import { OperationPage } from "@/modules/operations/page/OperationPage";
+import { OperationConfigsProvider } from "@/modules/operations/providers/OperationConfigsProvider";
 import { PageTemplate } from "@/modules/page-template/PageTemplate";
 import { RedactionPage } from "@/modules/redaction/page/RedactionPage";
 import { Outlet, Route, createRoutesFromElements } from "react-router";
@@ -22,7 +23,14 @@ export const router = createBrowserRouter(
       <Route path="battleground" element={<BattlegroundPage />} />
       <Route path="form" element={<FormPage />} />
       <Route path="dashboard" element={<Cool />} />
-      <Route path="mynotary" element={<PageTemplate />}>
+      <Route
+        path="mynotary"
+        element={
+          <OperationConfigsProvider>
+            <PageTemplate />
+          </OperationConfigsProvider>
+        }
+      >
         <Route element={<OperationWrapper />}>
           <Route path="operation/:operationId">
             <Route element={<OperationPage />}>

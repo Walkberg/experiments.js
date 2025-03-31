@@ -33,8 +33,8 @@ export class FakeContractClient implements ContractClient {
     return filteredContracts;
   }
 
-  async createContract(contractNew: ContractNew): Promise<ContractCreated> {
-    const id = "";
+  async createContract(contractNew: ContractNew): Promise<Contract> {
+    const id = contractNew.name;
 
     this.contracts.push({
       id: id,
@@ -42,6 +42,10 @@ export class FakeContractClient implements ContractClient {
       operationId: contractNew.operationId,
     });
 
-    return { id: id };
+    return {
+      id: id,
+      name: contractNew.name,
+      operationId: contractNew.operationId,
+    };
   }
 }

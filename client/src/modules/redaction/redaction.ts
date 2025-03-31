@@ -1,4 +1,5 @@
 export interface OperationConfig {
+  type: string; // templateId;
   availableLinks: LinkConfig[];
 }
 
@@ -10,7 +11,8 @@ export interface LinkConfig {
 }
 
 export interface BranchConfigCreation {
-  maxRecordCount: number;
+  maxRecordCount?: number;
+  isAutoCreate?: boolean;
 }
 
 export const vendeurConfig: LinkConfig = {
@@ -34,8 +36,16 @@ const bienConfig: LinkConfig = {
   creation: { maxRecordCount: 3 },
 };
 
-export const fakeRedaction: OperationConfig = {
-  availableLinks: [vendeurConfig, acquereurConfig, bienConfig],
+const autreConfig: LinkConfig = {
+  id: "branch-autre",
+  type: "autre",
+  acceptedTemplateIds: [],
+  creation: { isAutoCreate: true },
+};
+
+export const fakeConfig: OperationConfig = {
+  type: "vente-ancien",
+  availableLinks: [vendeurConfig, acquereurConfig, bienConfig, autreConfig],
 };
 
 export interface OperationLink {

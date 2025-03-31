@@ -6,12 +6,12 @@ import {
   useState,
 } from "react";
 import {
+  fakeConfig,
   fakeOperationLinks,
-  fakeRedaction,
   OperationConfig,
   OperationLink,
 } from "../redaction";
-import { set } from "react-hook-form";
+import { useOperationConfigs } from "@/modules/operations/providers/OperationConfigsProvider";
 
 type RedactionStatus = "fetching" | "init" | "succeed" | "error";
 
@@ -36,11 +36,13 @@ export const RedactionProvider = ({
   const [redaction, setRedaction] = useState<OperationConfig>();
   const [operationLinks, setOperationLinks] = useState<OperationLink[]>([]);
 
+  const { getOperationConfigs } = useOperationConfigs();
+
   useEffect(() => {
     const fetchRedaction = async () => {
       try {
         setStatus("fetching");
-        setRedaction(fakeRedaction);
+        setRedaction(getOperationConfigs(templateId));
         setOperationLinks(fakeOperationLinks);
         setStatus("succeed");
       } catch (error) {

@@ -1,11 +1,8 @@
-import { BranchRecordAdd } from "@/modules/branches/components/BranchRecordAdd";
 import { LinkConfig } from "../redaction";
 import { Button } from "@/components/ui/button";
 import { useRedaction } from "../providers/RedactionProvider";
-import { RecordTile } from "@/modules/records/components/RecordTile";
 import { RecordProvider } from "@/modules/records/record-context";
 import { Record } from "@/modules/records/components/Record";
-import { RecordActions } from "@/modules/records/components/RecordActions";
 
 interface OperationLinkConfigProps {
   operationLinkConfig: LinkConfig;
@@ -23,13 +20,13 @@ export const OperationLinkConfig = ({
     <div className="flex flex-col gap-2 w-full p-4">
       <div className="flex justify-between items-center">
         <div>{operationLinkConfig.type}</div>
-        <AddBranch />
+        <AddBranch onClick={() => {}} config={operationLinkConfig} />
       </div>
       <div className="flex flex-col gap-2">
         {targetOperationLinks.length === 0 ? (
           <div>
             <div>PAs de record pour le momeent</div>
-            <AddBranch />
+            <AddBranch onClick={() => {}} config={operationLinkConfig} />
           </div>
         ) : (
           targetOperationLinks.map((operationLink) => (
@@ -46,6 +43,14 @@ export const OperationLinkConfig = ({
   );
 };
 
-const AddBranch = () => {
-  return <Button>Ajouter</Button>;
+interface AddBranchProps {
+  config: LinkConfig;
+  onClick: () => void;
+}
+
+const AddBranch = ({ onClick, config }: AddBranchProps) => {
+  if (config.creation.isAutoCreate ?? false) {
+    return null;
+  }
+  return <Button onClick={onClick}>Ajouter</Button>;
 };

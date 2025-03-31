@@ -11,7 +11,7 @@ import { useContractClient } from "./ContractClientProvider"; // Importez votre 
 type ContractStatus = "fetching" | "init" | "succeed" | "error";
 
 interface ContractContextState {
-  createContract: (contractNew: ContractNew) => Promise<void>;
+  addContract: (contract: Contract) => Promise<void>;
   status: ContractStatus;
   contracts: Contract[];
 }
@@ -48,22 +48,12 @@ export const ContractProvider = ({
     fetchContracts();
   }, [client, operationId]);
 
-  const createContract = async (contractNew: ContractNew) => {
-    try {
-      const contractCreated = await client.createContract(contractNew);
-
-      setContracts((prev) => [
-        ...prev,
-        { id: contractCreated.id, ...contractNew },
-      ]);
-    } catch (error) {
-      console.error("Erreur lors de la création du contrat :", error);
-      throw error;
-    }
+  const addContract = async (contract: Contract) => {
+    setContracts((prev) => [...prev, contract]);
   };
 
   return (
-    <ContractContext.Provider value={{ contracts, status, createContract }}>
+    <ContractContext.Provider value={{ contracts, status, addContract }}>
       {children}
     </ContractContext.Provider>
   );
@@ -90,5 +80,5 @@ export function useCreateContract() {
     );
   }
 
-  return context.createContract;
+  return context.addContract;
 }

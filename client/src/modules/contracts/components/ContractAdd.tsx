@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { usePermission } from "@/modules/user-permissions/use-permission";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useCreateContract } from "../providers/ContractProvider";
+import { useContractClient } from "../providers/ContractClientProvider";
+import { Contract, ContractNew } from "../contract";
 
 interface ContractAddProps {
   operationId: string;
@@ -14,40 +16,32 @@ export const ContractAdd = ({ operationId }: ContractAddProps) => {
   const [name, setName] = useState<string>("");
 
   const canCreate = usePermission("contract", "create");
-  const createContract = useCreateContract();
+
+  const addContract = useCreateContract();
+
+  const [status, createContract] = useContractCreation();
+
+  useKey(["a"], () => setOpen((open) => !open));
+
+  const handleContractCreated = async (contract: Contract) => {
+    addContract(contract);
+    setName("");
+    setOpen(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await createContract({ name, operationId });
-    setName("");
-    setOpen(false);
+    await createContract(
+      { name, operationId },
+      {
+        onContractCreated: handleContractCreated,
+      }
+    );
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      let userAgent = window.navigator.userAgent.toLowerCase();
-      const isMac = false;
-
-      const isShortcutPressed = isMac
-        ? e.metaKey && e.key === "h"
-        : e.ctrlKey && e.key === "h";
-
-      if (isShortcutPressed) {
-        e.preventDefault();
-        setOpen(true);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -61,6 +55,7 @@ export const ContractAdd = ({ operationId }: ContractAddProps) => {
             placeholder="nom"
             onChange={handleInputChange}
             value={name}
+            disabled={!canCreate || status === "creating"}
           />
           <Button disabled={name.length === 0} type="submit">
             Creer
@@ -70,3 +65,66 @@ export const ContractAdd = ({ operationId }: ContractAddProps) => {
     </Dialog>
   );
 };
+
+function useKey(keys: string[], callback: () => void) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMac = false;
+
+      const isShortcutPressed = isMac
+        ? e.metaKey && keys.every((key) => e.key === key)
+        : e.ctrlKey && keys.every((key) => e.key === key);
+
+      if (isShortcutPressed) {
+        e.preventDefault();
+        callback();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+}
+
+interface ContractCreationOptions {
+  onContractCreate?: () => Promise<void>;
+  onContractCreated?: (contract: Contract) => Promise<void>;
+  onContractCreationFailed?: () => Promise<void>;
+}
+
+type UseContractCreation = [
+  Status,
+  (contractNew: ContractNew, options: ContractCreationOptions) => Promise<void>
+];
+
+type Status = "idle" | "creating" | "success" | "error";
+
+function useContractCreation(): UseContractCreation {
+  const contractClient = useContractClient();
+  const [status, setStatus] = useState<Status>("idle");
+
+  async function createContract(
+    contractNew: ContractNew,
+    {
+      onContractCreate,
+      onContractCreated,
+      onContractCreationFailed,
+    }: ContractCreationOptions
+  ) {
+    await onContractCreate?.();
+    try {
+      setStatus("creating");
+      const contractCreated = await contractClient.createContract(contractNew);
+      await onContractCreated?.(contractCreated);
+      setStatus("success");
+    } catch (e) {
+      await onContractCreationFailed?.();
+      setStatus("error");
+    }
+  }
+
+  return [status, createContract];
+}
