@@ -1,6 +1,6 @@
-import { UserNotification } from "@/modules/notification/components/UserNotifications";
-import { UserAvatar } from "@/modules/user/components/UserAvatar";
-import { useUser } from "@/modules/user/providers/UserProvider";
+import { UserNotification } from "@/modules/mynotary-clone/modules/notification/components/UserNotifications";
+import { UserAvatar } from "@/modules/mynotary-clone/modules/user/components/UserAvatar";
+import { useUser } from "@/modules/mynotary-clone/modules/user/providers/UserProvider";
 
 export const Header = () => {
   const { user } = useUser();

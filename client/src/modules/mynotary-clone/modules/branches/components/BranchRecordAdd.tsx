@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
 import { useBranch } from "../useBranch";
-import { RecordCreateOrSearch } from "@/modules/records/components/RecordCreateOrSearch";
+import { RecordCreateOrSearch } from "@/modules/mynotary-clone/modules/records/components/RecordCreateOrSearch";
 
 interface BranchRecordAddProps {}
 

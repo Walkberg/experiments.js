@@ -1,4 +1,4 @@
-import { DropZone } from "@/modules/drive/components/DropZone";
+import { DropZone } from "@/modules/mynotary-clone/modules/drive/components/DropZone";
 import { CardList, PlayerHand } from "../../battleground-page";
 
 export const Player = () => {

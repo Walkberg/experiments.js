@@ -1,8 +1,8 @@
 import { LinkConfig } from "../redaction";
 import { Button } from "@/components/ui/button";
 import { useRedaction } from "../providers/RedactionProvider";
-import { RecordProvider } from "@/modules/records/record-context";
-import { Record } from "@/modules/records/components/Record";
+import { RecordProvider } from "@/modules/mynotary-clone/modules/records/record-context";
+import { Record } from "@/modules/mynotary-clone/modules/records/components/Record";
 
 interface OperationLinkConfigProps {
   operationLinkConfig: LinkConfig;

@@ -11,7 +11,7 @@ import {
   ContractConfig,
   OperationLink,
 } from "../redaction";
-import { useContractsConfigs } from "@/modules/operations/providers/OperationConfigsProvider";
+import { useContractsConfigs } from "@/modules/mynotary-clone/modules/operations/providers/OperationConfigsProvider";
 
 type RedactionStatus = "fetching" | "init" | "succeed" | "error";
 

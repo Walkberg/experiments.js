@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { usePermission } from "@/modules/user-permissions/use-permission";
+import { usePermission } from "@/modules/mynotary-clone/modules/user-permissions/use-permission";
 import { Trash } from "lucide-react";
 
 interface ContractDeleteProps {

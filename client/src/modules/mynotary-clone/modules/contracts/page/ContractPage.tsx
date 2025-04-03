@@ -1,7 +1,7 @@
 import { ContractList } from "../components/ContractList";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { StorageDrive } from "@/modules/drive/components/StorageDrive";
+import { StorageDrive } from "@/modules/mynotary-clone/modules/drive/components/StorageDrive";
 import { useParams } from "react-router";
 import { ContractAdd } from "../components/ContractAdd";
 

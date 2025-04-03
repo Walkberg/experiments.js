@@ -4,17 +4,17 @@ import { BattlegroundPage } from "@/modules/battleground/battleground-page";
 import { CardGamePage } from "@/modules/card-game/CardGamePage";
 import { CommandPatternPage } from "@/modules/command-pattern/CommandPattern";
 import { ContractPage } from "@/modules/mynotary-clone/modules/contracts/page/ContractPage";
-import { DrivePage } from "@/modules/drive/page/DrivePage";
-import { FormPage } from "@/modules/form/FormPage";
+import { DrivePage } from "@/modules/mynotary-clone/modules/drive/page/DrivePage";
+import { FormPage } from "@/modules/mynotary-clone/modules/form/FormPage";
 import {
   ConfigManager,
   ContractConfigClientProvider,
-} from "@/modules/operations/components/OPerationConfigManager";
-import { OperationWrapper } from "@/modules/operations/components/OperationWrapper";
-import { OperationPage } from "@/modules/operations/page/OperationPage";
-import { OperationConfigsProvider } from "@/modules/operations/providers/OperationConfigsProvider";
+} from "@/modules/mynotary-clone/modules/operations/components/OPerationConfigManager";
+import { OperationWrapper } from "@/modules/mynotary-clone/modules/operations/components/OperationWrapper";
+import { OperationPage } from "@/modules/mynotary-clone/modules/operations/page/OperationPage";
+import { OperationConfigsProvider } from "@/modules/mynotary-clone/modules/operations/providers/OperationConfigsProvider";
 import { PageTemplate } from "@/modules/page-template/PageTemplate";
-import { RedactionPage } from "@/modules/redaction/page/RedactionPage";
+import { RedactionPage } from "@/modules/mynotary-clone/modules/redaction/page/RedactionPage";
 import { Outlet, Route, createRoutesFromElements } from "react-router";
 import { createBrowserRouter } from "react-router-dom";
 

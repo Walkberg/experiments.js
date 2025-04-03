@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { ContractConfig } from "@/modules/redaction/redaction";
+import { ContractConfig } from "@/modules/mynotary-clone/modules/redaction/redaction";
 import { useOperationConfigClient } from "../components/OPerationConfigManager";
 
 type OperationStatus = "fetching" | "init" | "succeed" | "error";

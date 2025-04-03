@@ -3,7 +3,7 @@ import {
   LinkConfig,
   ContractConfig,
   ContractConfigNew,
-} from "@/modules/redaction/redaction";
+} from "@/modules/mynotary-clone/modules/redaction/redaction";
 import {
   createContext,
   useCallback,

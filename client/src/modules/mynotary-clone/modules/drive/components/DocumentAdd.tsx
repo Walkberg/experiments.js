@@ -1,4 +1,4 @@
-import { FileUpload } from "@/modules/files/components/FileUpload";
+import { FileUpload } from "@/modules/mynotary-clone/modules/files/components/FileUpload";
 import { useCreateDocument } from "../providers/DriveDocumentProvider";
 
 interface DocumentAddProps {

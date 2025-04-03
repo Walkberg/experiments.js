@@ -16,7 +16,7 @@ import {
   useCardRefs,
   useShop,
 } from "./battleground.provider";
-import { DropZone } from "../drive/components/DropZone";
+import { DropZone } from "../mynotary-clone/modules/drive/components/DropZone";
 import { Player } from "./components/player/player";
 import { Shop } from "./components/shop/shop";
 

@@ -1,4 +1,4 @@
-import { usePermission } from "@/modules/user-permissions/use-permission";
+import { usePermission } from "@/modules/mynotary-clone/modules/user-permissions/use-permission";
 import { useContracts } from "../providers/ContractProvider";
 import { ContractTile } from "./ContractTile";
 

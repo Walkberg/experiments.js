@@ -17,7 +17,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useBranch } from "@/modules/branches/useBranch";
+import { useBranch } from "@/modules/mynotary-clone/modules/branches/useBranch";
 
 interface RecordActionsProps {
   recordId: string;

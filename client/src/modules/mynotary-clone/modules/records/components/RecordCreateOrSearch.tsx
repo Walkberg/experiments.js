@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
-import { RecordSearch } from "@/modules/records/components/RecordSearch";
-import { RecordCreate } from "@/modules/records/components/RecordCreate";
+import { RecordSearch } from "@/modules/mynotary-clone/modules/records/components/RecordSearch";
+import { RecordCreate } from "@/modules/mynotary-clone/modules/records/components/RecordCreate";
 import { RecordCreationProps } from "../record";
 
 export const RecordCreateOrSearch = ({

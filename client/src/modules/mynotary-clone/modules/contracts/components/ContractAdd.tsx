@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { usePermission } from "@/modules/user-permissions/use-permission";
+import { usePermission } from "@/modules/mynotary-clone/modules/user-permissions/use-permission";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useCreateContract } from "../providers/ContractProvider";
 import { useContractClient } from "../providers/ContractClientProvider";
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useContractsConfigs } from "@/modules/operations/providers/OperationConfigsProvider";
+import { useContractsConfigs } from "@/modules/mynotary-clone/modules/operations/providers/OperationConfigsProvider";
 
 interface ContractAddProps {
   operationId: string;

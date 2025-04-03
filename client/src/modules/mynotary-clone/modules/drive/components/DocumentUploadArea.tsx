@@ -1,4 +1,4 @@
-import { FileUploadArea } from "@/modules/files/components/FileUploadArea";
+import { FileUploadArea } from "@/modules/mynotary-clone/modules/files/components/FileUploadArea";
 import { ReactNode } from "react";
 import { useCreateDocument } from "../providers/DriveDocumentProvider";
 
