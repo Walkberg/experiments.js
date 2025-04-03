@@ -1,5 +1,5 @@
-import { FakeContractClient } from "@/modules/contracts/in-memory-contract.client";
-import { ContractClientProvider } from "@/modules/contracts/providers/ContractClientProvider";
+import { FakeContractClient } from "@/modules/mynotary-clone/modules/contracts/in-memory-contract.client";
+import { ContractClientProvider } from "@/modules/mynotary-clone/modules/contracts/providers/ContractClientProvider";
 import { DriveClientProvider } from "@/modules/drive/providers/DriveClientProvider";
 import { NotificationClientProvider } from "@/modules/notification/providers/NotificationClientProvider";
 import { OperationClientProvider } from "@/modules/operations/providers/OperationClientProvider";

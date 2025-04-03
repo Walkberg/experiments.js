@@ -4,7 +4,7 @@ import { Room } from "@/modules/presence/Room";
 import { RoomProvider } from "@/modules/presence/room-provider";
 import { RedactionProvider } from "../providers/RedactionProvider";
 import { OperationLinkConfigs } from "../components/OperationLinkConfigs";
-import { useContracts } from "@/modules/contracts/providers/ContractProvider";
+import { useContracts } from "@/modules/mynotary-clone/modules/contracts/providers/ContractProvider";
 import { useParams } from "react-router";
 
 export const RedactionPage = () => {

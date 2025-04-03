@@ -3,7 +3,7 @@ import { BalatroPage, BalatroTest } from "@/modules/balatro/BalatroPage";
 import { BattlegroundPage } from "@/modules/battleground/battleground-page";
 import { CardGamePage } from "@/modules/card-game/CardGamePage";
 import { CommandPatternPage } from "@/modules/command-pattern/CommandPattern";
-import { ContractPage } from "@/modules/contracts/page/ContractPage";
+import { ContractPage } from "@/modules/mynotary-clone/modules/contracts/page/ContractPage";
 import { DrivePage } from "@/modules/drive/page/DrivePage";
 import { FormPage } from "@/modules/form/FormPage";
 import {

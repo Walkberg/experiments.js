@@ -1,4 +1,4 @@
-import { ContractProvider } from "@/modules/contracts/providers/ContractProvider";
+import { ContractProvider } from "@/modules/mynotary-clone/modules/contracts/providers/ContractProvider";
 import { Outlet } from "react-router";
 
 export const OperationWrapper = () => {
