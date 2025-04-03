@@ -1,4 +1,4 @@
-import { LinkProvider } from "@/modules/links/links-context";
+import { LinkProvider } from "@/modules/mynotary-clone/modules/links/links-context";
 import { personnePhysiqueConfig } from "../record";
 import { RecordForm } from "./RecordForm";
 import { RecordLink } from "./RecordLink";

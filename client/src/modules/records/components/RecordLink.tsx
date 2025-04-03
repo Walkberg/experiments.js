@@ -1,6 +1,6 @@
 import { RecordProvider } from "../record-context";
 import { Record } from "./Record";
-import { useLinks } from "@/modules/links/useLinks";
+import { useLinks } from "@/modules/mynotary-clone/modules/links/useLinks";
 
 export const RecordLink = () => {
   const { links, status } = useLinks();
