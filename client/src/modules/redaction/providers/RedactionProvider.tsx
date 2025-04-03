@@ -8,16 +8,16 @@ import {
 import {
   fakeConfig,
   fakeOperationLinks,
-  OperationConfig,
+  ContractConfig,
   OperationLink,
 } from "../redaction";
-import { useOperationConfigs } from "@/modules/operations/providers/OperationConfigsProvider";
+import { useContractsConfigs } from "@/modules/operations/providers/OperationConfigsProvider";
 
 type RedactionStatus = "fetching" | "init" | "succeed" | "error";
 
 interface RedactionContextState {
   status: RedactionStatus;
-  redaction?: OperationConfig;
+  redaction?: ContractConfig;
   operationLinks: OperationLink[];
 }
 
@@ -33,10 +33,10 @@ export const RedactionProvider = ({
   templateId,
 }: RedactionProviderProps) => {
   const [status, setStatus] = useState<RedactionStatus>("init");
-  const [redaction, setRedaction] = useState<OperationConfig>();
+  const [redaction, setRedaction] = useState<ContractConfig>();
   const [operationLinks, setOperationLinks] = useState<OperationLink[]>([]);
 
-  const { getOperationConfigs } = useOperationConfigs();
+  const { getOperationConfigs } = useContractsConfigs();
 
   useEffect(() => {
     const fetchRedaction = async () => {

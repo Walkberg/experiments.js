@@ -6,6 +6,10 @@ import { CommandPatternPage } from "@/modules/command-pattern/CommandPattern";
 import { ContractPage } from "@/modules/contracts/page/ContractPage";
 import { DrivePage } from "@/modules/drive/page/DrivePage";
 import { FormPage } from "@/modules/form/FormPage";
+import {
+  ConfigManager,
+  ContractConfigClientProvider,
+} from "@/modules/operations/components/OPerationConfigManager";
 import { OperationWrapper } from "@/modules/operations/components/OperationWrapper";
 import { OperationPage } from "@/modules/operations/page/OperationPage";
 import { OperationConfigsProvider } from "@/modules/operations/providers/OperationConfigsProvider";
@@ -26,12 +30,15 @@ export const router = createBrowserRouter(
       <Route
         path="mynotary"
         element={
-          <OperationConfigsProvider>
-            <PageTemplate />
-          </OperationConfigsProvider>
+          <ContractConfigClientProvider>
+            <OperationConfigsProvider>
+              <PageTemplate />
+            </OperationConfigsProvider>
+          </ContractConfigClientProvider>
         }
       >
         <Route element={<OperationWrapper />}>
+          <Route path="configs" element={<ConfigManager />} />
           <Route path="operation/:operationId">
             <Route element={<OperationPage />}>
               <Route path="contracts" element={<ContractPage />} />

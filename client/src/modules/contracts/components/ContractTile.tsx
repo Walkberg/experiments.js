@@ -26,6 +26,7 @@ export const ContractTile = ({ contract }: ContractTileProps) => {
         <div>
           Contract tiel{contract.id} {contract.name}
         </div>
+        <div>type: {contract.templateId}</div>
         <ContractDelete contractId={contract.id} />
       </Card>
     </Button>

@@ -2,15 +2,34 @@ import {
   Contract,
   ContractFiltering,
   ContractClient,
-  ContractCreated,
   ContractNew,
 } from "./contract";
 
 const initialValues = [
-  { id: "uij", name: "test", operationId: "operation-1" },
-  { id: "uij", name: "test", operationId: "operation-1" },
-  { id: "uij", name: "test", operationId: "operation-1" },
-  { id: "uij", name: "test", operationId: "operation-1" },
+  {
+    id: "uij",
+    name: "test",
+    operationId: "operation-1",
+    templateId: "vente-ancien",
+  },
+  {
+    id: "uij",
+    name: "test",
+    operationId: "operation-1",
+    templateId: "vente-ancien",
+  },
+  {
+    id: "uij",
+    name: "test",
+    operationId: "operation-1",
+    templateId: "vente-ancien",
+  },
+  {
+    id: "uij",
+    name: "test",
+    operationId: "operation-1",
+    templateId: "vente-ancien",
+  },
 ];
 
 export class FakeContractClient implements ContractClient {
@@ -36,16 +55,15 @@ export class FakeContractClient implements ContractClient {
   async createContract(contractNew: ContractNew): Promise<Contract> {
     const id = contractNew.name;
 
-    this.contracts.push({
+    const contract = {
       id: id,
       name: contractNew.name,
       operationId: contractNew.operationId,
-    });
-
-    return {
-      id: id,
-      name: contractNew.name,
-      operationId: contractNew.operationId,
+      templateId: contractNew.templateId,
     };
+
+    this.contracts.push(contract);
+
+    return contract;
   }
 }

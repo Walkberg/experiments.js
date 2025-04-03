@@ -1,6 +1,7 @@
 export interface Contract {
   id: string;
   name: string;
+  templateId: string;
   operationId: string;
 }
 
@@ -10,6 +11,7 @@ export interface ContractFiltering {
 
 export interface ContractNew {
   name: string;
+  templateId: string;
   operationId: string;
 }
 

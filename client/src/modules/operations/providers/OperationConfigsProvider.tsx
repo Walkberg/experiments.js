@@ -5,16 +5,16 @@ import {
   useEffect,
   useState,
 } from "react";
-import { OperationConfigsClient } from "../operation"; // Importez correctement vos types
-import { OperationConfig } from "@/modules/redaction/redaction";
-import { FakeOperationConfigClient } from "../in-memory-operation-configs.client";
+import { ContractConfig } from "@/modules/redaction/redaction";
+import { useOperationConfigClient } from "../components/OPerationConfigManager";
 
 type OperationStatus = "fetching" | "init" | "succeed" | "error";
 
 interface OperationContextState {
   status: OperationStatus;
-  operationConfigs?: OperationConfig[];
-  getOperationConfigs: (type: string) => OperationConfig | undefined;
+  operationConfigs?: ContractConfig[];
+  getOperationConfigs: (type: string) => ContractConfig | undefined;
+  getContractsConfigs: () => ContractConfig[];
 }
 
 const OperationConfigsContext = createContext<OperationContextState | null>(
@@ -29,12 +29,10 @@ export const OperationConfigsProvider = ({
   children,
 }: OperationProviderProps) => {
   const [status, setStatus] = useState<OperationStatus>("init");
-  const [operationConfigs, setOperationConfigs] = useState<OperationConfig[]>(
+  const [operationConfigs, setOperationConfigs] = useState<ContractConfig[]>(
     []
   );
-  const [client, setClient] = useState<OperationConfigsClient>(
-    new FakeOperationConfigClient()
-  );
+  const client = useOperationConfigClient();
 
   useEffect(() => {
     const fetchOperationConfigs = async () => {
@@ -58,16 +56,25 @@ export const OperationConfigsProvider = ({
     return operationConfigs.find((config) => config.type === type);
   }
 
+  function getContractsConfigs() {
+    return operationConfigs;
+  }
+
   return (
     <OperationConfigsContext.Provider
-      value={{ operationConfigs, status, getOperationConfigs }}
+      value={{
+        operationConfigs,
+        status,
+        getOperationConfigs,
+        getContractsConfigs,
+      }}
     >
       {children}
     </OperationConfigsContext.Provider>
   );
 };
 
-export function useOperationConfigs() {
+export function useContractsConfigs() {
   const context = useContext(OperationConfigsContext);
 
   if (context == null) {

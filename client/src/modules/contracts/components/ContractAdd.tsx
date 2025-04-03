@@ -6,6 +6,15 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { useCreateContract } from "../providers/ContractProvider";
 import { useContractClient } from "../providers/ContractClientProvider";
 import { Contract, ContractNew } from "../contract";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useContractsConfigs } from "@/modules/operations/providers/OperationConfigsProvider";
 
 interface ContractAddProps {
   operationId: string;
@@ -14,8 +23,11 @@ interface ContractAddProps {
 export const ContractAdd = ({ operationId }: ContractAddProps) => {
   const [open, setOpen] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
+  const [type, setType] = useState<string>("");
 
   const canCreate = usePermission("contract", "create");
+
+  const { getContractsConfigs } = useContractsConfigs();
 
   const addContract = useCreateContract();
 
@@ -32,7 +44,7 @@ export const ContractAdd = ({ operationId }: ContractAddProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await createContract(
-      { name, operationId },
+      { name, operationId, templateId: type },
       {
         onContractCreated: handleContractCreated,
       }
@@ -50,6 +62,19 @@ export const ContractAdd = ({ operationId }: ContractAddProps) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <Select onValueChange={setType}>
+            <label htmlFor={name}>{"type"}</label>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={"placeholder"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {getContractsConfigs().map((option) => (
+                  <SelectItem value={option.id}>{option.type}</SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           <Input
             autoFocus
             placeholder="nom"

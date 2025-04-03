@@ -1,6 +1,17 @@
-export interface OperationConfig {
-  type: string; // templateId;
+export interface ContractConfig {
+  id: string;
+  type: string;
   availableLinks: LinkConfig[];
+}
+
+export interface ContractConfigNew {
+  id: string;
+  type: string;
+}
+
+export interface ContractConfigUpdate {
+  id: string;
+  type: string;
 }
 
 export interface LinkConfig {
@@ -43,7 +54,8 @@ const autreConfig: LinkConfig = {
   creation: { isAutoCreate: true },
 };
 
-export const fakeConfig: OperationConfig = {
+export const fakeConfig: ContractConfig = {
+  id: "vente-ancien",
   type: "vente-ancien",
   availableLinks: [vendeurConfig, acquereurConfig, bienConfig, autreConfig],
 };
