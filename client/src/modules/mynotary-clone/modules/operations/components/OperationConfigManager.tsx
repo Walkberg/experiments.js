@@ -11,11 +11,12 @@ import {
   useEffect,
   useState,
 } from "react";
-import { FakeOperationConfigClient } from "../in-memory-operation-configs.client";
-import { OperationConfigsClient } from "../operation";
+import { FakeContractConfigClient } from "../in-memory-operation-configs.client";
+import { ContractConfigsClient } from "../operation";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 import { Card } from "@/components/ui/card";
+import { DbContractConfigsClient } from "../db-contract-config.client";
 
 export function ConfigManager() {
   const navigate = useNavigate();
@@ -237,7 +238,7 @@ export function useContractConfigs() {
     const fetchConfigs = async () => {
       try {
         setStatus("fetching");
-        const data = await client.getOperationConfigs();
+        const data = await client.getContractConfigs();
         setConfigs(data);
         setStatus("success");
       } catch (err) {
@@ -255,6 +256,7 @@ export function useContractConfigs() {
       setStatus("success");
       setRefresh((prev) => !prev);
     } catch (err) {
+      console.log("client", err);
       setStatus("error");
     }
   };
@@ -282,14 +284,14 @@ export function useContractConfigs() {
 }
 
 const ContractConfigClientContext = createContext<
-  OperationConfigsClient | undefined
+  ContractConfigsClient | undefined
 >(undefined);
 
 export const ContractConfigClientProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const [client, setClient] = useState<OperationConfigsClient>(
-    new FakeOperationConfigClient()
+  const [client, setClient] = useState<ContractConfigsClient>(
+    new DbContractConfigsClient()
   );
 
   return (
@@ -309,7 +311,7 @@ export function useOperationConfigCreation() {
   ) => {
     try {
       setStatus("fetching");
-      const operationConfig = await client.createOperationConfig(newConfig);
+      const operationConfig = await client.createContractConfig(newConfig);
       onOprationConfigCreated(operationConfig);
       setStatus("success");
     } catch (err) {

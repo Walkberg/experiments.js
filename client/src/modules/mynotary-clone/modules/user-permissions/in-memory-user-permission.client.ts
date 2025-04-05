@@ -13,6 +13,20 @@ const initialValues = [
     organizationId: "organization-1",
   },
   {
+    id: "1",
+    type: "operation",
+    subType: "create",
+    userId: "user-1",
+    organizationId: "organization-1",
+  },
+  {
+    id: "1",
+    type: "operation",
+    subType: "delete",
+    userId: "user-1",
+    organizationId: "organization-1",
+  },
+  {
     id: "2",
     type: "contract",
     subType: "read",

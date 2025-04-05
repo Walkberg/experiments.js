@@ -5,12 +5,12 @@ import {
   ContractConfigUpdate,
   LinkConfig,
 } from "../redaction/redaction";
-import { OperationConfigsClient } from "./operation";
+import { ContractConfigsClient } from "./operation";
 
-export class FakeOperationConfigClient implements OperationConfigsClient {
+export class FakeContractConfigClient implements ContractConfigsClient {
   private operationConfigs: ContractConfig[] = [fakeConfig];
 
-  async createOperationConfig(config: ContractConfigNew) {
+  async createContractConfig(config: ContractConfigNew) {
     const newConfig: ContractConfig = {
       id: config.id,
       type: config.type,
@@ -20,7 +20,7 @@ export class FakeOperationConfigClient implements OperationConfigsClient {
     return newConfig;
   }
 
-  async updateOperationConfig(config: ContractConfigUpdate) {
+  async updateContractConfig(config: ContractConfigUpdate) {
     const index = this.operationConfigs.findIndex(
       (cfg) => cfg.id === config.id
     );
@@ -32,13 +32,13 @@ export class FakeOperationConfigClient implements OperationConfigsClient {
     }
   }
 
-  async deleteOperationConfig(configId: string) {
+  async deleteContractConfig(configId: string) {
     this.operationConfigs = this.operationConfigs.filter(
       (config) => config.id !== configId
     );
   }
 
-  async getOperationConfigs(): Promise<ContractConfig[]> {
+  async getContractConfigs(): Promise<ContractConfig[]> {
     return this.operationConfigs;
   }
 

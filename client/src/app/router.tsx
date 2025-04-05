@@ -9,7 +9,7 @@ import { FormPage } from "@/modules/mynotary-clone/modules/form/FormPage";
 import {
   ConfigManager,
   ContractConfigClientProvider,
-} from "@/modules/mynotary-clone/modules/operations/components/OPerationConfigManager";
+} from "@/modules/mynotary-clone/modules/operations/components/OperationConfigManager";
 import { OperationWrapper } from "@/modules/mynotary-clone/modules/operations/components/OperationWrapper";
 import { OperationPage } from "@/modules/mynotary-clone/modules/operations/page/OperationPage";
 import { OperationConfigsProvider } from "@/modules/mynotary-clone/modules/operations/providers/OperationConfigsProvider";
@@ -17,6 +17,7 @@ import { PageTemplate } from "@/modules/page-template/PageTemplate";
 import { RedactionPage } from "@/modules/mynotary-clone/modules/redaction/page/RedactionPage";
 import { Outlet, Route, createRoutesFromElements } from "react-router";
 import { createBrowserRouter } from "react-router-dom";
+import { OperationsPage } from "@/modules/mynotary-clone/modules/operations/page/OperationsPage";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,9 +38,10 @@ export const router = createBrowserRouter(
           </ContractConfigClientProvider>
         }
       >
+        <Route path="operations" element={<OperationsPage />}></Route>
+        <Route path="configs" element={<ConfigManager />} />
         <Route element={<OperationWrapper />}>
-          <Route path="configs" element={<ConfigManager />} />
-          <Route path="operation/:operationId">
+          <Route path="operations/:operationId">
             <Route element={<OperationPage />}>
               <Route path="contracts" element={<ContractPage />} />
               <Route path="drive" element={<DrivePage />} />

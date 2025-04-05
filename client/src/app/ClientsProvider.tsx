@@ -1,3 +1,4 @@
+import { DbContractClient } from "@/modules/mynotary-clone/modules/contracts/db-contract.client";
 import { FakeContractClient } from "@/modules/mynotary-clone/modules/contracts/in-memory-contract.client";
 import { ContractClientProvider } from "@/modules/mynotary-clone/modules/contracts/providers/ContractClientProvider";
 import { DriveClientProvider } from "@/modules/mynotary-clone/modules/drive/providers/DriveClientProvider";
@@ -15,7 +16,7 @@ interface ClientProviderProps {
 export const ClientsProvider = ({ children }: ClientProviderProps) => {
   return (
     <OperationClientProvider>
-      <ContractClientProvider contractClient={new FakeContractClient()}>
+      <ContractClientProvider contractClient={new DbContractClient()}>
         <NotificationClientProvider>
           <UserPermissionClientProvider
             userPermissionClient={new FakeUserPermissionClient()}

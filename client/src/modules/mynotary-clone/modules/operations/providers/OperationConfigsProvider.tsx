@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import { ContractConfig } from "@/modules/mynotary-clone/modules/redaction/redaction";
-import { useOperationConfigClient } from "../components/OPerationConfigManager";
+import { useOperationConfigClient } from "../components/OperationConfigManager";
 
 type OperationStatus = "fetching" | "init" | "succeed" | "error";
 
@@ -41,7 +41,7 @@ export const OperationConfigsProvider = ({
       }
       try {
         setStatus("fetching");
-        const fetchedOperation = await client.getOperationConfigs();
+        const fetchedOperation = await client.getContractConfigs();
         setOperationConfigs(fetchedOperation);
         setStatus("succeed");
       } catch (error) {

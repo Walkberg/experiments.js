@@ -1,6 +1,6 @@
 import { useUserPermissions } from "./providers/UserPermissionProvider";
 
-export function usePermission(type: string, subType: string) {
+export function usePermission(entity: string, permissionType: string) {
   const permission = useUserPermissions();
 
   if (permission.permissions == null) {
@@ -9,7 +9,7 @@ export function usePermission(type: string, subType: string) {
 
   return (
     permission.permissions.filter(
-      (perm) => perm.type === type && perm.subType === subType
+      (perm) => perm.type === entity && perm.subType === permissionType
     ).length !== 0
   );
 }

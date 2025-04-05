@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useContractsConfigs } from "@/modules/mynotary-clone/modules/operations/providers/OperationConfigsProvider";
+import { useKey } from "@/modules/mynotary-clone/hooks/useKey";
 
 interface ContractAddProps {
   operationId: string;
@@ -91,29 +92,6 @@ export const ContractAdd = ({ operationId }: ContractAddProps) => {
   );
 };
 
-function useKey(keys: string[], callback: () => void) {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isMac = false;
-
-      const isShortcutPressed = isMac
-        ? e.metaKey && keys.every((key) => e.key === key)
-        : e.ctrlKey && keys.every((key) => e.key === key);
-
-      if (isShortcutPressed) {
-        e.preventDefault();
-        callback();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-}
-
 interface ContractCreationOptions {
   onContractCreate?: () => Promise<void>;
   onContractCreated?: (contract: Contract) => Promise<void>;
@@ -146,6 +124,7 @@ function useContractCreation(): UseContractCreation {
       await onContractCreated?.(contractCreated);
       setStatus("success");
     } catch (e) {
+      console.log(e);
       await onContractCreationFailed?.();
       setStatus("error");
     }
