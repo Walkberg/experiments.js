@@ -1,12 +1,14 @@
 import Dexie, { Table } from "dexie";
-import { ContractConfig, LinkConfig } from "../redaction/redaction";
+import { ContractConfig } from "../redaction/redaction";
 import { Operation } from "../operations/operation";
 import { Contract } from "../contracts/contract";
+import { Member } from "../members/members";
 
 export class MyAppDB extends Dexie {
   operations!: Table<Operation, string>;
   contractConfigs!: Table<ContractConfig, string>;
   contracts!: Table<Contract, string>;
+  members!: Table<Member, string>;
 
   constructor() {
     super("MyAppDB");
@@ -14,6 +16,7 @@ export class MyAppDB extends Dexie {
       operations: "id, organizationId, creatorId, type",
       contracts: "id, operationId, templateId",
       contractConfigs: "id",
+      members: "id, organizationId, userId",
     });
   }
 }

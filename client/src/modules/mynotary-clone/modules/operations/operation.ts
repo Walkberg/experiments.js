@@ -27,6 +27,8 @@ export interface OperationNew {
 }
 
 export interface OperationFiltering {
+  search?: string;
+  templateIds?: TemplateId[];
   organizationId: OrganizationId;
   archived?: boolean;
 }

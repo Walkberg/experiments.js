@@ -1,16 +1,17 @@
 import {
   ChangeEvent,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 import { useOperationClient } from "../providers/OperationClientProvider";
-import { Operation, OperationNew } from "../operation";
+import { Operation, OperationFiltering, OperationNew } from "../operation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { Dialog } from "@radix-ui/react-dialog";
 import { DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
@@ -24,36 +25,87 @@ import {
 import { usePermission } from "../../user-permissions/use-permission";
 import { useKey } from "@/modules/mynotary-clone/hooks/useKey";
 import { Trash } from "lucide-react";
+import { Popover } from "@/components/ui/popover";
+import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useSearchParams } from "react-router-dom";
+import {
+  OperationTypesProvider,
+  useOperationTypes,
+} from "../components/OperationTypes/OperationTypes";
 
 export function OperationsPage() {
   return (
-    <OperationsProvider>
-      <div className="flex flex-grow flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <OperationFilter />
-          <OperationSearch />
-        </div>
-        <div>
-          <OperationAdd />
-        </div>
-        <div>
-          <OperationList />
-        </div>
-      </div>
-    </OperationsProvider>
+    <OperationTypesProvider>
+      <OperationsProvider>
+        <OperationsFilterProvider>
+          <div className="flex flex-grow flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <OperationFilter />
+              <OperationSearch />
+            </div>
+            <div>
+              <OperationAdd />
+            </div>
+            <div>
+              <OperationList />
+            </div>
+          </div>
+        </OperationsFilterProvider>
+      </OperationsProvider>
+    </OperationTypesProvider>
   );
 }
 
 function OperationFilter() {
-  return <div>Operation Filter</div>;
+  const [open, setOpen] = useState(false);
+
+  const { operationTypes } = useOperationTypes();
+
+  const { filter, updateTemplate } = useOperationFilter();
+
+  return (
+    <div>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger>
+          <Button>type</Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <Card>
+            {operationTypes.map((option) => (
+              <div>
+                <label htmlFor={option.type}>{option.type}</label>
+                <Checkbox
+                  checked={filter.templateIds?.includes(option.type)}
+                  onClick={() => updateTemplate([option.id])}
+                />
+              </div>
+            ))}
+          </Card>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 }
 
 function OperationSearch() {
-  return <Input placeholder="Rechercher un dossier" />;
+  const { updateSearch, filter } = useOperationFilter();
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    updateSearch(e.target.value);
+  };
+
+  return (
+    <Input
+      placeholder="Rechercher un dossier"
+      onChange={handleChange}
+      value={filter.search}
+    />
+  );
 }
 
 export function OperationAdd() {
-  const userId = "123";
+  const userId = "13";
   const organizationId = "1";
 
   const [open, setOpen] = useState<boolean>(false);
@@ -64,16 +116,7 @@ export function OperationAdd() {
   const { createOperation, status } = useCreateOperation();
   const { addOperation } = useOperations();
 
-  const operationTypes = [
-    {
-      id: "1",
-      type: "vente ancien",
-    },
-    {
-      id: "2",
-      type: "viager",
-    },
-  ];
+  const { operationTypes } = useOperationTypes();
 
   useKey(["a"], () => setOpen((open) => !open));
 
@@ -244,7 +287,16 @@ export function OperationDelete({ operationId }: OperationDeleteProps) {
 function OperationList() {
   const navigate = useNavigate();
 
-  const { operations, status } = useOperations();
+  const { fetchOperations, status } = useFetchOperations();
+
+  const { operations, setOperations } = useOperations();
+  const { filter } = useOperationFilter();
+
+  useEffect(() => {
+    fetchOperations(filter, {
+      onOperationFetched: async (operations) => setOperations(operations),
+    });
+  }, [fetchOperations, setOperations, filter]);
 
   const handleClickOperation = (operation: Operation) => {
     navigate(`./${operation.id}/contracts`);
@@ -260,6 +312,12 @@ function OperationList() {
 
   return (
     <div className="flex flex-col gap-2">
+      <div className=" grid grid-cols-[1fr_1fr_1fr_auto] gap-4 font-semibold px-2">
+        <div>name</div>
+        <div>type</div>
+        <div>createur</div>
+        <div>actions</div>
+      </div>
       {operations.map((operation) => (
         <OperationItem
           operation={operation}
@@ -278,17 +336,128 @@ function OperationItem({
   onClick?: () => void;
 }) {
   return (
-    <Card onClick={onClick} className="flex items-center justify-between p-2">
+    <Card
+      onClick={onClick}
+      className="grid grid-cols-[1fr_1fr_1fr_auto] gap-4 items-center p-2 cursor-pointer hover:bg-gray-50 transition"
+    >
       <div>{operation.name}</div>
+      <div>{operation.type}</div>
+      <div>{operation.creatorId}</div>
       <OperationDelete operationId={operation.id} />
     </Card>
   );
 }
 
+type FetchStatus = "idle" | "fetching" | "success" | "error";
+
+interface OperationFetchOptions {
+  onOperationFetch?: () => Promise<void>;
+  onOperationFetched?: (operations: Operation[]) => Promise<void>;
+  onOperationFetchFailed?: () => Promise<void>;
+}
+
+export function useFetchOperations() {
+  const operationClient = useOperationClient();
+  const [status, setStatus] = useState<FetchStatus>("idle");
+
+  const fetchOperations = useCallback(
+    async (filter: OperationFiltering, options?: OperationFetchOptions) => {
+      setStatus("fetching");
+      try {
+        options?.onOperationFetch?.();
+        const operations = await operationClient.getOperations(filter);
+        options?.onOperationFetched?.(operations);
+        setStatus("success");
+      } catch (error) {
+        options?.onOperationFetchFailed?.();
+        setStatus("error");
+      }
+    },
+    [operationClient]
+  );
+
+  return {
+    fetchOperations,
+    status,
+  };
+}
+
+interface OperationsFilterContextState {
+  filter: OperationFiltering;
+  updateSearch: (search?: string) => void;
+  updateTemplate: (templateIds?: string[]) => void;
+}
+
+const OperationsFilter = createContext<OperationsFilterContextState | null>(
+  null
+);
+
+export function OperationsFilterProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [filter, setFilter] = useState<OperationFiltering>({
+    organizationId: "1",
+    search: searchParams.get("search") || undefined,
+    templateIds: searchParams.get("templateIds")?.split(",") || undefined,
+  });
+
+  const location = useLocation();
+
+  const updateSearch = (search?: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (search) {
+      next.set("search", search);
+    } else {
+      next.delete("search");
+    }
+    setSearchParams(next);
+  };
+
+  const updateTemplate = (templateIds?: string[]) => {
+    const next = new URLSearchParams(searchParams);
+    if (templateIds && templateIds.length > 0) {
+      next.set("templateIds", templateIds.join(","));
+    } else {
+      next.delete("templateIds");
+    }
+    setSearchParams(next);
+  };
+
+  useEffect(() => {
+    const search = searchParams.get("search") || undefined;
+    const templateIds =
+      searchParams.get("templateIds")?.split(",") || undefined;
+
+    setFilter({
+      organizationId: "1",
+      search,
+      templateIds,
+    });
+  }, [location.search]);
+
+  return (
+    <OperationsFilter.Provider value={{ filter, updateSearch, updateTemplate }}>
+      {children}
+    </OperationsFilter.Provider>
+  );
+}
+
+export function useOperationFilter() {
+  const context = useContext(OperationsFilter);
+  if (context == null) {
+    throw new Error(
+      "useOperationFilter doit être utilisé dans un composant enfant de OperationsFilterProvider"
+    );
+  }
+  return context;
+}
+
 interface OperationsContextState {
   operations: Operation[];
-  status: FetchStatus;
-  fetchOperations: () => Promise<void>;
+  setOperations: (operations: Operation[]) => void;
   addOperation: (operation: Operation) => void;
   removeOperation: (operationId: string) => void;
 }
@@ -299,31 +468,8 @@ interface OperationProviderProps {
   children: React.ReactNode;
 }
 
-type FetchStatus = "idle" | "fetching" | "success" | "error";
-
 export function OperationsProvider({ children }: OperationProviderProps) {
-  const operationClient = useOperationClient();
-
   const [operations, setOperations] = useState<Operation[]>([]);
-  const [status, setStatus] = useState<FetchStatus>("idle");
-
-  useEffect(() => {
-    fetchOperations();
-  }, []);
-
-  const fetchOperations = async () => {
-    setStatus("fetching");
-    try {
-      const operations = await operationClient.getOperations({
-        organizationId: "1",
-      });
-
-      setOperations(operations);
-      setStatus("success");
-    } catch (error) {
-      setStatus("error");
-    }
-  };
 
   function addOperation(operation: Operation) {
     setOperations((operations) => [...operations, operation]);
@@ -339,10 +485,9 @@ export function OperationsProvider({ children }: OperationProviderProps) {
     <OperationsContext.Provider
       value={{
         operations,
-        status,
-        fetchOperations,
         addOperation,
         removeOperation,
+        setOperations,
       }}
     >
       {children}

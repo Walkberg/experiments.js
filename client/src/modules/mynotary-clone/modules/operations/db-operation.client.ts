@@ -18,8 +18,16 @@ export class DbOperationClient implements OperationClient {
     let query = db.operations
       .where("organizationId")
       .equals(filtering.organizationId);
+    let results = await query.toArray();
 
-    return await query.toArray();
+    if (filtering.search && filtering.search.trim() !== "") {
+      const searchLower = filtering.search.toLowerCase();
+      results = results.filter((op) =>
+        op.name.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return results;
   }
 
   async createOperation(operation: OperationNew): Promise<Operation> {
