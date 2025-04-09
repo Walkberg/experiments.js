@@ -33,6 +33,7 @@ import {
   OperationTypesProvider,
   useOperationTypes,
 } from "../components/OperationTypes/OperationTypes";
+import { useCurrentMember } from "../../members/pages/MembersPage";
 
 export function OperationsPage() {
   return (
@@ -105,8 +106,7 @@ function OperationSearch() {
 }
 
 export function OperationAdd() {
-  const userId = "13";
-  const organizationId = "1";
+  const { userId, organizationId } = useCurrentMember();
 
   const [open, setOpen] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
@@ -397,9 +397,11 @@ export function OperationsFilterProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const { organizationId } = useCurrentMember();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<OperationFiltering>({
-    organizationId: "1",
+    organizationId: organizationId,
     search: searchParams.get("search") || undefined,
     templateIds: searchParams.get("templateIds")?.split(",") || undefined,
   });
@@ -432,7 +434,7 @@ export function OperationsFilterProvider({
       searchParams.get("templateIds")?.split(",") || undefined;
 
     setFilter({
-      organizationId: "1",
+      organizationId,
       search,
       templateIds,
     });

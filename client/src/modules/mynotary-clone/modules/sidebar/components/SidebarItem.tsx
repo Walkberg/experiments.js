@@ -7,16 +7,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useSidebar } from "../providers/SidebarProvider";
+import { Link, useLocation } from "react-router-dom";
 
 interface SidebarItemProps {
   item: SidebarItemType;
 }
 
 export const SidebarItem = ({ item }: SidebarItemProps) => {
+  const location = useLocation();
+  const isActive = item.to && location.pathname.startsWith(item.to);
+
   const { collapsed } = useSidebar();
 
   return (
-    <div>
+    <Link to={item.to ?? ""}>
       <TooltipProvider delayDuration={100}>
         <Tooltip>
           <div className=" border-solid border-spacing-1 bg-gradient-to-br rounded">
@@ -36,6 +40,6 @@ export const SidebarItem = ({ item }: SidebarItemProps) => {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-    </div>
+    </Link>
   );
 };

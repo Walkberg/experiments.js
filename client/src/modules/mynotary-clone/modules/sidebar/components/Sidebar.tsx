@@ -5,7 +5,7 @@ import { Moon, Sun, TvIcon } from "lucide-react";
 import { useTheme } from "@/app/theme/ThemeProvider";
 
 export const Sidebar = () => {
-  const { appTheme, setTheme } = useTheme();
+  const { appTheme, toggleTheme } = useTheme();
   const { items, toggleSidebar } = useSidebar();
   return (
     <div className="flex p-2 border-r-2">
@@ -20,7 +20,7 @@ export const Sidebar = () => {
             ))}
           </div>
         </div>
-        <Button variant={"ghost"}>
+        <Button variant={"ghost"} onClick={toggleTheme}>
           {appTheme === "dark" ? <Sun /> : <Moon />}
         </Button>
       </div>

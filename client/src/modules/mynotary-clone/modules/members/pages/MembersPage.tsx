@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useMemberClient } from "../providers/MemberClientProvider";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { useKey } from "@/modules/mynotary-clone/hooks/useKey";
+import { useForm } from "react-hook-form";
 
 export function MembersPage() {
   return (
@@ -21,31 +24,39 @@ export function MembersPage() {
   );
 }
 
+type FormValues = {
+  email: string;
+};
+
 export function MemberAdd() {
-  const [email, setEmail] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
+
+  const { organizationId } = useCurrentMember();
 
   const { addMember } = useMembers();
   const { createMember } = useMemberCreation();
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>();
+
+  useKey(["a"], () => setOpen(true));
+
   const handleMemberCreated = (member: Member) => {
     addMember(member);
-    setEmail("");
+    //setEmail("");
     setOpen(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormValues) => {
     createMember(
-      { email, organizationId: "1" },
+      { email: data.email, organizationId },
       {
         onMemberCreated: handleMemberCreated,
       }
     );
-  };
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
   };
 
   return (
@@ -55,14 +66,27 @@ export function MemberAdd() {
           <Button>Ajouter un membre</Button>
         </DialogTrigger>
         <DialogContent>
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <Input
               autoFocus
-              placeholder="nom"
-              onChange={handleInputChange}
-              value={email}
+              placeholder="email"
+              {...register("email", {
+                required: "L'email est requis",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Adresse email invalide",
+                },
+              })}
             />
-            <Button disabled={email.length === 0} type="submit">
+            {errors.email && (
+              <span className="text-sm text-red-500">
+                {errors.email.message}
+              </span>
+            )}
+            <Button disabled={false} type="submit">
               Creer
             </Button>
           </form>
@@ -73,21 +97,24 @@ export function MemberAdd() {
 }
 
 export function MemberList() {
+  const { organizationId } = useCurrentMember();
   const { fetchMembers } = useFetchMembers();
   const { members, setMembers } = useMembers();
 
   useEffect(() => {
-    fetchMembers("1", {
+    fetchMembers(organizationId, {
       onMemberFetched: setMembers,
     });
-  }, []);
+  }, [fetchMembers, organizationId]);
 
   return (
     <div>
       MemberList
-      {members.map((member) => {
-        return <MemberTile key={member.id} member={member} />;
-      })}
+      <div className="flex flex-col gap-2">
+        {members.map((member) => {
+          return <MemberTile key={member.id} member={member} />;
+        })}
+      </div>
     </div>
   );
 }
@@ -97,7 +124,7 @@ interface MemberTileProps {
 }
 
 export function MemberTile({ member }: MemberTileProps) {
-  return <div>{member.id}</div>;
+  return <Card className="p-2">{member.email}</Card>;
 }
 
 type Status = "idle" | "loading" | "error" | "success";
@@ -160,4 +187,11 @@ export function useMemberCreation() {
   );
 
   return { createMember, status };
+}
+
+export function useCurrentMember() {
+  return {
+    organizationId: "1",
+    userId: "1",
+  };
 }

@@ -1,9 +1,8 @@
-import { IsoDate, MemberId, OrganizationId, UserId } from "../../types/common";
+import { IsoDate, MemberId, OrganizationId } from "../../types/common";
 
 export type Member = {
   id: MemberId;
   email: string;
-  userId: UserId;
   organizationId: OrganizationId;
   creationDate: IsoDate;
   lastUpdateDate: IsoDate;

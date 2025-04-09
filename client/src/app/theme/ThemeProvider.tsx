@@ -14,12 +14,14 @@ type ThemeProviderState = {
   theme: Theme;
   appTheme: AppTheme;
   setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
 };
 
 const initialState: ThemeProviderState = {
   theme: "system",
-  appTheme: "dark",
+  appTheme: "light",
   setTheme: () => null,
+  toggleTheme: () => null,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -66,6 +68,14 @@ export function ThemeProvider({
     }
   }, [theme]);
 
+  function toggleTheme() {
+    if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
+  }
+
   const value = {
     theme,
     appTheme,
@@ -73,6 +83,7 @@ export function ThemeProvider({
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
+    toggleTheme,
   };
 
   return (
