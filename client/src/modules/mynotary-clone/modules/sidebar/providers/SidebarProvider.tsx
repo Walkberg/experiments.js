@@ -11,6 +11,18 @@ interface SidebarState {
 
 const defaultItems: SidebarItem[] = [
   {
+    name: "Fish",
+    description: "Fish",
+    icon: <Fish />,
+    to: "/mynotary/users",
+  },
+  {
+    name: "Organizations",
+    description: "Organizations",
+    icon: <Drumstick />,
+    to: "/mynotary/organizations",
+  },
+  {
     name: "Members",
     description: "Members",
     icon: <Apple />,
@@ -29,12 +41,6 @@ const defaultItems: SidebarItem[] = [
     description: "Configs",
     icon: <Drumstick />,
     to: "/mynotary/configs",
-  },
-
-  {
-    name: "Fish",
-    description: "Fish",
-    icon: <Fish />,
   },
 ];
 

@@ -64,4 +64,6 @@ export const userData: User = {
   email: "test@test.fr",
   id: "user-1",
   avatarUrl: "test",
+  creationDate: new Date().toISOString(),
+  lastUpdateDate: new Date().toISOString(),
 };

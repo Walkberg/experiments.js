@@ -19,6 +19,8 @@ import { Outlet, Route, createRoutesFromElements } from "react-router";
 import { createBrowserRouter } from "react-router-dom";
 import { OperationsPage } from "@/modules/mynotary-clone/modules/operations/page/OperationsPage";
 import { MembersPage } from "@/modules/mynotary-clone/modules/members/pages/MembersPage";
+import { UsersPage } from "@/modules/mynotary-clone/modules/user/pages/UserPage";
+import { OrganizationsPage } from "@/modules/mynotary-clone/modules/organizations/pages/OrganizationPage";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,8 +41,10 @@ export const router = createBrowserRouter(
           </ContractConfigClientProvider>
         }
       >
-        <Route path="members" element={<MembersPage />}></Route>
-        <Route path="operations" element={<OperationsPage />}></Route>
+        <Route path="members" element={<MembersPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="organizations" element={<OrganizationsPage />} />
+        <Route path="operations" element={<OperationsPage />} />
         <Route path="configs" element={<ConfigManager />} />
         <Route element={<OperationWrapper />}>
           <Route path="operations/:operationId">

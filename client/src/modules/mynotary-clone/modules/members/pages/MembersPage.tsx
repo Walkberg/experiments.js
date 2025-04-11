@@ -1,13 +1,17 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Member, MemberNew } from "../members";
+import { isExistingMember, Member, MemberNew } from "../members";
 import { MembersProvider, useMembers } from "../providers/MemberProvider";
 import { Button } from "@/components/ui/button";
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMemberClient } from "../providers/MemberClientProvider";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useKey } from "@/modules/mynotary-clone/hooks/useKey";
 import { useForm } from "react-hook-form";
+import { OrganizationPicker } from "../../organizations/components/OrganizationPicker";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { CalendarIcon, UserIcon } from "lucide-react";
+import { format } from "date-fns";
 
 export function MembersPage() {
   return (
@@ -26,12 +30,11 @@ export function MembersPage() {
 
 type FormValues = {
   email: string;
+  organizationId: string;
 };
 
 export function MemberAdd() {
   const [open, setOpen] = useState<boolean>(false);
-
-  const { organizationId } = useCurrentMember();
 
   const { addMember } = useMembers();
   const { createMember } = useMemberCreation();
@@ -39,20 +42,22 @@ export function MemberAdd() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    control,
+    reset,
+    formState: { errors, isValid },
   } = useForm<FormValues>();
 
   useKey(["a"], () => setOpen(true));
 
   const handleMemberCreated = (member: Member) => {
     addMember(member);
-    //setEmail("");
+    reset();
     setOpen(false);
   };
 
   const onSubmit = async (data: FormValues) => {
     createMember(
-      { email: data.email, organizationId },
+      { email: data.email, organizationId: data.organizationId },
       {
         onMemberCreated: handleMemberCreated,
       }
@@ -70,6 +75,7 @@ export function MemberAdd() {
             className="flex flex-col gap-4"
             onSubmit={handleSubmit(onSubmit)}
           >
+            <OrganizationPicker control={control} name="organizationId" />
             <Input
               autoFocus
               placeholder="email"
@@ -86,7 +92,7 @@ export function MemberAdd() {
                 {errors.email.message}
               </span>
             )}
-            <Button disabled={false} type="submit">
+            <Button disabled={!isValid} type="submit">
               Creer
             </Button>
           </form>
@@ -124,7 +130,39 @@ interface MemberTileProps {
 }
 
 export function MemberTile({ member }: MemberTileProps) {
-  return <Card className="p-2">{member.email}</Card>;
+  const name = isExistingMember(member)
+    ? `${member.user.firstname} ${member.user.lastname}`
+    : "Invité";
+
+  const initials = isExistingMember(member)
+    ? `${member.user.firstname[0]}${member.user.lastname[0]}`
+    : member.email[0]?.toUpperCase();
+
+  return (
+    <Card className="flex items-center p-4 gap-4">
+      <Avatar className="h-12 w-12">
+        <AvatarFallback>{initials}</AvatarFallback>
+      </Avatar>
+      <div className="flex-1 space-y-1">
+        <div className="text-base font-medium">{name}</div>
+        <div className="text-sm text-muted-foreground">{member.email}</div>
+        <div className="text-sm text-muted-foreground">
+          Organisation :{" "}
+          <span className="font-semibold">{member.organizationId}</span>
+        </div>
+      </div>
+      <div className="flex flex-col items-end text-sm text-muted-foreground gap-1">
+        <div className="flex items-center gap-1">
+          <CalendarIcon className="w-4 h-4" />
+          {format(new Date(member.creationDate), "dd/MM/yyyy")}
+        </div>
+        <div className="flex items-center gap-1">
+          <UserIcon className="w-4 h-4" />
+          {isExistingMember(member) ? "Utilisateur existant" : "Invité"}
+        </div>
+      </div>
+    </Card>
+  );
 }
 
 type Status = "idle" | "loading" | "error" | "success";

@@ -1,4 +1,4 @@
-import { User, UserClient } from "./user";
+import { User, UserClient, UserNew } from "./user";
 
 export class FakeUserClient implements UserClient {
   // Utilisation d'une fausse base de données pour stocker les utilisateurs
@@ -10,6 +10,8 @@ export class FakeUserClient implements UserClient {
       email: "john@example.com",
       phone: "123-456-7890",
       avatarUrl: "https://example.com/avatar/john",
+      creationDate: new Date().toISOString(),
+      lastUpdateDate: new Date().toISOString(),
     },
     // ... Ajoutez d'autres utilisateurs ici si nécessaire
   ];
@@ -23,5 +25,12 @@ export class FakeUserClient implements UserClient {
     }
 
     return user;
+  }
+
+  async getUsers(): Promise<User[]> {
+    throw new Error("Method not implemented.");
+  }
+  async createUser(user: UserNew): Promise<User> {
+    throw new Error("Method not implemented.");
   }
 }

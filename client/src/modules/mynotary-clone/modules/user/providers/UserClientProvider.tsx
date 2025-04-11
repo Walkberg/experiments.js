@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 import { User, UserClient } from "../user";
-import { FakeUserClient } from "../in-memory-user.client";
+import { DbUserClient } from "../db-user.client";
 
 interface UserContextState {
   userClient: UserClient;
@@ -13,9 +13,7 @@ interface UserClientProviderProps {
 }
 
 export const UserClientProvider = ({ children }: UserClientProviderProps) => {
-  const [userClient, setUserClient] = useState<UserClient>(
-    new FakeUserClient()
-  );
+  const [userClient, setUserClient] = useState<UserClient>(new DbUserClient());
 
   return (
     <UserClientContext.Provider value={{ userClient }}>
@@ -40,4 +38,6 @@ export const userData: User = {
   email: "test@test.fr",
   id: "user-1",
   avatarUrl: "test",
+  creationDate: "2023-01-01",
+  lastUpdateDate: "2023-01-01",
 };
