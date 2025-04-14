@@ -67,6 +67,7 @@ export const RecordCreate = ({ onValidate }: RecordCreationProps) => {
               onSubmit={handleSubmit}
               display={"column"}
               form={form}
+              defaultValues={{ siren: "123456789" }}
             />
           )}
         </DialogContent>

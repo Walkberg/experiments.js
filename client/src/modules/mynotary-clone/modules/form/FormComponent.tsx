@@ -29,12 +29,23 @@ type FormResponse = FormValues<FormType>;
 interface FormProps {
   form: FormType;
   display: FormDisplay;
+  defaultValues?: FormResponse;
   onSubmit: (formResponse: FormResponse) => Promise<void> | void;
 }
 
-export const FormComponent = ({ form, display, onSubmit }: FormProps) => {
+export const FormComponent = ({
+  form,
+  display,
+  onSubmit,
+  defaultValues,
+}: FormProps) => {
   return (
-    <FormProvider form={form} display={display} onSubmit={onSubmit}>
+    <FormProvider
+      defaultValues={defaultValues}
+      form={form}
+      display={display}
+      onSubmit={onSubmit}
+    >
       <FormComponentLogic />
     </FormProvider>
   );
@@ -43,7 +54,7 @@ export const FormComponent = ({ form, display, onSubmit }: FormProps) => {
 interface FormComponentLogicProps {}
 
 export const FormComponentLogic = ({}: FormComponentLogicProps) => {
-  const { form, submit, status } = useForm();
+  const { form, submit, status, values } = useForm();
 
   return (
     <div>
@@ -208,6 +219,7 @@ interface FormProviderProps {
   form: FormType;
   display: FormDisplay;
   children: React.ReactNode;
+  defaultValues?: FormResponse;
   onSubmit: (formResponse: FormResponse) => Promise<void> | void;
 }
 
@@ -217,11 +229,13 @@ type FormProviderState = {
   onSubmit: (formResponse: FormResponse) => Promise<void> | void;
   submit: (e: React.FormEvent) => void;
   status: FormStatus;
+  values: FormResponse;
 } | null;
 
 const FormProviderContext = createContext<FormProviderState>(null);
 
 export function FormProvider({
+  defaultValues,
   children,
   form,
   display,
@@ -231,10 +245,16 @@ export function FormProvider({
 
   const [formValues, setFormValues] = useState<FormResponse>(
     form.questions.reduce((acc, question) => {
+      if (defaultValues && question.name in defaultValues) {
+        acc[question.name] = defaultValues[question.name];
+        return acc;
+      }
       acc[question.name] = question.type === "boolean" ? false : "";
       return acc;
     }, {} as FormResponse)
   );
+
+  console.log(formValues);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -245,7 +265,7 @@ export function FormProvider({
 
   return (
     <FormProviderContext.Provider
-      value={{ form, display, onSubmit, submit, status }}
+      value={{ form, display, onSubmit, submit, status, values: formValues }}
     >
       <div className="flex flex-col gap-4 p-4">{children}</div>
     </FormProviderContext.Provider>
