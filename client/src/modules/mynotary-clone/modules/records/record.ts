@@ -4,8 +4,11 @@ export interface Recorde {
   id: string;
   creatorId: string;
   organizationId: string;
-  templateId: string;
+  type: string;
+  answers?: Record<string, AnswerType>;
 }
+
+type AnswerType = string | number | boolean | "date";
 
 export interface RecordLink {
   fromRecordId: string;
@@ -31,7 +34,7 @@ export function createRandomRecords() {
 
 export function createRandomRecordNew(): RecordNew {
   return {
-    templateId: "personne-physique",
+    type: "personne-physique",
     organizationId: "organization-1",
     creatorId: "user-1",
   };
@@ -39,7 +42,7 @@ export function createRandomRecordNew(): RecordNew {
 
 export function createRandomRecord(): Recorde {
   return {
-    templateId: "personne-physique",
+    type: "personne-physique",
     id: `record-${getRandomInt(999999)}`,
     organizationId: "organization-1",
     creatorId: "user-1",

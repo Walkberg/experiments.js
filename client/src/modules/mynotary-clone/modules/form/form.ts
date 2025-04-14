@@ -32,18 +32,18 @@ export type FormQuestion =
   | SelectQuestion
   | UserQuestion;
 
-export type QuestionValueType<T extends FormQuestion> = T extends StringQuestion
+type ExtractQuestionValue<Q> = Q extends { type: "string" }
   ? string
-  : T extends NumberQuestion
+  : Q extends { type: "number" }
   ? number
-  : T extends BooleanQuestion
+  : Q extends { type: "boolean" }
   ? boolean
-  : T extends SelectQuestion
-  ? string
-  : T extends UserQuestion
+  : Q extends { type: "select"; options: readonly { value: infer V }[] }
+  ? V
+  : Q extends { type: "user" }
   ? string
   : never;
 
-export type FormValues<T extends FormType> = {
-  [K in T["questions"][number] as K["name"]]: QuestionValueType<K>;
+export type FormValues<T extends { questions: readonly any[] }> = {
+  [Q in T["questions"][number] as Q["name"]]: ExtractQuestionValue<Q>;
 };

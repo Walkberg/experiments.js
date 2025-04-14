@@ -82,7 +82,7 @@ export const StringQuestionComponent = ({
 }: StringQuestion) => {
   return (
     <QuestionContainer>
-      <label htmlFor={name}>{label}</label>
+      <Label htmlFor={name}>{label}</Label>
       <Input type="text" id={name} placeholder={placeholder} />
     </QuestionContainer>
   );
@@ -149,7 +149,7 @@ export const SelectQuestionComponent = ({
   return (
     <QuestionContainer>
       <Select>
-        <label htmlFor={name}>{label}</label>
+        <Label htmlFor={name}>{label}</Label>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -159,7 +159,9 @@ export const SelectQuestionComponent = ({
               <div>Pas de résultat</div>
             ) : (
               options.map((option) => (
-                <SelectItem value={option.value}>{option.name}</SelectItem>
+                <SelectItem key={option.value} value={option.value}>
+                  {option.name}
+                </SelectItem>
               ))
             )}
           </SelectGroup>
@@ -176,7 +178,7 @@ export const BooleanQuestionComponent = ({
 }: BooleanQuestion) => {
   return (
     <QuestionContainer>
-      <label htmlFor={name}>{label}</label>
+      <Label htmlFor={name}>{label}</Label>
       <Checkbox id={name} placeholder={placeholder} />
     </QuestionContainer>
   );

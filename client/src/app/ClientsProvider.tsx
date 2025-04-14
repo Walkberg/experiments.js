@@ -5,6 +5,7 @@ import { MemberClientProvider } from "@/modules/mynotary-clone/modules/members/p
 import { NotificationClientProvider } from "@/modules/mynotary-clone/modules/notification/providers/NotificationClientProvider";
 import { OperationClientProvider } from "@/modules/mynotary-clone/modules/operations/providers/OperationClientProvider";
 import { OrganizationClientProvider } from "@/modules/mynotary-clone/modules/organizations/providers/OrganizationClientProvider";
+import { RecordClientProvider } from "@/modules/mynotary-clone/modules/records/providers/RecordClientProvider";
 import { FakeUserPermissionClient } from "@/modules/mynotary-clone/modules/user-permissions/in-memory-user-permission.client";
 import { UserPermissionClientProvider } from "@/modules/mynotary-clone/modules/user-permissions/providers/UserPermissionClientProvider";
 import { UserClientProvider } from "@/modules/mynotary-clone/modules/user/providers/UserClientProvider";
@@ -16,22 +17,24 @@ interface ClientProviderProps {
 
 export const ClientsProvider = ({ children }: ClientProviderProps) => {
   return (
-    <OperationClientProvider>
-      <MemberClientProvider>
-        <OrganizationClientProvider>
-          <ContractClientProvider contractClient={new DbContractClient()}>
-            <NotificationClientProvider>
-              <UserPermissionClientProvider
-                userPermissionClient={new FakeUserPermissionClient()}
-              >
-                <UserClientProvider>
-                  <DriveClientProvider>{children}</DriveClientProvider>
-                </UserClientProvider>
-              </UserPermissionClientProvider>
-            </NotificationClientProvider>
-          </ContractClientProvider>
-        </OrganizationClientProvider>
-      </MemberClientProvider>
-    </OperationClientProvider>
+    <RecordClientProvider>
+      <OperationClientProvider>
+        <MemberClientProvider>
+          <OrganizationClientProvider>
+            <ContractClientProvider contractClient={new DbContractClient()}>
+              <NotificationClientProvider>
+                <UserPermissionClientProvider
+                  userPermissionClient={new FakeUserPermissionClient()}
+                >
+                  <UserClientProvider>
+                    <DriveClientProvider>{children}</DriveClientProvider>
+                  </UserClientProvider>
+                </UserPermissionClientProvider>
+              </NotificationClientProvider>
+            </ContractClientProvider>
+          </OrganizationClientProvider>
+        </MemberClientProvider>
+      </OperationClientProvider>
+    </RecordClientProvider>
   );
 };

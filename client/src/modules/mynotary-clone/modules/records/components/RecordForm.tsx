@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { ReactNode, createContext, useContext, useState } from "react";
-import { CloudCog } from "lucide-react";
 
 interface RecordFormProps {
   config: FormConfig;

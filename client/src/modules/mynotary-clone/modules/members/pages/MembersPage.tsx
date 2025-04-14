@@ -16,11 +16,11 @@ import { format } from "date-fns";
 export function MembersPage() {
   return (
     <MembersProvider>
-      <div className="flex flex-grow flex-col gap-2">
+      <div className="flex flex-grow flex-col gap-2 h-full">
         <div>
           <MemberAdd />
         </div>
-        <div>
+        <div className=" overflow-y-scroll">
           <MemberList />
         </div>
       </div>

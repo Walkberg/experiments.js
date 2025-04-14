@@ -72,6 +72,8 @@ export type RecordDb = {
   creatorId: UserIdDb;
   organizationId: OrganizationIdDb;
   type: string;
+  creationDate: IsoDate;
+  lastUpdateDate: IsoDate;
 };
 
 export interface LinkConfigDb {

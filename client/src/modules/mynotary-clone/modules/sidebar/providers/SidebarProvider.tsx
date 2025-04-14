@@ -35,7 +35,12 @@ const defaultItems: SidebarItem[] = [
     icon: <Cat />,
     to: "/mynotary/operations",
   },
-
+  {
+    name: "Fiches",
+    description: "Fiches",
+    icon: <Cat />,
+    to: "/mynotary/fiches",
+  },
   {
     name: "Configs",
     description: "Configs",
