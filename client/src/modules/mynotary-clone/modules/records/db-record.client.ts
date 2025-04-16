@@ -25,6 +25,7 @@ export class DbRecordClient implements RecordApi {
       id: uuidv4(),
       creationDate: now,
       lastUpdateDate: now,
+      answers: recordNew.answers,
     };
 
     await db.records.add(recordDb);

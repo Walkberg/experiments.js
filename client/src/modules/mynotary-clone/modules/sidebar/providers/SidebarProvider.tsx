@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 
 import { SidebarItem } from "../sidebar";
-import { Apple, Cat, Drumstick, Fish } from "lucide-react";
+import { Apple, Cat, Drumstick, Fish, Sheet } from "lucide-react";
 
 interface SidebarState {
   collapsed: boolean;
@@ -40,6 +40,12 @@ const defaultItems: SidebarItem[] = [
     description: "Fiches",
     icon: <Cat />,
     to: "/mynotary/fiches",
+  },
+  {
+    name: "Config Fiches",
+    description: "Config Fiches",
+    icon: <Sheet />,
+    to: "/mynotary/fiches-config",
   },
   {
     name: "Configs",

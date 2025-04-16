@@ -6,6 +6,7 @@ import {
   MemberDb,
   OperationDb,
   OrganizationDb,
+  RecordConfigDb,
   RecordDb,
   UserDb,
 } from "./db.type";
@@ -19,6 +20,7 @@ export class MyAppDB extends Dexie {
   users!: Table<UserDb, string>;
   branches!: Table<BranchDb, string>;
   records!: Table<RecordDb, string>;
+  recordConfigs!: Table<RecordConfigDb, string>;
 
   constructor() {
     super("MyAppDB");
@@ -31,6 +33,7 @@ export class MyAppDB extends Dexie {
       users: "id , email",
       branches: "id",
       records: "id, creatorId, organizationId",
+      recordConfigs: "id",
     });
   }
 }

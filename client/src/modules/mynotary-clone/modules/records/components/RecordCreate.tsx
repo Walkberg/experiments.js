@@ -1,4 +1,4 @@
-import { RecordCreationProps, RecordNew } from "../record";
+import { RecordCreationProps, Recorde, RecordNew } from "../record";
 import { Button } from "@/components/ui/button";
 import { useRecords } from "../providers/RecordPersistenceProvider";
 import { FormType, FormValues } from "../../form/form";
@@ -17,13 +17,23 @@ import {
 import { useState } from "react";
 import { useRecordConfigs } from "../providers/RecordConfigProvider";
 
-export const RecordCreate = ({ onValidate }: RecordCreationProps) => {
+interface RecordCreateProps extends RecordCreationProps {
+  trigger?: React.ReactNode;
+}
+
+export const RecordCreate = ({ onValidate, trigger }: RecordCreateProps) => {
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState<string>("");
+
   const { userId, organizationId } = useCurrentMember();
   const { addRecord } = useRecords();
   const { createRecord } = useRecordCreation();
   const { recordConfigs } = useRecordConfigs();
 
-  const [type, setType] = useState<string>("");
+  const handleRecordCreated = (record: Recorde) => {
+    addRecord(record);
+    setOpen(false);
+  };
 
   const handleSubmit = async (formResponse: FormValues<FormType>) => {
     const recordNew: RecordNew = {
@@ -32,19 +42,18 @@ export const RecordCreate = ({ onValidate }: RecordCreationProps) => {
       creatorId: userId,
       organizationId: organizationId,
     };
-    console.log(recordNew);
     createRecord(recordNew, {
-      onRecordCreated: addRecord,
+      onRecordCreated: handleRecordCreated,
     });
   };
 
-  const form = recordConfigs[type]?.form;
+  const form = recordConfigs.find((config) => config.id === type)?.form;
 
   return (
     <div className="flex items-center space-x-2 columns-1">
-      <Dialog>
-        <DialogTrigger>
-          <Button>Créer un Record</Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          {trigger ?? <Button>Créer une fiche</Button>}
         </DialogTrigger>
         <DialogContent>
           <Select onValueChange={setType}>
@@ -57,17 +66,17 @@ export const RecordCreate = ({ onValidate }: RecordCreationProps) => {
                 {Object.entries(recordConfigs)
                   .filter(([__key, value]) => value.type === "person")
                   .map(([key, option]) => (
-                    <SelectItem value={key}>{option.type}</SelectItem>
+                    <SelectItem value={key}>{option.label}</SelectItem>
                   ))}
               </SelectGroup>
             </SelectContent>
           </Select>
           {form && (
             <FormComponent
+              key={type}
               onSubmit={handleSubmit}
               display={"column"}
               form={form}
-              defaultValues={{ siren: "123456789" }}
             />
           )}
         </DialogContent>

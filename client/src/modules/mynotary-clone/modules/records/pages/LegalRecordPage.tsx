@@ -13,6 +13,10 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { FormComponent } from "../../form/FormComponent";
 import { useRecordConfigs } from "../providers/RecordConfigProvider";
+import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import React from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function RecordPage() {
   return (
@@ -36,36 +40,84 @@ function RecordPageContent() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-xl font-semibold">Records</h1>
+        <h1 className="text-xl font-semibold">Fiches</h1>
+        <RecordFiltering />
         <RecordCreate onValidate={() => {}} />
       </div>
-      <ScrollArea className="h-[80vh] w-full rounded-md border p-4 space-y-2">
-        <div className="flex flex-col gap-2">
-          {records.map((record) => (
-            <Dialog>
-              <DialogTrigger asChild>
-                <RecordTile key={record.id} record={record} />
-              </DialogTrigger>
-              <DialogContent>
-                <RecordDetail record={record} />
-              </DialogContent>
-            </Dialog>
-          ))}
-        </div>
-      </ScrollArea>
+      <div>
+        <ScrollArea className="h-[80vh] w-full rounded-md border p-4 space-y-2">
+          <div className="flex flex-col gap-2">
+            {records.map((record) => (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <RecordTile key={record.id} record={record} />
+                </DialogTrigger>
+                <DialogContent>
+                  <RecordDetail record={record} />
+                </DialogContent>
+              </Dialog>
+            ))}
+          </div>
+        </ScrollArea>
+        <RecordCreate
+          onValidate={() => {}}
+          trigger={
+            <CreatePlaceholder>Créer un nouvelle fiche</CreatePlaceholder>
+          }
+        />
+      </div>
     </div>
+  );
+}
+
+export const CreatePlaceholder = React.forwardRef<
+  HTMLButtonElement,
+  React.HTMLAttributes<HTMLButtonElement>
+>((props, ref) => {
+  return (
+    <button
+      ref={ref}
+      {...props}
+      className={cn(
+        "flex items-center justify-center rounded-xl border-2 border-dashed",
+        "h-24 w-full cursor-pointer transition-colors",
+        "hover:bg-green-50 hover:border-green-500"
+      )}
+    >
+      <Plus />
+      {props.children}
+    </button>
+  );
+});
+
+function RecordFiltering({}: {}) {
+  return (
+    <Tabs defaultValue="my">
+      <TabsList className="ml-auto">
+        <TabsTrigger value={"my"}>Mes fiches</TabsTrigger>
+        <TabsTrigger value={"all"}>Toutes les fiches</TabsTrigger>
+      </TabsList>
+    </Tabs>
   );
 }
 
 function RecordDetail({ record }: { record: Recorde }) {
   const { recordConfigs } = useRecordConfigs();
 
-  const form = recordConfigs[record.type]?.form ?? { questions: [] };
+  const form = recordConfigs.find((config) => config.id === record.type)
+    ?.form ?? {
+    questions: [],
+  };
 
   return (
     <div>
       <h1>{record.id}</h1>
-      <FormComponent display={"row"} form={form} onSubmit={() => {}} />
+      <FormComponent
+        display={"row"}
+        form={form}
+        defaultValues={record.answers}
+        onSubmit={() => {}}
+      />
     </div>
   );
 }

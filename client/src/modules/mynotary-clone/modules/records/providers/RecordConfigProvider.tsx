@@ -1,13 +1,13 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { FormType } from "../../form/form";
+import { RecordConfig, RecordFormConfig } from "../record-configs";
 
 type RecordType = string;
 
 interface RecordConfigContextValue {
-  currentType: RecordType;
-  currentConfig: RecordConfig;
-  setRecordType: (type: RecordType) => void;
-  recordConfigs: Record<string, RecordConfig>;
+  recordConfigs: RecordConfig[];
+  setRecordConfigs: (configs: RecordConfig[]) => void;
+  addRecordConfig: (newConfig: RecordConfig) => void;
 }
 
 const RecordConfigContext = createContext<RecordConfigContextValue | null>(
@@ -15,15 +15,15 @@ const RecordConfigContext = createContext<RecordConfigContextValue | null>(
 );
 
 export const RecordConfigProvider = ({ children }: { children: ReactNode }) => {
-  const [recordType, setRecordType] = useState<RecordType>("personne_physique");
   const [recordConfigs, setRecordConfigs] =
-    useState<Record<string, RecordConfig>>(recordConfigsInitial);
+    useState<RecordConfig[]>(recordConfigsInitial);
 
   const value: RecordConfigContextValue = {
-    currentType: recordType,
-    currentConfig: recordConfigs[recordType],
-    setRecordType,
     recordConfigs,
+    setRecordConfigs,
+    addRecordConfig: (newConfig: RecordConfig) => {
+      setRecordConfigs((prevConfigs) => [...prevConfigs, newConfig]);
+    },
   };
 
   return (
@@ -43,53 +43,33 @@ export const useRecordConfigs = () => {
   return context;
 };
 
-const personnePhysiqueForm: FormType = {
+export const personnePhysiqueForm: FormType = {
   questions: [
     {
       type: "string",
-      name: "name",
+      name: "lastname",
       label: "Nom",
       placeholder: "Nom",
       required: true,
     },
     {
-      type: "number",
-      name: "age",
-      label: "Age",
-      placeholder: "Age",
+      type: "string",
+      name: "firstname",
+      label: "Prénom",
+      placeholder: "Prénom",
       required: true,
     },
     {
-      type: "boolean",
-      name: "isCool",
-      label: "Est cool",
-      placeholder: "Est cool",
+      type: "string",
+      name: "email",
+      label: "Email",
+      placeholder: "Email",
       required: true,
-    },
-    {
-      type: "select",
-      name: "fjkdfok",
-      label: "select",
-      placeholder: "select",
-      options: [
-        { name: "test", value: "test" },
-        { name: "aaaa", value: "aaa" },
-        { name: "bbb", value: "bbb" },
-        { name: "cxcc", value: "cccc" },
-      ],
-      required: false,
-    },
-    {
-      type: "user",
-      name: "topUser",
-      label: "Attribué à:",
-      placeholder: "Est cool",
-      required: false,
     },
   ],
 };
 
-const personneMoralForm: FormType = {
+const personneMoralForm: RecordFormConfig = {
   questions: [
     {
       type: "string",
@@ -101,7 +81,7 @@ const personneMoralForm: FormType = {
   ],
 };
 
-const bienForm: FormType = {
+const bienForm: RecordFormConfig = {
   questions: [
     {
       type: "string",
@@ -113,30 +93,23 @@ const bienForm: FormType = {
   ],
 };
 
-type RecordConfigId = string;
-
-type RecordConfigType = "person" | "property";
-
-type RecordConfig = {
-  id: RecordConfigId;
-  type: RecordConfigType;
-  form: FormType;
-};
-
-const recordConfigsInitial: Record<string, RecordConfig> = {
-  personne_physique: {
+const recordConfigsInitial: RecordConfig[] = [
+  {
     id: "personne_physique",
+    label: "Personne physique",
     type: "person",
     form: personnePhysiqueForm,
   },
-  personne_moral: {
+  {
     id: "personne_moral",
+    label: "Personne morale",
     type: "person",
     form: personneMoralForm,
   },
-  bien: {
+  {
     id: "bien",
+    label: "Bien",
     type: "property",
     form: bienForm,
   },
-};
+];

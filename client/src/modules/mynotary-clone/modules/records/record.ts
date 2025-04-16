@@ -1,14 +1,17 @@
 import { getRandomInt } from "@/utils/random";
+import { FormType } from "../form/form";
 
 export interface Recorde {
   id: string;
   creatorId: string;
   organizationId: string;
   type: string;
-  answers?: Record<string, AnswerType>;
+  answers: Record<QuestionId, AnswerType>;
 }
 
-type AnswerType = string | number | boolean | "date";
+type QuestionId = string;
+
+type AnswerType = string | number | boolean;
 
 export interface RecordLink {
   fromRecordId: string;
@@ -37,6 +40,7 @@ export function createRandomRecordNew(): RecordNew {
     type: "personne-physique",
     organizationId: "organization-1",
     creatorId: "user-1",
+    answers: {},
   };
 }
 
@@ -46,6 +50,7 @@ export function createRandomRecord(): Recorde {
     id: `record-${getRandomInt(999999)}`,
     organizationId: "organization-1",
     creatorId: "user-1",
+    answers: {},
   };
 }
 
@@ -53,42 +58,3 @@ export interface RecordApi {
   createRecord(recordNew: RecordNew): Promise<Recorde>;
   getRecords(filtering: RecordFiltering): Promise<Recorde[]>;
 }
-
-interface RecordConfig {
-  id: string;
-  labelPattern: string;
-  form: FormConfig;
-}
-
-export interface FormConfig {
-  questions: Question[];
-}
-
-export interface Question {
-  id: string;
-  name: string;
-  type: QuestionType;
-}
-
-type QuestionType = "text" | "number";
-
-export const personnePhysiqueConfig: RecordConfig = {
-  id: "personne-physique",
-  labelPattern: "test",
-  form: {
-    questions: [
-      { id: "firstname", type: "text", name: "Prénom" },
-      { id: "lastname", type: "text", name: "Nom" },
-      { id: "email", type: "text", name: "Email" },
-      { id: "phone", type: "text", name: "Téléphone" },
-    ],
-  },
-};
-
-const bienConfig: RecordConfig = {
-  id: "bien",
-  labelPattern: "test",
-  form: {
-    questions: [{ id: "address", type: "text", name: "Adresse" }],
-  },
-};

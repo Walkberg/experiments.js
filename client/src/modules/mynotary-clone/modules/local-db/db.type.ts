@@ -1,4 +1,5 @@
 import { IsoDate } from "../../types/common";
+import { FormType } from "../form/form";
 
 export type OperationIdDb = string;
 
@@ -72,9 +73,16 @@ export type RecordDb = {
   creatorId: UserIdDb;
   organizationId: OrganizationIdDb;
   type: string;
+  answers: Answers;
   creationDate: IsoDate;
   lastUpdateDate: IsoDate;
 };
+
+type QuestionId = string;
+
+type Answers = Record<QuestionId, Answer>;
+
+type Answer = any;
 
 export interface LinkConfigDb {
   id: string;
@@ -87,3 +95,44 @@ export interface BranchConfigCreation {
   maxRecordCount?: number;
   isAutoCreate?: boolean;
 }
+
+export interface RecordConfigDb {
+  id: string;
+  type: string;
+  label: string;
+  form: FormDb;
+}
+
+type FormDb = {
+  questions: FormQuestion[];
+};
+
+export type QuestionType = "string" | "number" | "boolean" | "select" | "user";
+
+export type BaseQuestion = {
+  type: QuestionType;
+  name: string;
+  label: string;
+  placeholder: string;
+  required?: boolean;
+};
+
+export type StringQuestion = { type: "string" } & BaseQuestion;
+
+export type UserQuestion = { type: "user" } & BaseQuestion;
+
+export type NumberQuestion = { type: "number" } & BaseQuestion;
+
+export type BooleanQuestion = { type: "boolean" } & BaseQuestion;
+
+export type SelectQuestion = {
+  type: "select";
+  options: { name: string; value: string }[];
+} & BaseQuestion;
+
+export type FormQuestion =
+  | StringQuestion
+  | NumberQuestion
+  | BooleanQuestion
+  | SelectQuestion
+  | UserQuestion;

@@ -11,7 +11,7 @@ import {
 } from "./form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -21,6 +21,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import {
+  Controller,
+  FormProvider,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
 
 type FormDisplay = "column" | "row";
 
@@ -39,35 +45,28 @@ export const FormComponent = ({
   onSubmit,
   defaultValues,
 }: FormProps) => {
-  return (
-    <FormProvider
-      defaultValues={defaultValues}
-      form={form}
-      display={display}
-      onSubmit={onSubmit}
-    >
-      <FormComponentLogic />
-    </FormProvider>
-  );
-};
-
-interface FormComponentLogicProps {}
-
-export const FormComponentLogic = ({}: FormComponentLogicProps) => {
-  const { form, submit, status, values } = useForm();
+  const methods = useForm<FormResponse>({
+    defaultValues: form.questions.reduce((acc, q) => {
+      acc[q.name] =
+        defaultValues?.[q.name] ?? (q.type === "boolean" ? false : "");
+      return acc;
+    }, {} as FormResponse),
+  });
 
   return (
-    <div>
-      <form className="flex flex-col gap-4" onSubmit={submit}>
+    <FormProvider {...methods}>
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={methods.handleSubmit(onSubmit)}
+      >
         {form.questions.map((question) => (
           <QuestionComponent key={question.name} {...question} />
         ))}
-
         <Button disabled={status === "submitting"} type="submit">
           Envoyer
         </Button>
       </form>
-    </div>
+    </FormProvider>
   );
 };
 
@@ -90,11 +89,18 @@ export const StringQuestionComponent = ({
   name,
   label,
   placeholder,
+  required,
 }: StringQuestion) => {
+  const { register } = useFormContext();
   return (
     <QuestionContainer>
       <Label htmlFor={name}>{label}</Label>
-      <Input type="text" id={name} placeholder={placeholder} />
+      <Input
+        type="text"
+        id={name}
+        placeholder={placeholder}
+        {...register(name, { required: required })}
+      />
     </QuestionContainer>
   );
 };
@@ -103,11 +109,21 @@ export const NumberQuestionComponent = ({
   name,
   label,
   placeholder,
+  required,
 }: NumberQuestion) => {
+  const { register } = useFormContext();
   return (
     <QuestionContainer>
       <Label htmlFor={name}>{label}</Label>
-      <Input type="number" id={name} placeholder={placeholder} />
+      <Input
+        type="number"
+        id={name}
+        placeholder={placeholder}
+        {...register(name, {
+          required: required,
+          valueAsNumber: true,
+        })}
+      />
     </QuestionContainer>
   );
 };
@@ -157,27 +173,39 @@ export const SelectQuestionComponent = ({
   placeholder,
   options,
 }: SelectQuestion) => {
+  const { control } = useFormContext();
+
   return (
     <QuestionContainer>
-      <Select>
-        <Label htmlFor={name}>{label}</Label>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {options.length === 0 ? (
-              <div>Pas de résultat</div>
-            ) : (
-              options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.name}
-                </SelectItem>
-              ))
-            )}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      <Label htmlFor={name}>{label}</Label>
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Select
+            className="w-full"
+            onValueChange={field.onChange}
+            value={field.value}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {options.length === 0 ? (
+                  <div>Pas de résultat</div>
+                ) : (
+                  options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.name}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+      />
     </QuestionContainer>
   );
 };
@@ -187,10 +215,17 @@ export const BooleanQuestionComponent = ({
   label,
   placeholder,
 }: BooleanQuestion) => {
+  const { control } = useFormContext();
   return (
     <QuestionContainer>
       <Label htmlFor={name}>{label}</Label>
-      <Checkbox id={name} placeholder={placeholder} />
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Checkbox checked={field.value} id={name} placeholder={placeholder} />
+        )}
+      />
     </QuestionContainer>
   );
 };
@@ -200,7 +235,7 @@ export const QuestionContainer = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { display } = useForm();
+  const [display, setDisplay] = useState("column");
 
   return (
     <div
@@ -212,72 +247,3 @@ export const QuestionContainer = ({
     </div>
   );
 };
-
-type FormStatus = "idle" | "submitting" | "success" | "error";
-
-interface FormProviderProps {
-  form: FormType;
-  display: FormDisplay;
-  children: React.ReactNode;
-  defaultValues?: FormResponse;
-  onSubmit: (formResponse: FormResponse) => Promise<void> | void;
-}
-
-type FormProviderState = {
-  form: FormType;
-  display: FormDisplay;
-  onSubmit: (formResponse: FormResponse) => Promise<void> | void;
-  submit: (e: React.FormEvent) => void;
-  status: FormStatus;
-  values: FormResponse;
-} | null;
-
-const FormProviderContext = createContext<FormProviderState>(null);
-
-export function FormProvider({
-  defaultValues,
-  children,
-  form,
-  display,
-  onSubmit,
-}: FormProviderProps) {
-  const [status, setStatus] = useState<FormStatus>("idle");
-
-  const [formValues, setFormValues] = useState<FormResponse>(
-    form.questions.reduce((acc, question) => {
-      if (defaultValues && question.name in defaultValues) {
-        acc[question.name] = defaultValues[question.name];
-        return acc;
-      }
-      acc[question.name] = question.type === "boolean" ? false : "";
-      return acc;
-    }, {} as FormResponse)
-  );
-
-  console.log(formValues);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus("submitting");
-    await onSubmit(formValues);
-    setStatus("idle");
-  };
-
-  return (
-    <FormProviderContext.Provider
-      value={{ form, display, onSubmit, submit, status, values: formValues }}
-    >
-      <div className="flex flex-col gap-4 p-4">{children}</div>
-    </FormProviderContext.Provider>
-  );
-}
-
-export function useForm() {
-  const context = useContext(FormProviderContext);
-
-  if (context == null) {
-    throw new Error("useForm must be used within a FormProvider");
-  }
-
-  return context;
-}
