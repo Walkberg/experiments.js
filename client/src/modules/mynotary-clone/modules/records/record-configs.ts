@@ -1,4 +1,4 @@
-import { FormType } from "../form/form";
+import { FormQuestion, FormType, QuestionType } from "../form/form";
 
 export type RecordConfigId = string;
 
@@ -24,4 +24,14 @@ export interface RecordConfigClient {
   getRecordConfig: (id: RecordConfigId) => Promise<RecordConfig>;
 
   createRecordConfig: (config: RecordConfigNew) => Promise<RecordConfig>;
+
+  addQuestionToRecordConfig: (
+    configId: RecordConfigId,
+    question: FormQuestion
+  ) => Promise<RecordConfig>;
+
+  removeQuestionFromRecordConfig: (
+    configId: RecordConfigId,
+    questionId: string
+  ) => Promise<RecordConfig>;
 }

@@ -21,6 +21,7 @@ import {
 } from "../record-configs";
 import { Controller, useForm } from "react-hook-form";
 import { useRecordConfigClient } from "../providers/RecordConfigClientProvider";
+import { FormQuestion, QuestionType } from "../../form/form";
 
 export function RecordConfigPage() {
   return (
@@ -53,11 +54,141 @@ function RecordConfigList() {
 
 function RecordConfigTile({ config }: { config: RecordConfig }) {
   return (
-    <Card className="p-4">
-      <h2 className="text-lg font-semibold">{config.label}</h2>
-      <p className="text-sm text-muted-foreground">Type : {config.type}</p>
-      <p className="text-sm text-muted-foreground">ID : {config.id}</p>
-    </Card>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Card className="p-4">
+          <h2 className="text-lg font-semibold">{config.label}</h2>
+          <p className="text-sm text-muted-foreground">Type : {config.type}</p>
+          <p className="text-sm text-muted-foreground">ID : {config.id}</p>
+        </Card>
+      </DialogTrigger>
+      <DialogContent>
+        <RecordConfigDetail
+          config={config}
+          onUpdate={(updatedConfig) =>
+            console.log("Updated config:", updatedConfig)
+          }
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+const questionTypes: { value: QuestionType; label: string }[] = [
+  { value: "string", label: "Texte" },
+  { value: "number", label: "Nombre" },
+  { value: "boolean", label: "Oui / Non" },
+  { value: "select", label: "Liste de choix" },
+  { value: "user", label: "Utilisateur" },
+];
+
+type QuestionForm = {
+  label: string;
+  name: string;
+  placeholder: string;
+  type: QuestionType;
+};
+
+export function RecordConfigDetail({
+  config,
+  onUpdate,
+}: {
+  config: RecordConfig;
+  onUpdate: (updated: RecordConfig) => void;
+}) {
+  const { createRecordConfigQuestion } = useAddQuestionToRecordConfig();
+  const { addQuestionToRecordConfig } = useRecordConfigs();
+
+  const { register, handleSubmit, control, reset } = useForm<QuestionForm>({
+    defaultValues: {
+      label: "",
+      name: "",
+      placeholder: "",
+      type: "string",
+    },
+  });
+
+  const handleQuestionCreated = (question: FormQuestion) => {
+    addQuestionToRecordConfig(config.id, question);
+  };
+
+  const onSubmit = async (data: QuestionForm) => {
+    const question: FormQuestion = {
+      ...data,
+      required: true,
+      ...(data.type === "select" ? { options: [] } : {}),
+    } as FormQuestion;
+
+    await createRecordConfigQuestion(config.id, question, {
+      onQuestionRecordConfigCreated: handleQuestionCreated,
+    });
+
+    reset();
+  };
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold">Ajouter une question</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <Label>Intitulé</Label>
+          <Input
+            {...register("label", { required: true })}
+            placeholder="Nom complet"
+          />
+        </div>
+        <div>
+          <Label>Nom technique</Label>
+          <Input
+            {...register("name", { required: true })}
+            placeholder="ex: full_name"
+          />
+        </div>
+        <div>
+          <Label>Placeholder</Label>
+          <Input
+            {...register("placeholder")}
+            placeholder="Entrez une valeur..."
+          />
+        </div>
+        <div>
+          <Label>Type</Label>
+          <Controller
+            control={control}
+            name="type"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Choisissez un type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {questionTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+        <Button type="submit">Ajouter</Button>
+      </form>
+
+      <div className="pt-6">
+        <h3 className="text-md font-semibold">Questions existantes</h3>
+        <div className="space-y-2 pt-2">
+          {config.form?.questions.map((q) => (
+            <div key={q.name} className="border p-2 rounded-md">
+              <div className="font-medium">{q.label}</div>
+              <div className="text-xs text-muted-foreground">
+                {q.type} | {q.name}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -183,4 +314,23 @@ export function useRecordConfigCreation() {
   };
 
   return { createRecordConfig };
+}
+
+interface useAddQuestionToRecordConfigOptions {
+  onQuestionRecordConfigCreated: (formQuestion: FormQuestion) => void;
+}
+
+export function useAddQuestionToRecordConfig() {
+  const client = useRecordConfigClient();
+
+  const createRecordConfigQuestion = async (
+    configId: string,
+    question: FormQuestion,
+    options: useAddQuestionToRecordConfigOptions
+  ) => {
+    await client.addQuestionToRecordConfig(configId, question);
+    options.onQuestionRecordConfigCreated(question);
+  };
+
+  return { createRecordConfigQuestion };
 }

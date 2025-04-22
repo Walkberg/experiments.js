@@ -13,10 +13,13 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { FormComponent } from "../../form/FormComponent";
 import { useRecordConfigs } from "../providers/RecordConfigProvider";
-import { Plus } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { usePermission } from "../../user-permissions/use-permission";
+import { useRecord } from "../useRecord";
+import { Button } from "@/components/ui/button";
 
 export function RecordPage() {
   return (
@@ -122,6 +125,34 @@ function RecordDetail({ record }: { record: Recorde }) {
   );
 }
 
+export function RecordDelete({ record }: { record: Recorde }) {
+  const canDelete = usePermission("record", "delete");
+
+  const { deleteRecord } = useRecordDeletion();
+  const { removeRecord } = useRecords();
+
+  const handleRecordDeleted = async (recordId: string) => {
+    removeRecord(recordId);
+  };
+
+  const handleDeleteRecord = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    await deleteRecord(record.id, {
+      onRecordDeleted: handleRecordDeleted,
+    });
+  };
+
+  return (
+    <Button
+      disabled={!canDelete || status === "creating"}
+      variant={"ghost"}
+      onClick={handleDeleteRecord}
+    >
+      <Trash />
+    </Button>
+  );
+}
+
 function useFetchRecords() {
   const client = useRecordClient();
 
@@ -153,4 +184,22 @@ export function useRecordCreation() {
   };
 
   return { createRecord };
+}
+
+interface UseRecordDeletionOptions {
+  onRecordDeleted: (recordId: string) => void;
+}
+
+export function useRecordDeletion() {
+  const client = useRecordClient();
+
+  const deleteRecord = async (
+    recordId: string,
+    options: UseRecordDeletionOptions
+  ) => {
+    const record = await client.deleteRecord(recordId);
+    options.onRecordDeleted(recordId);
+  };
+
+  return { deleteRecord };
 }

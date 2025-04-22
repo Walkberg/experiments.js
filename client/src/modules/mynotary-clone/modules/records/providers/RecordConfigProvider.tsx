@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-import { FormType } from "../../form/form";
+import { FormQuestion, FormType } from "../../form/form";
 import { RecordConfig, RecordFormConfig } from "../record-configs";
 
 type RecordType = string;
@@ -8,6 +8,14 @@ interface RecordConfigContextValue {
   recordConfigs: RecordConfig[];
   setRecordConfigs: (configs: RecordConfig[]) => void;
   addRecordConfig: (newConfig: RecordConfig) => void;
+  addQuestionToRecordConfig: (
+    configId: RecordType,
+    question: FormQuestion
+  ) => void;
+  removeQuestionFromRecordConfig: (
+    configId: RecordType,
+    questionId: string
+  ) => void;
 }
 
 const RecordConfigContext = createContext<RecordConfigContextValue | null>(
@@ -15,14 +23,51 @@ const RecordConfigContext = createContext<RecordConfigContextValue | null>(
 );
 
 export const RecordConfigProvider = ({ children }: { children: ReactNode }) => {
-  const [recordConfigs, setRecordConfigs] =
-    useState<RecordConfig[]>(recordConfigsInitial);
+  const [recordConfigs, setRecordConfigs] = useState<RecordConfig[]>([]);
 
   const value: RecordConfigContextValue = {
     recordConfigs,
     setRecordConfigs,
     addRecordConfig: (newConfig: RecordConfig) => {
       setRecordConfigs((prevConfigs) => [...prevConfigs, newConfig]);
+    },
+    addQuestionToRecordConfig: (
+      configId: RecordType,
+      question: FormQuestion
+    ) => {
+      setRecordConfigs((prevConfigs) =>
+        prevConfigs.map((config) =>
+          config.id === configId
+            ? {
+                ...config,
+                form: {
+                  ...config.form,
+                  questions: [...(config.form?.questions ?? []), question],
+                },
+              }
+            : config
+        )
+      );
+    },
+    removeQuestionFromRecordConfig: (
+      configId: RecordType,
+      questionId: string
+    ) => {
+      setRecordConfigs((prevConfigs) =>
+        prevConfigs.map((config) =>
+          config.id === configId
+            ? {
+                ...config,
+                form: {
+                  ...config.form,
+                  questions: config.form.questions.filter(
+                    (question) => question.name !== questionId
+                  ),
+                },
+              }
+            : config
+        )
+      );
     },
   };
 

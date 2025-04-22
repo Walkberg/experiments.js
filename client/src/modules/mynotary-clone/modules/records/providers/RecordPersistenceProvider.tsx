@@ -5,6 +5,7 @@ interface RecordContextState {
   records: Recorde[];
   setRecords: (records: Recorde[]) => void;
   addRecord: (record: Recorde) => void;
+  removeRecord: (recordId: string) => void;
 }
 
 const RecordContext = createContext<RecordContextState | null>(null);
@@ -20,8 +21,14 @@ export function RecordProvider({ children }: RecordProviderProps) {
     setRecords((prev) => [...prev, record]);
   };
 
+  const removeRecord = (recordId: string) => {
+    setRecords((prev) => prev.filter((record) => record.id !== recordId));
+  };
+
   return (
-    <RecordContext.Provider value={{ records, setRecords, addRecord }}>
+    <RecordContext.Provider
+      value={{ records, setRecords, addRecord, removeRecord }}
+    >
       {children}
     </RecordContext.Provider>
   );

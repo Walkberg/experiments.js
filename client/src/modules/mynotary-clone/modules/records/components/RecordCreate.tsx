@@ -14,8 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecordConfigs } from "../providers/RecordConfigProvider";
+import { useFetchRecordConfigs } from "../pages/RecordConfigPage";
+import { useKey } from "@/modules/mynotary-clone/hooks/useKey";
 
 interface RecordCreateProps extends RecordCreationProps {
   trigger?: React.ReactNode;
@@ -28,7 +30,17 @@ export const RecordCreate = ({ onValidate, trigger }: RecordCreateProps) => {
   const { userId, organizationId } = useCurrentMember();
   const { addRecord } = useRecords();
   const { createRecord } = useRecordCreation();
-  const { recordConfigs } = useRecordConfigs();
+
+  const { fetchRecordConfigs } = useFetchRecordConfigs();
+  const { recordConfigs, setRecordConfigs } = useRecordConfigs();
+
+  useKey(["a"], () => setOpen(true));
+
+  useEffect(() => {
+    fetchRecordConfigs({
+      onRecordConfigsFetched: setRecordConfigs,
+    });
+  }, []);
 
   const handleRecordCreated = (record: Recorde) => {
     addRecord(record);
@@ -63,10 +75,10 @@ export const RecordCreate = ({ onValidate, trigger }: RecordCreateProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                {Object.entries(recordConfigs)
-                  .filter(([__key, value]) => value.type === "person")
-                  .map(([key, option]) => (
-                    <SelectItem value={key}>{option.label}</SelectItem>
+                {recordConfigs
+                  .filter((value) => value.type === "person")
+                  .map((option) => (
+                    <SelectItem value={option.id}>{option.label}</SelectItem>
                   ))}
               </SelectGroup>
             </SelectContent>

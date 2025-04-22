@@ -47,6 +47,13 @@ const initialValues = [
     userId: "user-1",
     organizationId: "organization-2",
   },
+  {
+    id: "5",
+    type: "record",
+    subType: "delete",
+    userId: "user-1",
+    organizationId: "organization-1",
+  },
 ];
 
 export class FakeUserPermissionClient implements UserPermissionClient {

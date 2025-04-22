@@ -56,5 +56,8 @@ export function createRandomRecord(): Recorde {
 
 export interface RecordApi {
   createRecord(recordNew: RecordNew): Promise<Recorde>;
+
   getRecords(filtering: RecordFiltering): Promise<Recorde[]>;
+
+  deleteRecord(recordId: string): Promise<void>;
 }

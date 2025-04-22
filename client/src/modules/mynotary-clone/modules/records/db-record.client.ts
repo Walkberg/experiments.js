@@ -32,6 +32,10 @@ export class DbRecordClient implements RecordApi {
 
     return convertRecordDbToRecorde(recordDb);
   }
+
+  async deleteRecord(recordId: string): Promise<void> {
+    await db.records.delete(recordId);
+  }
 }
 
 function convertRecordDbToRecorde(recordDb: RecordDb): Recorde {
