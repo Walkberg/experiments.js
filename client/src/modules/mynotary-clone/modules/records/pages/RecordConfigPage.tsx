@@ -22,6 +22,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { useRecordConfigClient } from "../providers/RecordConfigClientProvider";
 import { FormQuestion, QuestionType } from "../../form/form";
+import { useNavigate } from "react-router";
 
 export function RecordConfigPage() {
   return (
@@ -53,24 +54,13 @@ function RecordConfigList() {
 }
 
 function RecordConfigTile({ config }: { config: RecordConfig }) {
+  const navigate = useNavigate();
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Card className="p-4">
-          <h2 className="text-lg font-semibold">{config.label}</h2>
-          <p className="text-sm text-muted-foreground">Type : {config.type}</p>
-          <p className="text-sm text-muted-foreground">ID : {config.id}</p>
-        </Card>
-      </DialogTrigger>
-      <DialogContent>
-        <RecordConfigDetail
-          config={config}
-          onUpdate={(updatedConfig) =>
-            console.log("Updated config:", updatedConfig)
-          }
-        />
-      </DialogContent>
-    </Dialog>
+    <Card className="p-4" onClick={() => navigate(config.id)}>
+      <h2 className="text-lg font-semibold">{config.label}</h2>
+      <p className="text-sm text-muted-foreground">Type : {config.type}</p>
+      <p className="text-sm text-muted-foreground">ID : {config.id}</p>
+    </Card>
   );
 }
 
@@ -174,20 +164,6 @@ export function RecordConfigDetail({
         </div>
         <Button type="submit">Ajouter</Button>
       </form>
-
-      <div className="pt-6">
-        <h3 className="text-md font-semibold">Questions existantes</h3>
-        <div className="space-y-2 pt-2">
-          {config.form?.questions.map((q) => (
-            <div key={q.name} className="border p-2 rounded-md">
-              <div className="font-medium">{q.label}</div>
-              <div className="text-xs text-muted-foreground">
-                {q.type} | {q.name}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

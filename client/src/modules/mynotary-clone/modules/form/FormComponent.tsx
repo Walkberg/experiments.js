@@ -27,6 +27,7 @@ import {
   useForm,
   useFormContext,
 } from "react-hook-form";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 type FormDisplay = "column" | "row";
 
@@ -59,9 +60,11 @@ export const FormComponent = ({
         className="flex flex-col gap-4"
         onSubmit={methods.handleSubmit(onSubmit)}
       >
-        {form.questions.map((question) => (
-          <QuestionComponent key={question.name} {...question} />
-        ))}
+        <ScrollArea>
+          {form.questions.map((question) => (
+            <QuestionComponent key={question.name} {...question} />
+          ))}
+        </ScrollArea>
         <Button disabled={status === "submitting"} type="submit">
           Envoyer
         </Button>

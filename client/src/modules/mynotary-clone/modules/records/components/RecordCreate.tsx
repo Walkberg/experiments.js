@@ -68,29 +68,31 @@ export const RecordCreate = ({ onValidate, trigger }: RecordCreateProps) => {
           {trigger ?? <Button>Créer une fiche</Button>}
         </DialogTrigger>
         <DialogContent>
-          <Select onValueChange={setType}>
-            <label htmlFor={"name"}>{"type"}</label>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={"placeholder"} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {recordConfigs
-                  .filter((value) => value.type === "person")
-                  .map((option) => (
-                    <SelectItem value={option.id}>{option.label}</SelectItem>
-                  ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          {form && (
-            <FormComponent
-              key={type}
-              onSubmit={handleSubmit}
-              display={"column"}
-              form={form}
-            />
-          )}
+          <div className="scroll-y">
+            <Select onValueChange={setType}>
+              <label htmlFor={"name"}>{"type"}</label>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={"placeholder"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {recordConfigs
+                    .filter((value) => value.type === "person")
+                    .map((option) => (
+                      <SelectItem value={option.id}>{option.label}</SelectItem>
+                    ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            {form && (
+              <FormComponent
+                key={type}
+                onSubmit={handleSubmit}
+                display={"column"}
+                form={form}
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

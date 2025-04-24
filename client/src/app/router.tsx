@@ -24,6 +24,7 @@ import { OrganizationsPage } from "@/modules/mynotary-clone/modules/organization
 import { RecordPage } from "@/modules/mynotary-clone/modules/records/pages/LegalRecordPage";
 import { RecordConfigProvider } from "@/modules/mynotary-clone/modules/records/providers/RecordConfigProvider";
 import { RecordConfigPage } from "@/modules/mynotary-clone/modules/records/pages/RecordConfigPage";
+import { RecordConfigDetailPage } from "@/modules/mynotary-clone/modules/records/pages/RecordConfigDetailPage";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -52,6 +53,7 @@ export const router = createBrowserRouter(
         <Route path="operations" element={<OperationsPage />} />
         <Route path="fiches" element={<RecordPage />} />
         <Route path="fiches-config" element={<RecordConfigPage />} />
+        <Route path="fiches-config/:id" element={<RecordConfigDetailPage />} />
         <Route path="configs" element={<ConfigManager />} />
         <Route element={<OperationWrapper />}>
           <Route path="operations/:operationId">
