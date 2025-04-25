@@ -4,7 +4,12 @@ import { useAddQuestionToRecordConfig } from "./RecordConfigPage";
 import { ReactNode, useEffect, useState } from "react";
 import { RecordConfig } from "../record-configs";
 import { useRecordConfigs } from "../providers/RecordConfigProvider";
-import { FormQuestion, FormType } from "../../form/form";
+import {
+  FormQuestion,
+  FormType,
+  QuestionType,
+  SelectQuestion,
+} from "../../form/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +27,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FormComponent } from "../../form/FormComponent";
 import { Dialog } from "@radix-ui/react-dialog";
 import { DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import clsx from "clsx";
 
 export function RecordConfigDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -100,13 +107,15 @@ export const FormFieldsList = ({
     <div className="pt-6">
       <h3 className="text-md font-semibold">Questions existantes</h3>
       <ScrollArea>
-        {form.questions.map((question) => (
-          <FormQuestionEdit
-            key={question.name}
-            question={question}
-            configId={configId}
-          />
-        ))}
+        <div className="flex flex-col gap-2 pt-4">
+          {form.questions.map((question) => (
+            <FormQuestionEdit
+              key={question.name}
+              question={question}
+              configId={configId}
+            />
+          ))}
+        </div>
       </ScrollArea>
     </div>
   );
@@ -124,18 +133,8 @@ export const FormQuestionEdit = ({
       <div className="flex items-center gap-2">
         <div>
           <div className="text-xs text-muted-foreground flex flex-col gap-2">
-            <Input type="text" placeholder={question.name} className="w-full" />
-            <Input
-              type="text"
-              placeholder={question.label}
-              className="w-full"
-            />
             <div className="text-xs text-muted-foreground">{question.type}</div>
-            <Input
-              type="text"
-              placeholder={question.placeholder}
-              className="w-full"
-            />
+            <QuestionEditFactory question={question} />
           </div>
         </div>
         <DeleteQuestionButton configId={configId} questionId={question.name} />
@@ -143,6 +142,87 @@ export const FormQuestionEdit = ({
     </div>
   );
 };
+
+function QuestionEditFactory({ question }: { question: FormQuestion }) {
+  const Component =
+    questionTypeComponentMap[question.type] || DefaultQuestionEdit;
+  return <Component question={question} />;
+}
+
+const questionTypeComponentMap: Record<
+  QuestionType,
+  React.FC<QuestionEditProps<any>>
+> = {
+  string: DefaultQuestionEdit,
+  number: DefaultQuestionEdit,
+  boolean: DefaultQuestionEdit,
+  select: SelectQuestionEdit,
+  user: DefaultQuestionEdit,
+};
+
+interface QuestionEditProps<T extends FormQuestion = FormQuestion> {
+  question: T;
+}
+
+function DefaultQuestionEdit({ question }: QuestionEditProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <QuestionContainer>
+        <Label>Nom techqnique</Label>
+        <Input type="text" defaultValue={question.name} className="w-full" />
+      </QuestionContainer>
+      <QuestionContainer>
+        <Label>Libélé</Label>
+        <Input type="text" defaultValue={question.type} className="w-full" />
+      </QuestionContainer>
+      <QuestionContainer>
+        <Label>Placeholder</Label>
+        <Input
+          type="text"
+          defaultValue={question.placeholder}
+          className="w-full"
+        />
+      </QuestionContainer>
+    </div>
+  );
+}
+
+function SelectQuestionEdit({ question }: QuestionEditProps<SelectQuestion>) {
+  return (
+    <div className="flex flex-col gap-2">
+      <QuestionContainer>
+        <Label>Nom techqnique</Label>
+        <Input type="text" defaultValue={question.name} className="w-full" />
+      </QuestionContainer>
+      <QuestionContainer>
+        <Label>Libélé</Label>
+        <Input type="text" defaultValue={question.label} className="w-full" />
+      </QuestionContainer>
+      <QuestionContainer>
+        <Label>Placeholder</Label>
+        <Input
+          type="text"
+          defaultValue={question.placeholder}
+          className="w-full"
+        />
+      </QuestionContainer>
+      <div>
+        {question.options.map((option) => (
+          <div key={option.value} className="flex gap-2">
+            <Input type="text" defaultValue={option.name} className="w-full" />
+            <Button variant="outline" size="icon">
+              <Trash />
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function QuestionContainer({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-row gap-2">{children}</div>;
+}
 
 const basicFieldConfigs: FieldConfig[] = [
   {
@@ -185,7 +265,7 @@ const basicFieldConfigs: FieldConfig[] = [
       name: "active",
       label: "Oui/Non",
       type: "boolean",
-      placeholder: "Actif ou non",
+      placeholder: "Oui/Non",
       required: false,
     },
   },
@@ -272,14 +352,17 @@ interface FieldCardProps {
 export const FieldCard = ({ field, onClick }: FieldCardProps) => {
   return (
     <div
-      className={
-        "p-4 flex flex-col items-center gap-4 cursor-pointer transition-all border hover:border-primary hover:shadow-md rounded-2xl"
-      }
+      className={clsx(
+        "p-4 flex flex-col items-center gap-4 cursor-pointer transition-all rounded-2xl",
+        "border-2 hover:border-green-500 hover:shadow-green-200 hover:shadow-md group"
+      )}
       onClick={onClick}
     >
-      <div>{field.icon}</div>
-      <div className="flex-1">
-        <div className="text-base font-medium">{field.defaultValue.label}</div>
+      <div className="text-muted-foreground group-hover:text-green-700">
+        {field.icon}
+      </div>
+      <div className="text-base font-medium group-hover:text-green-700">
+        {field.defaultValue.label}
       </div>
     </div>
   );

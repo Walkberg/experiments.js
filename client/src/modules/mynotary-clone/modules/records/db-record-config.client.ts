@@ -45,7 +45,16 @@ export class DbRecordConfigClient implements RecordConfigClient {
     const updatedConfig: RecordConfig = {
       ...config,
       form: {
-        questions: [...(config.form?.questions ?? []), question],
+        questions: [
+          ...(config.form?.questions ?? []),
+          {
+            ...question,
+            name: createUniqueQuestionIdentifier(
+              config.form?.questions ?? [],
+              question
+            ),
+          },
+        ],
       },
     };
 
@@ -85,4 +94,16 @@ function convertRecordConfigToDbRecordConfig(
         ? config.type
         : "person",
   };
+}
+
+function createUniqueQuestionIdentifier(
+  questions: FormQuestion[],
+  newQuestion: FormQuestion
+): string {
+  const duplicate = questions.filter((q) => q.name === newQuestion.name).length;
+
+  if (duplicate === 0) {
+    return newQuestion.name;
+  }
+  return `${newQuestion.name}-${duplicate + 1}`;
 }

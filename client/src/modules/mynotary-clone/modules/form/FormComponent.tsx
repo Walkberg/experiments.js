@@ -28,6 +28,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { AvatarFallback, Avatar, AvatarImage } from "@/components/ui/avatar";
 
 type FormDisplay = "column" | "row";
 
@@ -166,16 +167,30 @@ export const UserQuestionComponent = ({ type, ...rest }: UserQuestion) => {
       }))}
       type="select"
       {...rest}
+      component={({ option }) => (
+        <div className="flex items-center">
+          <Avatar className="w-6 h-6 mr-2">
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <div>{option.name}</div>
+        </div>
+      )}
     />
   );
 };
+
+interface SelectQuestionProp extends SelectQuestion {
+  component?: React.FC<{ option: { value: string; name: string } }>;
+}
 
 export const SelectQuestionComponent = ({
   name,
   label,
   placeholder,
   options,
-}: SelectQuestion) => {
+  component: CustomCompoennt,
+}: SelectQuestionProp) => {
   const { control } = useFormContext();
 
   return (
@@ -200,7 +215,11 @@ export const SelectQuestionComponent = ({
                 ) : (
                   options.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {option.name}
+                      {CustomCompoennt ? (
+                        <CustomCompoennt option={option} />
+                      ) : (
+                        <>{option.name}</>
+                      )}
                     </SelectItem>
                   ))
                 )}
