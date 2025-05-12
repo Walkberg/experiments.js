@@ -48,11 +48,15 @@ export const useWorkflow = () => {
 };
 
 function createNode(id: NodeId): ConfigNode {
+  return createNodePosition(id, { x: 100, y: 100 });
+}
+
+function createNodePosition(id: NodeId, position: Position): ConfigNode {
   return {
     id,
     workFlowId: "1",
     type: "form",
-    position: { x: 100, y: 100 },
+    position: position,
   };
 }
 
@@ -71,7 +75,10 @@ function createConnection(
 }
 
 const defaultGraph = {
-  nodes: [createNode("1"), createNode("2")],
+  nodes: [
+    createNodePosition("1", { x: 100, y: 100 }),
+    createNodePosition("2", { x: 400, y: 100 }),
+  ],
   connections: [createConnection("1", "1", "2")],
 };
 

@@ -73,11 +73,11 @@ export const NodeComponent: React.FC<Props> = ({ node }) => {
       >
         <div
           id={`handle-${node.id}-in`}
-          className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-blue-500 rounded-full"
+          className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-blue-500 rounded-full"
         />
         <div
           id={`handle-${node.id}-out`}
-          className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-green-500 rounded-full"
+          className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-green-500 rounded-full"
         />
         <CardHeader>
           <CardTitle>Card Title</CardTitle>
