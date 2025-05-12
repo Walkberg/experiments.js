@@ -1,6 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  FormQuestion,
+  FormElement,
   FormType,
   StringQuestion,
   NumberQuestion,
@@ -61,7 +61,7 @@ export const FormComponent = ({
         className="flex flex-col gap-4"
         onSubmit={methods.handleSubmit(onSubmit)}
       >
-        <ScrollArea>
+        <ScrollArea className="flex flex-col gap-4">
           {form.questions.map((question) => (
             <QuestionComponent key={question.name} {...question} />
           ))}
@@ -74,7 +74,7 @@ export const FormComponent = ({
   );
 };
 
-function QuestionComponent(question: FormQuestion) {
+function QuestionComponent(question: FormElement) {
   switch (question.type) {
     case "string":
       return <StringQuestionComponent {...question} />;
@@ -189,7 +189,7 @@ export const SelectQuestionComponent = ({
   label,
   placeholder,
   options,
-  component: CustomCompoennt,
+  component: CustomComponent,
 }: SelectQuestionProp) => {
   const { control } = useFormContext();
 
@@ -215,8 +215,8 @@ export const SelectQuestionComponent = ({
                 ) : (
                   options.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {CustomCompoennt ? (
-                        <CustomCompoennt option={option} />
+                      {CustomComponent ? (
+                        <CustomComponent option={option} />
                       ) : (
                         <>{option.name}</>
                       )}

@@ -21,7 +21,7 @@ import {
 } from "../record-configs";
 import { Controller, useForm } from "react-hook-form";
 import { useRecordConfigClient } from "../providers/RecordConfigClientProvider";
-import { FormQuestion, QuestionType } from "../../form/form";
+import { FormElement, QuestionType } from "../../form/form";
 import { useNavigate } from "react-router";
 
 export function RecordConfigPage() {
@@ -98,16 +98,16 @@ export function RecordConfigDetail({
     },
   });
 
-  const handleQuestionCreated = (question: FormQuestion) => {
+  const handleQuestionCreated = (question: FormElement) => {
     addQuestionToRecordConfig(config.id, question);
   };
 
   const onSubmit = async (data: QuestionForm) => {
-    const question: FormQuestion = {
+    const question: FormElement = {
       ...data,
       required: true,
       ...(data.type === "select" ? { options: [] } : {}),
-    } as FormQuestion;
+    } as FormElement;
 
     await createRecordConfigQuestion(config.id, question, {
       onQuestionRecordConfigCreated: handleQuestionCreated,
@@ -171,6 +171,7 @@ export function RecordConfigDetail({
 type FormResponse = {
   type: "person" | "property";
   label: string;
+  description: string;
 };
 
 function RecordConfigCreate() {
@@ -212,13 +213,6 @@ function RecordConfigCreate() {
         <DialogContent>
           <form onSubmit={handleSubmit(handleCreate)} className="space-y-4">
             <div className="space-y-1">
-              <Label className="block text-sm font-medium">Nom</Label>
-              <Input
-                placeholder="Ex: Société civile"
-                {...register("label", { required: true })}
-              />
-            </div>
-            <div className="space-y-1">
               <Label className="block text-sm font-medium">Type</Label>
               <Controller
                 name={"type"}
@@ -241,6 +235,20 @@ function RecordConfigCreate() {
                     </SelectContent>
                   </Select>
                 )}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="block text-sm font-medium">Nom</Label>
+              <Input
+                placeholder="Ex: Société civile"
+                {...register("label", { required: true })}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="block text-sm font-medium">Description</Label>
+              <Input
+                placeholder="Ex: Société civile"
+                {...register("description", { required: true })}
               />
             </div>
             <Button type="submit">Créer</Button>
@@ -293,7 +301,7 @@ export function useRecordConfigCreation() {
 }
 
 interface useAddQuestionToRecordConfigOptions {
-  onQuestionRecordConfigCreated: (formQuestion: FormQuestion) => void;
+  onQuestionRecordConfigCreated: (formQuestion: FormElement) => void;
 }
 
 export function useAddQuestionToRecordConfig() {
@@ -301,7 +309,7 @@ export function useAddQuestionToRecordConfig() {
 
   const createRecordConfigQuestion = async (
     configId: string,
-    question: FormQuestion,
+    question: FormElement,
     options: useAddQuestionToRecordConfigOptions
   ) => {
     await client.addQuestionToRecordConfig(configId, question);

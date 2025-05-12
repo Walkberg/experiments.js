@@ -1,5 +1,5 @@
 export type FormType = {
-  questions: FormQuestion[];
+  questions: FormElement[];
 };
 
 export type QuestionType = "string" | "number" | "boolean" | "select" | "user";
@@ -25,7 +25,7 @@ export type SelectQuestion = {
   options: { name: string; value: string }[];
 } & BaseQuestion;
 
-export type FormQuestion =
+export type FormElement =
   | StringQuestion
   | NumberQuestion
   | BooleanQuestion

@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-import { FormQuestion, FormType } from "../../form/form";
-import { RecordConfig, RecordFormConfig } from "../record-configs";
+import { FormElement, FormType } from "../../form/form";
+import { RecordConfig } from "../record-configs";
 
 type RecordType = string;
 
@@ -10,7 +10,7 @@ interface RecordConfigContextValue {
   addRecordConfig: (newConfig: RecordConfig) => void;
   addQuestionToRecordConfig: (
     configId: RecordType,
-    question: FormQuestion
+    question: FormElement
   ) => void;
   removeQuestionFromRecordConfig: (
     configId: RecordType,
@@ -33,7 +33,7 @@ export const RecordConfigProvider = ({ children }: { children: ReactNode }) => {
     },
     addQuestionToRecordConfig: (
       configId: RecordType,
-      question: FormQuestion
+      question: FormElement
     ) => {
       setRecordConfigs((prevConfigs) =>
         prevConfigs.map((config) =>
@@ -113,48 +113,3 @@ export const personnePhysiqueForm: FormType = {
     },
   ],
 };
-
-const personneMoralForm: RecordFormConfig = {
-  questions: [
-    {
-      type: "string",
-      name: "siren",
-      label: "Siren",
-      placeholder: "Siren",
-      required: true,
-    },
-  ],
-};
-
-const bienForm: RecordFormConfig = {
-  questions: [
-    {
-      type: "string",
-      name: "address",
-      label: "Address",
-      placeholder: "Address",
-      required: true,
-    },
-  ],
-};
-
-const recordConfigsInitial: RecordConfig[] = [
-  {
-    id: "personne_physique",
-    label: "Personne physique",
-    type: "person",
-    form: personnePhysiqueForm,
-  },
-  {
-    id: "personne_moral",
-    label: "Personne morale",
-    type: "person",
-    form: personneMoralForm,
-  },
-  {
-    id: "bien",
-    label: "Bien",
-    type: "property",
-    form: bienForm,
-  },
-];

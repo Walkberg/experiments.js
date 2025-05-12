@@ -38,7 +38,7 @@ export const Drive = ({ driveId }: DriveProps) => {
             </div>
             <DropZone id={EMPTY_FOLDER_AREA}>
               <DocumentUploadArea>
-                <Documents DocumentComponent={Document} />
+                <Documents DocumentComponent={Document} filtered={false} />
                 <DocumentAdd />
               </DocumentUploadArea>
             </DropZone>

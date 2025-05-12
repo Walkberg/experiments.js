@@ -25,6 +25,10 @@ import { RecordPage } from "@/modules/mynotary-clone/modules/records/pages/Legal
 import { RecordConfigProvider } from "@/modules/mynotary-clone/modules/records/providers/RecordConfigProvider";
 import { RecordConfigPage } from "@/modules/mynotary-clone/modules/records/pages/RecordConfigPage";
 import { RecordConfigDetailPage } from "@/modules/mynotary-clone/modules/records/pages/RecordConfigDetailPage";
+import {
+  WorkFlowEditor,
+  WorkflowPage,
+} from "@/modules/form-node-editor/WorkflowPage";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +39,7 @@ export const router = createBrowserRouter(
       <Route path="battleground" element={<BattlegroundPage />} />
       <Route path="form" element={<FormPage />} />
       <Route path="dashboard" element={<Cool />} />
+      <Route path="workflows" element={<WorkflowPage />} />
       <Route
         path="mynotary"
         element={

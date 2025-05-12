@@ -70,6 +70,14 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      backgroundImage: {
+        'dot-grid': `
+          radial-gradient(circle, rgba(0,0,0,0.2) 1.2px, transparent 1px)
+        `,
+      },
+      backgroundSize: {
+        'dot-grid': '25px 25px',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

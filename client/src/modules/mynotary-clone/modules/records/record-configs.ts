@@ -1,4 +1,4 @@
-import { FormQuestion, FormType, QuestionType } from "../form/form";
+import { FormElement, FormType, QuestionType } from "../form/form";
 
 export type RecordConfigId = string;
 
@@ -27,7 +27,7 @@ export interface RecordConfigClient {
 
   addQuestionToRecordConfig: (
     configId: RecordConfigId,
-    question: FormQuestion
+    question: FormElement
   ) => Promise<RecordConfig>;
 
   removeQuestionFromRecordConfig: (

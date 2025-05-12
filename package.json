@@ -4,6 +4,8 @@
     "@radix-ui/react-select": "^2.0.0",
     "axios": "^1.6.3",
     "date-fns": "^4.1.0",
-    "dexie": "^4.0.11"
+    "dexie": "^4.0.11",
+    "leader-line": "^1.0.8",
+    "react-xarrows": "^2.0.2"
   }
 }
