@@ -34,16 +34,35 @@ export const WorkFlowEditor = () => {
       id="canvas"
       className="relative w-full h-screen bg-gray-50 overflow-hidden"
     >
-      {/* Grid */}
-      <div className="absolute bg-dot-grid bg-[length:25px_25px] inset-0 bg-grid-pattern pointer-events-none" />
+      <GridRenderer size={GRID_SIZE} />
+      <NodeRender nodes={nodes} />
+      <ConnectionRenderer connections={connections} />
+      <ConnectionPreview />
+    </div>
+  );
+};
+
+export const ConnectionPreview = () => {
+  const {} = useWorkflow();
+
+  return <></>;
+};
+
+export const NodeRender = ({ nodes }: { nodes: ConfigNode[] }) => {
+  return (
+    <>
       {nodes.map((node) => (
         <NodeComponent key={node.id} node={node} />
       ))}
-      <ConnectionRenderer connections={connections} />
-      {/* {connections.map((connection) => (
-        <ConnectionComponent key={connection.id} connection={connection} />
-      ))} */}
-    </div>
+    </>
+  );
+};
+
+export const GridRenderer = ({ size }: { size: number }) => {
+  return (
+    <div
+      className={`absolute bg-dot-grid bg-[length:${size}px_${size}px] inset-0 bg-grid-pattern pointer-events-none`}
+    />
   );
 };
 
@@ -69,26 +88,46 @@ export const NodeComponent: React.FC<Props> = ({ node }) => {
         style={{
           border: selectedNode === node.id ? "3px solid blue" : "none",
         }}
+        className="cursor-pointer hover:bg-gray-100"
         onClick={() => selectNode(node.id)}
       >
-        <div
-          id={`handle-${node.id}-in`}
-          className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-blue-500 rounded-full"
-        />
-        <div
-          id={`handle-${node.id}-out`}
-          className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-green-500 rounded-full"
-        />
+        <Anchor position="left" color="blue" node={node} />
+        <Anchor position="right" color="green" node={node} />
         <CardHeader>
-          <CardTitle>Card Title</CardTitle>
-          <CardDescription>Card Description</CardDescription>
-          <Button>
-            <CrossIcon />
-          </Button>
+          <div className="flex justify-between">
+            <div>
+              <CardTitle>Card Title</CardTitle>
+              <CardDescription>Card Description</CardDescription>
+            </div>
+            <Button>
+              <CrossIcon />
+            </Button>
+          </div>
         </CardHeader>
         Form Node: {node.id}
       </Card>
     </MovableElement>
+  );
+};
+
+export const Anchor = ({
+  node,
+  position,
+  color,
+}: {
+  node: ConfigNode;
+  position: "left" | "right";
+  color: "blue" | "green";
+}) => {
+  return (
+    <div
+      id={`handle-${node.id}-${position === "left" ? "in" : "out"}`}
+      className={`absolute -${
+        position === "left" ? "left" : "right"
+      }-2 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+        color === "blue" ? " bg-blue-500" : "bg-green-500"
+      } rounded-full`}
+    />
   );
 };
 
