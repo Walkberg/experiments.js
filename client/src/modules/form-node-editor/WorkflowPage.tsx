@@ -91,8 +91,8 @@ export const NodeComponent: React.FC<Props> = ({ node }) => {
         className="cursor-pointer hover:bg-gray-100"
         onClick={() => selectNode(node.id)}
       >
-        <Anchor position="left" color="blue" node={node} />
-        <Anchor position="right" color="green" node={node} />
+        <Anchor position="left" node={node} />
+        <Anchor position="right" node={node} />
         <CardHeader>
           <div className="flex justify-between">
             <div>
@@ -110,23 +110,32 @@ export const NodeComponent: React.FC<Props> = ({ node }) => {
   );
 };
 
+export const config: Record<
+  "left" | "right",
+  { color: string; position: "left" | "right" }
+> = {
+  left: {
+    color: "bg-blue-500",
+    position: "left",
+  },
+  right: {
+    color: "bg-green-500",
+    position: "right",
+  },
+};
+
 export const Anchor = ({
   node,
   position,
-  color,
 }: {
   node: ConfigNode;
   position: "left" | "right";
-  color: "blue" | "green";
 }) => {
+  const { color, position: nodePosition } = config[position];
   return (
     <div
       id={`handle-${node.id}-${position === "left" ? "in" : "out"}`}
-      className={`absolute -${
-        position === "left" ? "left" : "right"
-      }-2 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-        color === "blue" ? " bg-blue-500" : "bg-green-500"
-      } rounded-full`}
+      className={`absolute -${nodePosition}-2 top-1/2 transform -translate-y-1/2 w-4 h-4 ${color} rounded-full`}
     />
   );
 };
